@@ -1,0 +1,36 @@
+{
+  "author": "Manelisi Mpotulo",
+  "bugs": {
+    "url": "https://github.com/celo-org/celo-composer/issues"
+  },
+  "description": "Custom Celo Composer project.",
+  "homepage": "https://github.com/celo-org/celo-composer/blob/main/README.md",
+  "keywords": [
+    "celo-composer",
+    "celo"
+  ],
+  "license": "MIT",
+  "name": "taxicityapp",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/celo-org/celo-composer.git"
+  },
+  "scripts": {
+    "react-app:dev": "yarn workspace @taxicityapp/react-app dev",
+    "react-app:build": "yarn workspace @taxicityapp/react-app build",
+    "react-app:start": "yarn workspace @taxicityapp/react-app start",
+    "react-app:lint": "yarn workspace @taxicityapp/react-app lint",
+    "hardhat:compile": "yarn workspace @taxicityapp/hardhat compile",
+    "hardhat:tsc": "yarn workspace @taxicityapp/hardhat tsc",
+    "hardhat:build": "yarn workspace @taxicityapp/hardhat build",
+    "hardhat:clean": "yarn workspace @taxicityapp/hardhat clean",
+    "hardhat:run:node": "yarn workspace @taxicityapp/hardhat run:node",
+    "hardhat:test": "yarn workspace @taxicityapp/hardhat test",
+    "hardhat:prettier": "yarn workspace @taxicityapp/hardhat prettier"
+  },
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ]
+}
