@@ -1,3 +1,66 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* styles/colors.css */
+
+/* Color Palette */
+:root {
+  --prim-color: #001f3f; /* Bright Primary Color */
+  --sec-color: #634aa3; /* Purple Secondary Color */
+  --accent-color: #bc74f7; /* Pink Accent Color */
+  --bg-color: #ffffff; /* Bright Background Color */
+  --neutral-color: #a0a7af; /* Bright Neutral Color */
+  --font-color: #ffffff; /* Font Color */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Example Usage */
+body {
+  background-color: var(--bg-color);
+  color: var(--prim-color);
+}
+
+main {
+  min-height: 82vh;
+}
+
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  color: #ffffff;
+  background-color: var(--prim-color);
+}
+
+button:active {
+  translate: translateY(2px) !important;
+}
+
+.button {
+  background-color: var(--sec-color);
+  color: #ffffff;
+}
+
+.button:hover {
+  background-color: var(--accent-color);
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid var(--neutral-color);
+}
+
+a {
+  color: var(--accent-color);
+}
+
+footer {
+  background-color: var(--prim-color);
+  color: #ffffff;
+}

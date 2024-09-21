@@ -9,6 +9,8 @@ import { WagmiProvider, createConfig, http } from 'wagmi';
 import { celo, celoAlfajores } from 'wagmi/chains';
 import Layout from '../components/Layout';
 import '../styles/globals.css';
+import '../styles/header.css';
+import '../styles/footer.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 

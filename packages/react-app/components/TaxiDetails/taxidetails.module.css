@@ -1,0 +1,46 @@
+.TaxiDetailsPopUp {
+	display: flex;
+	position: fixed;
+	flex-direction: column;
+	z-index: 2;
+	background-color: var(--bg-color);
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	min-width: 250px;
+	border-radius: 10px;
+	padding: 10px 20px;
+	box-shadow: 2px 2px 10px 0px rgba(0, 0, 0, 0.4);
+	gap: 20px;
+}
+
+.TaxiDetailsPopUpInfo {
+	display: flex;
+	flex-direction: column;
+	border-top: 1px solid var(--neutral-color);
+	padding: 5px 0;
+}
+
+.TaxiDetailsPopUpInfoRow {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	min-height: 30px;
+	gap: 0 10px;
+}
+
+.TaxiDetailsPopUpInfoRow span {
+	border-right: 1px solid var(--neutral-color);
+	width: 100px;
+	font-weight: bold;
+}
+
+.TaxiDetailsPopUpInfoRow p {
+	width: 100%;
+	text-align: left;
+}
+
+.TaxiDetailsPopUpButtons {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}

@@ -1,0 +1,148 @@
+.rankLocatorHeader {
+  background-color: var(--sec-color);
+  color: var(--font-color);
+  display: none;
+  padding: 10px 20px;
+}
+
+.rankLocator {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  min-height: 300px;
+  padding: 20px;
+  width: 100%;
+}
+
+.rankLocatorForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 20px;
+  max-width: 300px;
+}
+
+.rankLocatorForm .formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rankLocatorForm label {
+  font-weight: bold;
+  font-size: 19px;
+}
+
+.rankLocatorForm .select {
+  padding: 10px 10px;
+  font-size: 19px;
+  box-shadow: 2px 2px 4px var(--prim-color);
+  border-radius: 5px;
+  color: var(--prim-color);
+  min-width: 250px;
+}
+
+.rankLocatorForm .select:focus {
+  outline: none;
+  box-shadow: 2px 2px 4px var(--sec-color);
+}
+
+.rankLocatorForm select option {
+  color: var(--font-color);
+  background-color: var(--prim-color);
+  border-radius: 10px;
+}
+
+.rankLocatorForm select option:hover,
+.rankLocatorForm select option:focus {
+  background-color: var(--sec-color) !important;
+}
+
+.rankLocatorForm button {
+  padding: 10px;
+  font-size: 19px;
+  border: none;
+  border-radius: 5px;
+  color: var(--font-color);
+  background-color: var(--prim-color);
+  margin-top: 20px;
+}
+
+.rankLocatorForm button:hover {
+  background-color: var(--sec-color);
+}
+
+.rankLocatorMap {
+  min-width: 250px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.availableTaxis {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / -1;
+  gap: 10px;
+  padding: 20px;
+  min-width: 100%;
+  width: fit-content;
+  max-width: calc(90% - 40px);
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.availableTaxis::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.availableTaxis::-webkit-scrollbar-thumb {
+  background-color: var(--sec-color);
+  border-radius: 10px;
+}
+
+.availableTaxis::-webkit-scrollbar-track {
+  background-color: var(--bg-color);
+}
+
+.availableTaxis::-webkit-scrollbar-thumb:hover {
+  background-color: var(--font-color);
+}
+
+.availableTaxis::-webkit-scrollbar-thumb:active {
+  background-color: var(--sec-color);
+}
+
+.availableTaxis h2 {
+  font-size: 24px;
+}
+
+.availableTaxis table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.availableTaxis th {
+  background-color: var(--sec-color);
+  color: var(--font-color);
+  padding: 10px;
+}
+
+.availableTaxis td {
+  padding: 5px 10px;
+  text-wrap: nowrap;
+}
+
+.availableTaxis tr:nth-child(even) {
+  background-color: var(--neutral-color);
+}
+
+.availableTaxis tr:nth-child(odd) {
+  background-color: var(--bg-color);
+}
+
+.availableTaxis tr:hover {
+  background-color: var(--font-color);
+  color: var(--sec-color);
+}
