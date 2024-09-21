@@ -17,6 +17,7 @@
     "url": "git+https://github.com/celo-org/celo-composer.git"
   },
   "scripts": {
+    "vercel-build": "npm install --legacy-peer-deps && next build",
     "react-app:dev": "yarn workspace @taxicityapp/react-app dev",
     "react-app:build": "yarn workspace @taxicityapp/react-app build",
     "react-app:start": "yarn workspace @taxicityapp/react-app start",
