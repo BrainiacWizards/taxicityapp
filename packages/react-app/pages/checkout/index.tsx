@@ -67,7 +67,12 @@ const Checkout: React.FC = () => {
 
   return (
     <div className={styles.checkoutContainer}>
-      {showPaymentModal && <PayModal TaxiData={taxiData} />}
+      {showPaymentModal && (
+        <PayModal
+          TaxiData={taxiData}
+          setShowPaymentModal={setShowPaymentModal}
+        />
+      )}
       <div className={styles.tripDetailsContainer}>
         <TaxiDetails
           TaxiData={taxiData}

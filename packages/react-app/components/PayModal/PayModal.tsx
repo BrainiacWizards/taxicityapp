@@ -1,8 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { iTaxiData } from '@/models/RankMapModels';
 import styles from './paymodal.module.css';
 
-const PayModal: React.FC<{ TaxiData: iTaxiData }> = ({ TaxiData }) => {
+interface iPayModal {
+  TaxiData: iTaxiData;
+  setShowPaymentModal: Dispatch<SetStateAction<boolean>>;
+}
+
+const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const [paymentStatus, setPaymentStatus] = useState<
     'pending' | 'successful' | 'error'
   >('pending');
@@ -20,20 +31,31 @@ const PayModal: React.FC<{ TaxiData: iTaxiData }> = ({ TaxiData }) => {
       setPaymentLog((prevLog) => `${prevLog}\n${message}`);
     };
 
+    // INITIALIZE
     setPaymentLog('Payment initiated...');
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    // PENDING
     if (isCancelled) {
       logPayment('error', 'Transaction Cancelled');
       return;
     }
     logPayment('pending', 'Payment is pending...');
-
     await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    // ERROR
     if (isCancelled) {
       logPayment('error', 'Transaction Cancelled');
       return;
     }
-    // logPayment('successful', 'Payment was successful!');
+    logPayment('error', 'An error occurred...');
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
+    // SUCCESS
+    if (isCancelled) {
+      logPayment('error', 'Transaction Cancelled');
+      return;
+    }
+    logPayment('successful', 'Payment was successful!');
   };
 
   useEffect(() => {
@@ -67,6 +89,10 @@ const PayModal: React.FC<{ TaxiData: iTaxiData }> = ({ TaxiData }) => {
     setPaymentLog((prevLog) => `${prevLog}\nPayment was cancelled.`);
   };
 
+  const handleContinue = () => {
+    setShowPaymentModal(false);
+  };
+
   const renderStatusIcon = () => {
     switch (paymentStatus) {
       case 'pending':
@@ -96,7 +122,7 @@ const PayModal: React.FC<{ TaxiData: iTaxiData }> = ({ TaxiData }) => {
           </>
         );
       case 'successful':
-        return <button>Continue</button>;
+        return <button onClick={handleContinue}>Continue</button>;
       case 'pending':
         return <button onClick={handleCancel}>Cancel</button>;
       default:
@@ -114,7 +140,7 @@ const PayModal: React.FC<{ TaxiData: iTaxiData }> = ({ TaxiData }) => {
         </div>
         <div className={styles.paymentInfo} ref={paymentInfoRef}>
           {paymentLog.split('\n').map((log, index) => (
-            <p key={index}>{log}</p>
+            <p key={index}>:{log}</p>
           ))}
         </div>
         <div className={styles.paymentActions}>{renderActions()}</div>
