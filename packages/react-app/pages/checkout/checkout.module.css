@@ -1,0 +1,62 @@
+.checkoutContainer {
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.accessCodeContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  width: 100%;
+}
+
+.accessCodeContainer h2 {
+  font-weight: bold;
+  width: 100%;
+  text-align: center;
+  color: var(--prim-color);
+}
+
+.accessCodeContainer input {
+  color: var(--neutral-color);
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 20px;
+  box-shadow: 2px 2px 3px 0 var(--neutral-color);
+}
+
+.accessCodeContainer button {
+  width: calc(100% - 20px);
+}
+
+.accessCodeContainer .accessCodeForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.accessCodeContainer .codeError {
+  width: 100%;
+  text-align: center;
+}
+
+.QrScanner {
+  background-color: var(--neutral-color);
+  padding: 10px;
+  max-width: calc(100% - 20px);
+}
+
+.QrReader {
+  display: none;
+}
+
+.tripDetailsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

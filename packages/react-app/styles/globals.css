@@ -23,8 +23,7 @@
 body {
   background-color: var(--bg-color);
   color: var(--prim-color);
-  width: 100vw;
-  overflow-x: hidden;
+  width: 100%;
 }
 
 main {
@@ -34,7 +33,7 @@ main {
 button {
   padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 10px;
   color: #ffffff;
   background-color: var(--prim-color);
 }

@@ -11,13 +11,18 @@ import {
   FaQuestionCircle,
   FaEnvelope,
   FaHome,
+  FaTimes,
 } from 'react-icons/fa';
 import Link from 'next/link';
 
 export default function Header() {
   const [hideConnectBtn, setHideConnectBtn] = useState(false);
-  const [showLinks, setShowLinks] = useState(() => window.innerWidth > 800);
+  const [showLinks, setShowLinks] = useState(false);
   const { connect } = useConnect();
+
+  useEffect(() => {
+    setShowLinks(window.innerWidth > 800);
+  }, []);
 
   useEffect(() => {
     if (window.ethereum && window.ethereum.isMiniPay) {
@@ -69,7 +74,11 @@ export default function Header() {
             className="dropdownBtn"
             onClick={() => setShowLinks(!showLinks)}
           >
-            <Bars3Icon aria-hidden="true" />
+            {showLinks ? (
+              <FaTimes aria-hidden="true" />
+            ) : (
+              <Bars3Icon aria-hidden="true" />
+            )}
           </button>
         </ul>
         {showLinks && (
