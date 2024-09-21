@@ -4,9 +4,9 @@ import styles from './checkout.module.css';
 import { iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
 import Divider from '@/components/Divider/Divider';
-import { useConnect } from 'wagmi';
-import { injected } from 'wagmi/connectors';
+import { useConnect, useAccount } from 'wagmi';
 import PayModal from '@/components/PayModal/PayModal';
+import { injected } from '@wagmi/connectors';
 
 const dummyTaxiData: iTaxiData = {
   capacity: 0,
@@ -25,8 +25,10 @@ const Checkout: React.FC = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [taxiData, setTaxiData] = useState<iTaxiData>(dummyTaxiData);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const code = 'ABC1235';
   const { connect } = useConnect();
+  const { isConnected } = useAccount();
 
   useEffect(() => {
     if (accessCode.trim() === '') {
@@ -47,6 +49,10 @@ const Checkout: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    setIsWalletConnected(isConnected);
+  }, [isConnected]);
+
   const handleAccessCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAccessCode(e.target.value);
   };
@@ -62,6 +68,10 @@ const Checkout: React.FC = () => {
   }
 
   const payForTrip = () => {
+    if (!isWalletConnected) {
+      alert('Please connect your wallet first.');
+      return;
+    }
     setShowPaymentModal(true);
   };
 
@@ -99,7 +109,19 @@ const Checkout: React.FC = () => {
           <QRCodeScanner onScan={handleScan} styles={styles} />
         </div>
       ) : (
-        <button onClick={payForTrip}>Pay with Wallet</button>
+        <>
+          {!isWalletConnected ? (
+            <button
+              onClick={() =>
+                connect({ connector: injected({ target: 'metaMask' }) })
+              }
+            >
+              Connect Wallet
+            </button>
+          ) : (
+            <button onClick={payForTrip}>Pay with Wallet</button>
+          )}
+        </>
       )}
     </div>
   );
