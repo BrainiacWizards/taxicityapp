@@ -5,6 +5,7 @@ import { iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
 import Divider from '@/components/Divider/Divider';
 import { useConnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
 
 const dummyTaxiData: iTaxiData = {
   capacity: 0,
@@ -23,6 +24,7 @@ const Checkout: React.FC = () => {
   const [isMounted, setIsMounted] = useState(false);
   const [taxiData, setTaxiData] = useState<iTaxiData>(dummyTaxiData);
   const code = 'ABC1235';
+  const { connect } = useConnect();
 
   useEffect(() => {
     if (accessCode.trim() === '') {

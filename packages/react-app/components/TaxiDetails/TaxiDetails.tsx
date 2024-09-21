@@ -14,9 +14,9 @@ const TaxiDetails: React.FC<{
 
   let clsName = '';
   if (type === 'fitted') {
-    clsName == 'TaxiDetails';
+    clsName = 'TaxiDetails';
   } else {
-    clsName == 'TaxiDetailsPopUp';
+    clsName = 'TaxiDetailsPopUp';
   }
 
   const storeTripOnLocal = () => {
@@ -64,7 +64,7 @@ const TaxiDetails: React.FC<{
           </div>
         </div>
 
-        {type == 'pop-up' && (
+        {type == 'popup' && (
           <div className={styles.TaxiDetailsPopUpButtons}>
             <button
               onClick={() => {

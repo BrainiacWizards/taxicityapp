@@ -1,9 +1,21 @@
 import {
   RainbowKitProvider,
   connectorsForWallets,
+  darkTheme,
+  lightTheme,
+  midnightTheme,
 } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
-import { injectedWallet } from '@rainbow-me/rainbowkit/wallets';
+import {
+  binanceWallet,
+  braveWallet,
+  coinbaseWallet,
+  injectedWallet,
+  metaMaskWallet,
+  rainbowWallet,
+  valoraWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 import type { AppProps } from 'next/app';
 import { WagmiProvider, createConfig, http } from 'wagmi';
 import { celo, celoAlfajores } from 'wagmi/chains';
@@ -13,12 +25,22 @@ import '../styles/header.css';
 import '../styles/footer.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { baseTheme } from '@rainbow-me/rainbowkit/dist/themes/baseTheme';
 
 const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended',
-      wallets: [injectedWallet],
+      wallets: [
+        injectedWallet,
+        metaMaskWallet,
+        valoraWallet,
+        coinbaseWallet,
+        rainbowWallet,
+        walletConnectWallet,
+        binanceWallet,
+        braveWallet,
+      ],
     },
   ],
   {
@@ -42,7 +64,14 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider
+          coolMode
+          theme={midnightTheme({
+            accentColor: '#bc74f7',
+            borderRadius: 'large',
+            overlayBlur: 'small',
+          })}
+        >
           <Layout>
             <Component {...pageProps} />
           </Layout>

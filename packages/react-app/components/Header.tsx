@@ -1,5 +1,4 @@
 import { Bars3Icon } from '@heroicons/react/24/outline';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from 'react';
 import { useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
