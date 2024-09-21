@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "vercel-build": "npm install --legacy-peer-deps && next build",
-    "build": "next build",
+    "vercel-build": "npm install $NPM_FLAGS && next build",
     "start": "next start",
     "lint": "next lint"
   },
