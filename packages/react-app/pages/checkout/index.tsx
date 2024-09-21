@@ -6,6 +6,7 @@ import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
 import Divider from '@/components/Divider/Divider';
 import { useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
+import PayModal from '@/components/PayModal/PayModal';
 
 const dummyTaxiData: iTaxiData = {
   capacity: 0,
@@ -23,6 +24,7 @@ const Checkout: React.FC = () => {
   const [isCodeEntered, setIsCodeEntered] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [taxiData, setTaxiData] = useState<iTaxiData>(dummyTaxiData);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const code = 'ABC1235';
   const { connect } = useConnect();
 
@@ -59,10 +61,13 @@ const Checkout: React.FC = () => {
     return null;
   }
 
-  const payForTrip = () => {};
+  const payForTrip = () => {
+    setShowPaymentModal(true);
+  };
 
   return (
     <div className={styles.checkoutContainer}>
+      {showPaymentModal && <PayModal TaxiData={taxiData} />}
       <div className={styles.tripDetailsContainer}>
         <TaxiDetails
           TaxiData={taxiData}
@@ -89,7 +94,7 @@ const Checkout: React.FC = () => {
           <QRCodeScanner onScan={handleScan} styles={styles} />
         </div>
       ) : (
-        <button>Pay with Wallet</button>
+        <button onClick={payForTrip}>Pay with Wallet</button>
       )}
     </div>
   );
