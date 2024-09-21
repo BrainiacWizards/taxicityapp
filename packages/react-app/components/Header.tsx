@@ -14,6 +14,7 @@ import {
   FaTimes,
 } from 'react-icons/fa';
 import Link from 'next/link';
+import CustomConnectButton from './CustomConnectBtn/CustomConnectBtn';
 
 export default function Header() {
   const [hideConnectBtn, setHideConnectBtn] = useState(false);
@@ -94,17 +95,7 @@ export default function Header() {
         )}
         <div className="user-actions">
           <div className="wallet-address">
-            {!hideConnectBtn && (
-              <ConnectButton
-                label="Login"
-                showBalance={{
-                  smallScreen: true,
-                  largeScreen: false,
-                }}
-                chainStatus="icon"
-                accountStatus="avatar"
-              />
-            )}
+            {!hideConnectBtn && <CustomConnectButton />}
           </div>
         </div>
       </nav>

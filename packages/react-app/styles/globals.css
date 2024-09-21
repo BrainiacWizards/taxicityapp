@@ -38,6 +38,11 @@ button {
   background-color: var(--prim-color);
 }
 
+button:hover,
+button:focus {
+  background-color: var(--accent-color);
+}
+
 button:active {
   translate: translateY(2px) !important;
 }
