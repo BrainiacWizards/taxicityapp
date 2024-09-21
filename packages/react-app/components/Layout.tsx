@@ -27,13 +27,11 @@ interface Props {
 }
 const Layout: FC<Props> = ({ children }) => {
   return (
-    <html lang="en">
-      <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
-      </body>
-    </html>
+    <>
+      <Header />
+      <main>{children}</main>
+      <Footer />
+    </>
   );
 };
 

@@ -7,13 +7,6 @@ const Footer: React.FC = () => {
   return (
     <footer>
       <div className="footer-content">
-        <div className="footer-links">
-          <Link href="/about">About Us</Link>
-          <Link href="/faq">FAQ</Link>
-          <Link href="/contact">Contact</Link>
-          <Link href="/terms">Terms of Service</Link>
-          <Link href="/privacy">Privacy Policy</Link>
-        </div>
         <div className="social-icons">
           <a href="#" target="_blank" rel="noopener noreferrer">
             <FaFacebook />

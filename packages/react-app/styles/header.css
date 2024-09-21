@@ -4,6 +4,8 @@ header {
   background-color: var(--prim-color);
   color: var(--font-color);
   padding-bottom: 10px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .top-navbar {
@@ -39,6 +41,25 @@ header {
   margin: 0 auto;
   border-radius: 10px;
   font-size: 18px;
+}
+
+.main-navbar .dropdown {
+  display: none;
+}
+
+.main-navbar .dropdown .dropdownBtn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50px;
+  aspect-ratio: 1/1;
+  color: var(--prim-color);
+  background-color: transparent;
+}
+
+.main-navbar .dropdown .dropdownBtn:hover {
+  background-color: var(--prim-color);
+  color: var(--font-color);
 }
 
 .logo a {
@@ -104,4 +125,53 @@ header {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+@media screen and (max-width: 800px) {
+  header {
+    max-height: 120px;
+    overflow: visible;
+    max-width: 96vw;
+  }
+
+  .main-navbar {
+    max-width: calc(98% - 40px);
+    overflow: visible;
+    max-height: 50px;
+    align-items: flex-start;
+    z-index: 5;
+    position: relative;
+    padding: 0;
+    margin: 0 auto;
+    padding-right: 10px;
+  }
+
+  .main-navbar .dropdown {
+    display: flex;
+  }
+
+  .main-navbar .nav-links {
+    position: absolute;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    gap: 0;
+    margin-top: 60px;
+    width: 100%;
+    height: fit-content;
+    z-index: 10;
+    border-radius: 0 0 10px 10px;
+    background-color: var(--bg-color);
+  }
+
+  .main-navbar .nav-links li {
+    margin: 0;
+    height: 50px;
+    border-radius: 0;
+    width: 100%;
+  }
+
+  .main-navbar .user-actions {
+    margin: auto 0;
+  }
 }

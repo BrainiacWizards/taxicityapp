@@ -84,12 +84,13 @@
   flex-direction: column;
   grid-column: 1 / -1;
   gap: 10px;
-  padding: 20px;
-  min-width: 100%;
+  padding: 20px 0;
+  min-width: calc(100% - 40px);
+  max-width: calc(100% - 40px);
   width: fit-content;
-  max-width: calc(90% - 40px);
   max-height: 450px;
   overflow-y: auto;
+  margin: 0 auto;
 }
 
 .availableTaxis::-webkit-scrollbar {
@@ -145,4 +146,26 @@
 .availableTaxis tr:hover {
   background-color: var(--font-color);
   color: var(--sec-color);
+}
+
+@media screen and (max-width: 600px) {
+  .rankLocator {
+    grid-template-columns: 1fr;
+  }
+
+  .rankLocatorForm {
+    max-width: calc(100% - 10px);
+    min-width: calc(100% - 10px);
+    padding: 0;
+    margin-top: auto;
+  }
+
+  .rankLocatorForm .select {
+    max-width: 100%;
+    min-width: 100%;
+  }
+
+  .rankLocatorMap {
+    min-width: 100%;
+  }
 }

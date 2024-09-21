@@ -1,7 +1,5 @@
-import { Disclosure } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon } from '@heroicons/react/24/outline';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
@@ -9,7 +7,6 @@ import {
   FaFacebook,
   FaTwitter,
   FaInstagram,
-  FaInfoCircle,
   FaCog,
   FaQuestionCircle,
   FaEnvelope,
@@ -19,6 +16,7 @@ import Link from 'next/link';
 
 export default function Header() {
   const [hideConnectBtn, setHideConnectBtn] = useState(false);
+  const [showLinks, setShowLinks] = useState(() => window.innerWidth > 800);
   const { connect } = useConnect();
 
   useEffect(() => {
@@ -26,62 +24,76 @@ export default function Header() {
       setHideConnectBtn(true);
       connect({ connector: injected({ target: 'metaMask' }) });
     }
-  }, []);
+
+    const handleResize = () => setShowLinks(window.innerWidth > 800);
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [connect]);
+
+  const navLinks = [
+    { href: '/', icon: <FaHome />, label: 'Home' },
+    { href: '/how-it-works', icon: <FaCog />, label: 'Help' },
+    { href: '/faq', icon: <FaQuestionCircle />, label: 'FAQ' },
+    { href: '/contact', icon: <FaEnvelope />, label: 'Contact' },
+  ];
+
+  const socialPlatforms = [
+    { name: 'facebook', icon: <FaFacebook /> },
+    { name: 'twitter', icon: <FaTwitter /> },
+    { name: 'instagram', icon: <FaInstagram /> },
+  ];
 
   return (
     <header>
       <div className="top-navbar">
         <div className="social-icons">
-          <a href="#" target="_blank" rel="noopener noreferrer">
-            <FaFacebook />
-          </a>
-          <a href="#" target="_blank" rel="noopener noreferrer">
-            <FaTwitter />
-          </a>
-          <a href="#" target="_blank" rel="noopener noreferrer">
-            <FaInstagram />
-          </a>
+          {socialPlatforms.map((platform) => (
+            <a
+              key={platform.name}
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {platform.icon}
+            </a>
+          ))}
         </div>
         <div className="logo">
           <Link href="/">Taxi City</Link>
         </div>
       </div>
       <nav className="main-navbar">
-        <ul className="nav-links">
-          <li>
-            <Link href="/">
-              <FaHome /> Home
-            </Link>
-          </li>
-          <li>
-            <Link href="/about">
-              <FaInfoCircle /> About
-            </Link>
-          </li>
-          <li>
-            <Link href="/how-it-works">
-              <FaCog /> How It Works
-            </Link>
-          </li>
-          <li>
-            <Link href="/faq">
-              <FaQuestionCircle /> FAQ
-            </Link>
-          </li>
-          <li>
-            <Link href="/contact">
-              <FaEnvelope /> Contact
-            </Link>
-          </li>
+        <ul className="dropdown">
+          <button
+            className="dropdownBtn"
+            onClick={() => setShowLinks(!showLinks)}
+          >
+            <Bars3Icon aria-hidden="true" />
+          </button>
         </ul>
+        {showLinks && (
+          <ul className="nav-links">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href}>
+                  {link.icon} {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
         <div className="user-actions">
           <div className="wallet-address">
             {!hideConnectBtn && (
               <ConnectButton
+                label="Login"
                 showBalance={{
                   smallScreen: true,
                   largeScreen: false,
                 }}
+                chainStatus="icon"
+                accountStatus="avatar"
               />
             )}
           </div>

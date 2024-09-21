@@ -20,10 +20,11 @@
   box-sizing: border-box;
 }
 
-/* Example Usage */
 body {
   background-color: var(--bg-color);
   color: var(--prim-color);
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 main {
