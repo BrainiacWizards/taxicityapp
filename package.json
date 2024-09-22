@@ -34,7 +34,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "modern-react-qr-reader": "^1.0.12",
     "taxicityapp": "file:"
   }
 }
