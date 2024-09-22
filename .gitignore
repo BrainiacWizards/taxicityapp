@@ -42,3 +42,6 @@ PROPOSAL.md
 package-lock.json
 yarn.lock
 .vercel
+
+# ENVIROMENTS
+.env*
