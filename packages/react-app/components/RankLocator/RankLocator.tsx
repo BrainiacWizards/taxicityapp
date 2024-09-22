@@ -7,6 +7,7 @@ import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 import TaxiDetails from '../TaxiDetails/TaxiDetails';
+import Divider from '../Divider/Divider';
 
 const RankLocator: React.FC = () => {
   const [filteredRanks, setFilteredRanks] = useState<iRank[]>([]);
@@ -161,6 +162,8 @@ const RankLocator: React.FC = () => {
           <GoogleMap locations={filteredRanks} />
         </div>
       </div>
+
+      <Divider />
 
       <div className={styles.availableTaxis}>
         <h2>Available Taxis</h2>

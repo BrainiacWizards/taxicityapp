@@ -11,7 +11,8 @@
   gap: 20px;
   min-height: 300px;
   padding: 20px;
-  width: 100%;
+  width: calc(100% - 40px);
+  margin: 0 auto;
 }
 
 .rankLocatorForm {
@@ -84,13 +85,14 @@
   flex-direction: column;
   grid-column: 1 / -1;
   gap: 10px;
-  padding: 20px 0;
-  min-width: calc(100% - 40px);
-  max-width: calc(100% - 40px);
+  padding: 0px 10px;
+  min-width: calc(90% - 0px);
+  max-width: calc(90% - 0px);
   width: fit-content;
-  max-height: 450px;
+  max-height: 650px;
   overflow-y: auto;
-  margin: 0 auto;
+  margin: 50px auto;
+  scroll-margin: 20px;
 }
 
 .availableTaxis::-webkit-scrollbar {

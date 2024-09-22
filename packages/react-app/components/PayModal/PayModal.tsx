@@ -13,7 +13,6 @@ import Image from 'next/image';
 import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'ethers/lib/utils';
 import { FaCheckDouble, FaCopy } from 'react-icons/fa';
-import { ethers } from 'ethers';
 
 interface iPayModal {
   TaxiData: iTaxiData;
@@ -48,26 +47,21 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     useWaitForTransactionReceipt({ hash });
 
   const to = '0x0717329C677ab484EAA73F4C8EEd92A2FA948746';
-  // const value = useMemo(() => TaxiData.price.toString(), [TaxiData.price]);
   const value = '1.2';
 
   const initiatePayment = useCallback(() => {
-    if (!paymentInfoRef.current) {
+    if (!paymentInfoRef.current || isPending || isConfirming) {
       return null;
     }
     setPaymentLog('Payment initiated...');
     sendTransaction({
       to,
+      value: parseEther(value).toBigInt(),
       data: '0x0717329c677ab484eaa73f4c8eed92a2fa948746',
     });
-  }, [sendTransaction, to, value]);
+  }, [isPending, isConfirming]);
 
   useEffect(() => {
-    if (isCancelled) {
-      logPayment('error', 'Transaction Cancelled');
-      return;
-    }
-
     if (isConfirmed) {
       logPayment('successful', 'Payment successful');
     } else if (isPending) {
@@ -79,7 +73,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     if (error) {
       logPayment('error', error.message);
     }
-  }, [isPending, isConfirmed, isConfirming, isCancelled, error, logPayment]);
+  }, [isPending, isConfirmed, isConfirming, error, logPayment]);
 
   useEffect(() => {
     if (retry) {
@@ -91,7 +85,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     } else {
       initiatePayment();
     }
-  }, [retry, initiatePayment]);
+  }, [retry]);
 
   useEffect(() => {
     if (paymentInfoRef.current) {
@@ -107,11 +101,10 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, []);
 
   const handleCancel = useCallback(() => {
-    setIsCancelled(true);
     setPaymentStatus('error');
     setPaymentLog((prevLog) => `${prevLog}\nPayment was cancelled.`);
     setShowPaymentModal(false);
-  }, []);
+  }, [setShowPaymentModal]);
 
   const handleContinue = useCallback(() => {
     setShowPaymentModal(false);
