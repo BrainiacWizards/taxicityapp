@@ -1,6 +1,6 @@
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
-import { useAccount, useConnect, useEnsName } from 'wagmi';
+import { useConnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import {
   FaFacebook,
@@ -14,13 +14,11 @@ import {
 } from 'react-icons/fa';
 import Link from 'next/link';
 import CustomConnectButton from './CustomConnectBtn/CustomConnectBtn';
-import { config } from '@/lib/config';
 
 export default function Header() {
   const [hideConnectBtn, setHideConnectBtn] = useState(false);
   const [showLinks, setShowLinks] = useState(false);
-  const { address } = useAccount();
-  const { data, status } = useEnsName({ address });
+
   const { connect } = useConnect();
 
   useEffect(() => {
@@ -97,15 +95,7 @@ export default function Header() {
         )}
         <div className="user-actions">
           <div className="wallet-address">
-            {!hideConnectBtn ? (
-              <CustomConnectButton />
-            ) : status === 'pending' ? (
-              <button>...</button>
-            ) : status === 'error' ? (
-              <button>!!!</button>
-            ) : (
-              <button>{data}</button>
-            )}
+            {!hideConnectBtn ? <CustomConnectButton /> : <span>Welcome</span>}
           </div>
         </div>
       </nav>
