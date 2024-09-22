@@ -50,16 +50,13 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const value = '1.2';
 
   const initiatePayment = useCallback(() => {
-    if (!paymentInfoRef.current || isPending || isConfirming) {
-      return null;
-    }
     setPaymentLog('Payment initiated...');
     sendTransaction({
       to,
       value: parseEther(value).toBigInt(),
       data: '0x0717329c677ab484eaa73f4c8eed92a2fa948746',
     });
-  }, [isPending, isConfirming]);
+  }, []);
 
   useEffect(() => {
     if (isConfirmed) {
@@ -161,26 +158,26 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
       case 'error':
         return (
           <>
-            <button onClick={handleCancel}>Cancel</button>
-            <button onClick={handleCopy} className={styles.copyButton}>
+            <button onClick={() => handleCancel()}>Cancel</button>
+            <button onClick={() => handleCopy()} className={styles.copyButton}>
               {copyIcon}
             </button>
-            <button onClick={handleRetry}>Retry</button>
+            <button onClick={() => handleRetry()}>Retry</button>
           </>
         );
       case 'successful':
         return (
           <>
-            <button onClick={handleCopy} className={styles.copyButton}>
+            <button onClick={() => handleCopy()} className={styles.copyButton}>
               <FaCopy size={24} />
             </button>
-            <button onClick={handleContinue}>Continue</button>
+            <button onClick={() => handleContinue()}>Continue</button>
           </>
         );
       case 'pending':
         return (
           <>
-            <button onClick={handleCopy} className={styles.copyButton}>
+            <button onClick={() => handleCopy()} className={styles.copyButton}>
               <FaCopy size={24} />
             </button>
             <button onClick={handleCancel}>Cancel</button>
