@@ -38,8 +38,7 @@ button {
   background-color: var(--prim-color);
 }
 
-button:hover,
-button:focus {
+button:hover {
   background-color: var(--accent-color);
 }
 

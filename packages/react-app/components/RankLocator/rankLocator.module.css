@@ -148,6 +148,16 @@
   color: var(--sec-color);
 }
 
+.buttonGroup {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.buttonGroup button {
+  min-width: 50px;
+}
+
 @media screen and (max-width: 600px) {
   .rankLocator {
     grid-template-columns: 1fr;

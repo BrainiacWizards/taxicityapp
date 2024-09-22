@@ -134,10 +134,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     <div className={styles.payModalContainer}>
       <div className={styles.payModal}>
         <h2>Price: {TaxiData.price} Celo</h2>
-        <div className={styles.paymentStatus}>
-          {renderStatusIcon()}
-          <p>Status: {paymentStatus}</p>
-        </div>
+        <div className={styles.paymentStatus}>{renderStatusIcon()}</div>
         <div className={styles.paymentInfo} ref={paymentInfoRef}>
           {paymentLog.split('\n').map((log, index) => (
             <p key={index}>:{log}</p>

@@ -15,6 +15,8 @@ const RankLocator: React.FC = () => {
   const [currentTaxiData, setCurrentTaxiData] = useState<iTaxiData | undefined>(
     undefined
   );
+  const [visibleFields, setVisibleFields] = useState<number>(1);
+
   const provinces = Array.from(
     new Set(ranks.map((rank: iRank) => rank.province))
   );
@@ -64,11 +66,11 @@ const RankLocator: React.FC = () => {
   const filterRanks = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget as HTMLFormElement;
-    const province = form.province.value.trim().toLowerCase();
-    const fromCity = form.fromCity.value.trim().toLowerCase();
-    const fromTown = form.fromTown.value.trim().toLowerCase();
-    const toCity = form.toCity.value.trim().toLowerCase();
-    const toTown = form.toTown.value.trim().toLowerCase();
+    const province = form.province?.value.trim().toLowerCase();
+    const fromCity = form.fromCity?.value.trim().toLowerCase();
+    const fromTown = form.fromTown?.value.trim().toLowerCase();
+    const toCity = form.toCity?.value.trim().toLowerCase();
+    const toTown = form.toTown?.value.trim().toLowerCase();
 
     const filtered = ranks.filter(
       (rank) =>
@@ -97,8 +99,9 @@ const RankLocator: React.FC = () => {
     <>
       <div className={styles.rankLocator}>
         <form onSubmit={filterRanks} className={styles.rankLocatorForm}>
-          {['province', 'fromCity', 'fromTown', 'toCity', 'toTown'].map(
-            (field: string) => (
+          {['province', 'fromCity', 'fromTown', 'toCity', 'toTown']
+            .slice(0, visibleFields)
+            .map((field: string) => (
               <div key={field} className={styles.formGroup}>
                 <label htmlFor={field}>
                   {field.charAt(0).toUpperCase() + field.slice(1)}
@@ -130,8 +133,21 @@ const RankLocator: React.FC = () => {
                   ))}
                 </datalist>
               </div>
-            )
-          )}
+            ))}
+          <div className={styles.buttonGroup}>
+            <button
+              type="button"
+              onClick={() => setVisibleFields((prev) => Math.min(prev + 1, 5))}
+            >
+              +
+            </button>
+            <button
+              type="button"
+              onClick={() => setVisibleFields((prev) => Math.max(prev - 1, 1))}
+            >
+              -
+            </button>
+          </div>
           <button type="submit">Search</button>
         </form>
 
