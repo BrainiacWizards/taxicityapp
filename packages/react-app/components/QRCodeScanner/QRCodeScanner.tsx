@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // @ts-ignore
-import QrReader from 'modern-react-qr-reader';
+// import QrReader from 'modern-react-qr-reader';
 
 interface QRCodeScannerProps {
   onScan: (data: string | null) => void;
@@ -25,7 +25,8 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, styles }) => {
       {error === 'No video input devices found' ? (
         <p>QR Code Error: {error}</p>
       ) : (
-        <QrReader delay={300} onError={handleError} onScan={handleScan} />
+        // <QrReader delay={300} onError={handleError} onScan={handleScan} />
+        <>QR Code</>
       )}
       {error && error !== 'No video input devices found' && (
         <p>QR Code Error: {error}</p>

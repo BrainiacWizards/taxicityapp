@@ -5,16 +5,16 @@
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-ignition": "^0.15.5",
     "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
-    "@nomicfoundation/hardhat-network-helpers": "^1.0.3",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.11",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.8",
     "@nomicfoundation/ignition-core": "^0.15.5",
-    "@nomiclabs/hardhat-ethers": "^1.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@typechain/ethers-v6": "^0.5.0",
-    "@typechain/hardhat": "^6.0.0",
+    "@typechain/hardhat": "^9.1.0",
     "@types/chai": "^4.3.16",
     "@types/mocha": "^10.0.7",
-    "chain": "^1.0.0",
+    "chain": "^0.4.0",
     "hardhat": "^2.22.6",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.8.1",
@@ -23,10 +23,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "@wagmi/connectors": "5.1.11",
-    "dotenv": "^16.4.5",
-    "ethers": "6.13.2",
-    "next": "14.2.13"
+    "dotenv": "^16.4.5"
   },
   "scripts": {
     "compile": "hardhat compile",

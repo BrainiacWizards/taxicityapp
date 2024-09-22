@@ -41,3 +41,4 @@ nb-configuration.xml
 PROPOSAL.md
 package-lock.json
 yarn.lock
+.vercel
