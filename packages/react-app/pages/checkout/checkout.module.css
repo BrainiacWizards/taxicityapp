@@ -45,14 +45,14 @@
 }
 
 .QrScanner {
-  background-color: var(--neutral-color);
+  background-color: red;
   padding: 10px;
   max-width: calc(100% - 20px);
 }
 
-.QrReader {
+/* .QrReader {
   display: none;
-}
+} */
 
 .tripDetailsContainer {
   display: flex;
