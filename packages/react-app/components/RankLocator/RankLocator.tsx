@@ -147,8 +147,10 @@ const RankLocator: React.FC = () => {
             >
               -
             </button>
+            <button className={styles.searchBtn} type="submit">
+              Search
+            </button>
           </div>
-          <button type="submit">Search</button>
         </form>
 
         <div

@@ -1,0 +1,13 @@
+.loaderContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  flex-wrap: wrap;
+}
+
+.loader {
+  font-size: 24px;
+  color: #333;
+}

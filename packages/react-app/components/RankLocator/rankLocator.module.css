@@ -156,6 +156,12 @@
 
 .buttonGroup button {
   min-width: 50px;
+  background-color: var(--neutral-color);
+}
+
+.searchBtn {
+  width: 100%;
+  background-color: var(--prim-color) !important;
 }
 
 @media screen and (max-width: 600px) {

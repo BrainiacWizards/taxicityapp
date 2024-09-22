@@ -54,7 +54,7 @@ function CustomConnectButton() {
                   </button>
 
                   <button onClick={openAccountModal} type="button">
-                    {account.displayName}
+                    {account.displayBalance}
                   </button>
                 </div>
               );

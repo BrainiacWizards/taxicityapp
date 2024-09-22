@@ -2,6 +2,7 @@ import { FC, ReactNode } from 'react';
 import type { Metadata } from 'next';
 import Footer from './Footer';
 import Header from './Header';
+import Loader from './Loader/Loader';
 
 export const metadata: Metadata = {
   title: 'TaxiCity',

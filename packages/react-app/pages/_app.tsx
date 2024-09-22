@@ -1,80 +1,55 @@
-import {
-  RainbowKitProvider,
-  connectorsForWallets,
-  darkTheme,
-  lightTheme,
-  midnightTheme,
-} from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, midnightTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
-import {
-  binanceWallet,
-  braveWallet,
-  coinbaseWallet,
-  injectedWallet,
-  metaMaskWallet,
-  rainbowWallet,
-  valoraWallet,
-  walletConnectWallet,
-} from '@rainbow-me/rainbowkit/wallets';
+
 import type { AppProps } from 'next/app';
-import { WagmiProvider, createConfig, http } from 'wagmi';
-import { celo, celoAlfajores } from 'wagmi/chains';
+import { WagmiProvider } from 'wagmi';
+
 import Layout from '../components/Layout';
 import '../styles/globals.css';
 import '../styles/header.css';
 import '../styles/footer.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { baseTheme } from '@rainbow-me/rainbowkit/dist/themes/baseTheme';
-
-const connectors = connectorsForWallets(
-  [
-    {
-      groupName: 'Recommended',
-      wallets: [
-        injectedWallet,
-        metaMaskWallet,
-        valoraWallet,
-        coinbaseWallet,
-        rainbowWallet,
-        walletConnectWallet,
-        binanceWallet,
-        braveWallet,
-      ],
-    },
-  ],
-  {
-    appName: 'Celo Composer',
-    projectId: process.env.WC_PROJECT_ID ?? '044601f65212332475a09bc14ceb3c34',
-  }
-);
-
-const config = createConfig({
-  connectors,
-  chains: [celo, celoAlfajores],
-  transports: {
-    [celo.id]: http(),
-    [celoAlfajores.id]: http(),
-  },
-});
+import Loader from '@/components/Loader/Loader';
+import { useEffect, useState } from 'react';
+import { config } from '@/lib/config';
 
 const queryClient = new QueryClient();
 
 function App({ Component, pageProps }: AppProps) {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const handleLoadingStateChange = () => {
+      setLoading(document.readyState !== 'complete');
+    };
+
+    // Set initial loading state
+    handleLoadingStateChange();
+
+    // Listen for changes in the loading state
+    document.addEventListener('readystatechange', handleLoadingStateChange);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      document.removeEventListener(
+        'readystatechange',
+        handleLoadingStateChange
+      );
+    };
+  }, []);
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          coolMode
           theme={midnightTheme({
             accentColor: '#bc74f7',
             borderRadius: 'large',
             overlayBlur: 'small',
           })}
         >
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <Layout>{loading ? <Loader /> : <Component {...pageProps} />}</Layout>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
