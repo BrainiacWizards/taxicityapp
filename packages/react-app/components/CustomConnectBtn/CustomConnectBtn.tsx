@@ -11,6 +11,9 @@ function CustomConnectButton() {
         openConnectModal,
         mounted,
       }) => {
+        {
+          localStorage.setItem('chain', JSON.stringify(chain));
+        }
         return (
           <div
             {...(!mounted && {

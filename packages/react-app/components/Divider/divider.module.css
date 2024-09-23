@@ -1,7 +1,7 @@
 .divider {
   background-color: var(--neutral-color);
   min-height: 2px;
-  width: 100%;
+  width: 90%;
   border-radius: 20px;
-  margin: 10px 0;
+  margin: 10px auto;
 }

@@ -11,6 +11,7 @@
   --accent-color: #bc74f7; /* Pink Accent Color */
   --bg-color: #ffffff; /* Bright Background Color */
   --neutral-color: #a0a7af; /* Bright Neutral Color */
+  --neutral-light-color: #d4d4d4; /* Light Neutral Color */
   --font-color: #ffffff; /* Font Color */
 }
 
@@ -18,12 +19,18 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  caret-color: var(--accent-color);
+  font-family: 'Poppins', sans-serif;
+  hyphens: auto;
 }
 
 body {
   background-color: var(--bg-color);
   color: var(--prim-color);
   width: 100%;
+  background-image: url('../public/background_pattern.png') !important;
+  background-position: center;
+  background-size: contain;
 }
 
 main {

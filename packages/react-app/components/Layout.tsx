@@ -30,7 +30,9 @@ const Layout: FC<Props> = ({ children }) => {
   return (
     <>
       <Header />
-      <main>{children}</main>
+      <main style={{ backgroundColor: 'rgba(255, 255, 255, 0.71)' }}>
+        {children}
+      </main>
       <Footer />
     </>
   );

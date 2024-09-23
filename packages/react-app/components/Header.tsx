@@ -11,6 +11,7 @@ import {
   FaEnvelope,
   FaHome,
   FaTimes,
+  FaUserCircle,
 } from 'react-icons/fa';
 import Link from 'next/link';
 import CustomConnectButton from './CustomConnectBtn/CustomConnectBtn';
@@ -42,6 +43,7 @@ export default function Header() {
     { href: '/how-it-works', icon: <FaCog />, label: 'Help' },
     { href: '/faq', icon: <FaQuestionCircle />, label: 'FAQ' },
     { href: '/contact', icon: <FaEnvelope />, label: 'Contact' },
+    { href: '/u/profile', icon: <FaUserCircle />, label: 'User Profile' },
   ];
 
   const socialPlatforms = [
@@ -73,7 +75,8 @@ export default function Header() {
         <ul className="dropdown">
           <button
             className="dropdownBtn"
-            onClick={() => setShowLinks(!showLinks)}
+            onMouseDown={() => setShowLinks(!showLinks)}
+            // onBlur={() => setShowLinks(false)}
           >
             {showLinks ? (
               <FaTimes aria-hidden="true" />
