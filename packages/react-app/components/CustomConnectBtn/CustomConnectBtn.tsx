@@ -12,7 +12,9 @@ function CustomConnectButton() {
         mounted,
       }) => {
         {
-          localStorage.setItem('chain', JSON.stringify(chain));
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('chain', JSON.stringify(chain));
+          }
         }
         return (
           <div
