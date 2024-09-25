@@ -75,11 +75,11 @@ const RankLocator: React.FC = () => {
 
     const filtered = ranks.filter(
       (rank) =>
-        (!province || rank.province.toLowerCase() == province) &&
-        (!fromCity || rank.city.toLowerCase() == fromCity) &&
-        (!fromTown || rank.town.toLowerCase() == fromTown) &&
+        (!province || rank.province.toLowerCase() === province) &&
+        (!fromCity || rank.city.toLowerCase() === fromCity) &&
+        (!fromTown || rank.town.toLowerCase() === fromTown) &&
         (!toCity ||
-          rank.routes.some((route) => route.toCity.toLowerCase() == toCity)) &&
+          rank.routes.some((route) => route.toCity.toLowerCase() === toCity)) &&
         (!toTown ||
           rank.routes.some((route) => route.toTown.toLowerCase() === toTown))
     );

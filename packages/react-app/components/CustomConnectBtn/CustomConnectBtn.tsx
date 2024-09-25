@@ -1,4 +1,5 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import Image from 'next/image';
 
 function CustomConnectButton() {
   return (
@@ -51,10 +52,11 @@ function CustomConnectButton() {
                     style={{ display: 'flex', alignItems: 'center' }}
                     type="button"
                   >
-                    <img
-                      src={chain.iconUrl}
-                      alt={chain.name}
-                      style={{ width: 20, height: 20 }}
+                    <Image
+                      src={chain.iconUrl || ''}
+                      alt={chain.name || 'Chain Avatar'}
+                      width={20}
+                      height={20}
                     />
                   </button>
 

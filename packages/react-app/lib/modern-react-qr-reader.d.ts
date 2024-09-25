@@ -3,7 +3,7 @@ declare module 'modern-react-qr-reader' {
 
   interface QrReaderProps {
     delay?: number;
-    onError?: (error: any) => void;
+    onError?: (error: string) => void;
     onScan?: (data: string | null) => void;
     style?: React.CSSProperties;
   }

@@ -64,7 +64,7 @@ const TaxiDetails: React.FC<{
           </div>
         </div>
 
-        {type == 'popup' && (
+        {type === 'popup' && (
           <div className={styles.TaxiDetailsPopUpButtons}>
             <button
               onClick={() => {

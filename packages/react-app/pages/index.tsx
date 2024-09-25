@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 export default function Home() {
-  const [userAddress, setUserAddress] = useState('');
+  const [, setUserAddress] = useState('');
   const [isMounted, setIsMounted] = useState(false);
   const { address, isConnected } = useAccount();
 

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import {
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
-  FaBars,
   FaCog,
   FaHistory,
   FaMoneyCheckAlt,

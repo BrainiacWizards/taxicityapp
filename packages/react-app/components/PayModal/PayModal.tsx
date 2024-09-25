@@ -24,7 +24,6 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     'pending' | 'successful' | 'error'
   >('pending');
   const [paymentLog, setPaymentLog] = useState<string>('No log info yet..');
-  const [isCancelled, setIsCancelled] = useState<boolean>(false);
   const [retry, setRetry] = useState<boolean>(false);
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
@@ -74,7 +73,6 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
 
   useEffect(() => {
     if (retry) {
-      setIsCancelled(false);
       setPaymentStatus('pending');
       setPaymentLog('Retrying payment...');
       initiatePayment();

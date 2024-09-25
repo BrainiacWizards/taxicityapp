@@ -6,7 +6,7 @@ import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
 import Divider from '@/components/Divider/Divider';
 import { useConnect, useAccount } from 'wagmi';
 import PayModal from '@/components/PayModal/PayModal';
-import { injected } from '@wagmi/connectors';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 
 const dummyTaxiData: iTaxiData = {
   capacity: 0,
@@ -27,8 +27,9 @@ const Checkout: React.FC = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const code = 'ABC1235';
-  const { connect } = useConnect();
+  useConnect();
   const { isConnected } = useAccount();
+  const { openConnectModal } = useConnectModal();
 
   useEffect(() => {
     if (accessCode.trim() === '') {
@@ -112,9 +113,9 @@ const Checkout: React.FC = () => {
         <>
           {!isWalletConnected ? (
             <button
-              onClick={() =>
-                connect({ connector: injected({ target: 'metaMask' }) })
-              }
+              onClick={() => {
+                if (openConnectModal) openConnectModal();
+              }}
             >
               Connect Wallet
             </button>

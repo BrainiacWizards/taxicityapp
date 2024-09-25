@@ -4,21 +4,11 @@ import React, { useState } from 'react';
 
 interface QRCodeScannerProps {
   onScan: (data: string | null) => void;
-  styles: any;
+  styles: Record<string, string>;
 }
 
-const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ onScan, styles }) => {
-  const [error, setError] = useState<string | null>(null);
-
-  const handleScan = (data: string | null) => {
-    if (data) {
-      onScan(data);
-    }
-  };
-
-  const handleError = (err: any) => {
-    setError(err.message);
-  };
+const QRCodeScanner: React.FC<QRCodeScannerProps> = ({ styles }) => {
+  const [error] = useState<string | null>(null);
 
   return (
     <div className={styles.QrScanner}>

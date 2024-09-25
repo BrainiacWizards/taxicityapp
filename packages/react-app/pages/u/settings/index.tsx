@@ -11,6 +11,7 @@ import {
 import { getAccount } from '@wagmi/core';
 import styles from './settings.module.css';
 import { config } from '@/lib/config';
+import Image from 'next/image';
 
 const SettingsPage = () => {
   const [theme, setTheme] = useState('light');
@@ -44,7 +45,6 @@ const SettingsPage = () => {
   }, [storageClear, calculateStorageSize]);
 
   useEffect(() => {
-    console.log('Account:', account);
     setChain(account?.chain || chains[0]);
   }, [chains, account]);
 
@@ -90,10 +90,11 @@ const SettingsPage = () => {
                 <p>
                   Wallet Name:
                   {account.connector.icon && (
-                    <img
+                    <Image
                       src={account.connector.icon}
                       alt={`${account.connector.name} icon`}
-                      style={{ width: '20px', height: '20px' }}
+                      width={20}
+                      height={20}
                     />
                   )}{' '}
                   {account.connector.name}
