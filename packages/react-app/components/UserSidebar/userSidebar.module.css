@@ -2,7 +2,7 @@
   position: absolute;
   display: grid;
   grid-template-columns: 1fr;
-  background-color: var(--neutral-light-color);
+  background-color: var(--neutral-color);
   width: fit-content;
   height: 100%;
   padding: 20px 10px;
@@ -13,7 +13,7 @@
 .userSidebar ul {
   display: grid;
   grid-template-columns: 1fr;
-  background-color: var(--neutral-light-color);
+  background-color: var(--neutral-color);
   width: 100%;
   grid-template-rows: repeat(auto-fill, 60px);
 }
@@ -60,10 +60,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--neutral-light-color);
+  background-color: var(--neutral-color);
   color: var(--prim-color);
   padding: 0;
-  box-shadow: 2px 1px 3px var(--neutral-color);
 }
 
 .userSidebar .openSidebarBtn:hover {

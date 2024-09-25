@@ -40,27 +40,27 @@ const UserSideBar: React.FC = () => {
         onFocusCapture={openSidebar}
       >
         <li>
-          <Link href="/dashboard">
+          <Link href="./profile">
             <FaTachometerAlt /> Dashboard
           </Link>
         </li>
         <li>
-          <Link href="/transactions">
+          <Link href="./transactions">
             <FaMoneyCheckAlt /> View Transactions
           </Link>
         </li>
         <li>
-          <Link href="/trip-history">
+          <Link href="./trip-history">
             <FaHistory /> Trip History
           </Link>
         </li>
         <li>
-          <Link href="/settings">
+          <Link href="./settings">
             <FaCog /> Settings
           </Link>
         </li>
         <li>
-          <Link href="/logout">
+          <Link href="./logout">
             <FaSignOutAlt /> Logout
           </Link>
         </li>

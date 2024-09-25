@@ -5,6 +5,7 @@ import { useChains, useAccount } from 'wagmi';
 import { createPublicClient, formatEther, getContract, http } from 'viem';
 import { celoAlfajores } from 'wagmi/chains';
 import { stableTokenABI } from '@celo/abis';
+import CustomConnectButton from '@/components/CustomConnectBtn/CustomConnectBtn';
 
 const STABLE_TOKEN_ADDRESS = '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9';
 
@@ -128,46 +129,56 @@ const ProfilePage: React.FC = () => {
       <div className={styles.userProfile}>
         <form className={styles.profileForm}>
           <div className={styles.profileDetails}>
-            <h1>{userProfile.name}</h1>
-            <div className={styles.currencyDetails}>
-              <span key={chain.id} className={styles.balance}>
-                <img
-                  src={chain.iconUrl}
-                  alt="Celo Icon"
-                  className={styles.icon}
-                />
-                {userBalance.substring(0, 4)} {chains[0].nativeCurrency.symbol}
-              </span>
-            </div>
-            {formFields.map((field, index) => (
-              <div className={styles.formGroup} key={index}>
-                <label>
-                  {field.icon} {field.label}:
-                </label>
-                <input
-                  type={field.type}
-                  value={field.value}
-                  readOnly={field.readOnly}
-                  onChange={field.onChange}
-                />
-              </div>
-            ))}
-            <div className={styles.formActions}>
-              {isEditing ? (
-                <>
-                  <button type="button" onClick={handleSave}>
-                    Save
-                  </button>
-                  <button type="button" onClick={handleDiscard}>
-                    Discard
-                  </button>
-                </>
-              ) : (
-                <button type="button" onClick={() => setIsEditing(true)}>
-                  Edit
-                </button>
-              )}
-            </div>
+            {account.isConnected ? (
+              <>
+                <h1>{userProfile.name}</h1>
+                <div className={styles.currencyDetails}>
+                  <span key={chain.id} className={styles.balance}>
+                    <img
+                      src={chain.iconUrl}
+                      alt="Celo Icon"
+                      className={styles.icon}
+                    />
+                    {userBalance.substring(0, 4)}{' '}
+                    {chains[0].nativeCurrency.symbol}
+                  </span>
+                </div>
+                {formFields.map((field, index) => (
+                  <div className={styles.formGroup} key={index}>
+                    <label>
+                      {field.icon} {field.label}:
+                    </label>
+                    <input
+                      type={field.type}
+                      value={field.value}
+                      readOnly={field.readOnly}
+                      onChange={field.onChange}
+                    />
+                  </div>
+                ))}
+                <div className={styles.formActions}>
+                  {isEditing ? (
+                    <>
+                      <button type="button" onClick={handleSave}>
+                        Save
+                      </button>
+                      <button type="button" onClick={handleDiscard}>
+                        Discard
+                      </button>
+                    </>
+                  ) : (
+                    <button type="button" onClick={() => setIsEditing(true)}>
+                      Edit
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <h3>You Need to Login First</h3>
+                <CustomConnectButton />
+              </>
+            )}
           </div>
         </form>
       </div>
