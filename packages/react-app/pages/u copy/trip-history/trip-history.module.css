@@ -1,0 +1,90 @@
+.userTripPage {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.userTripPage .userTripContent {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 20px;
+}
+
+.userTripPage h1 {
+  color: var(--prim-color);
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+  margin-bottom: 20px;
+  box-shadow: 2px 2px 4px var(--neutral-color);
+  background-color: color-mix(in srgb, var(--bg-color) 50%, #ffffff42 50%);
+  border-radius: 20px;
+}
+
+.userTripPage .userTripContent .tripCard {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: var(--prim-color);
+  color: var(--font-color);
+}
+
+.userTripPage .userTripContent .tripCard .tripCardHeader {
+  display: grid;
+  grid-template-columns: 1fr 50px 1fr;
+  align-items: center;
+  border-bottom: 1px solid var(--neutral-color);
+  padding-bottom: 5px;
+  font-weight: bold;
+  justify-items: center;
+}
+
+.userTripPage .userTripContent .tripCard .tripCardHeader h3 {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 5px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.userTripPage .userTripContent .tripCard .tripCardHeader h3 svg {
+  color: var(--accent-color);
+}
+
+.userTripPage .pagination {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
+  margin-top: 20px;
+}
+
+.sortOptions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background-color: var(--bg-color);
+  color: var(--prim-color);
+  padding: 5px 2px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.sortOptions select {
+  padding: 2px;
+  border-radius: 5px;
+  border: 1px solid var(--prim-color);
+}
+
+.sortOptions select:focus,
+.sortOptions select:hover {
+  outline: none;
+}
+
+.sortOptions label {
+  font-weight: bold;
+}

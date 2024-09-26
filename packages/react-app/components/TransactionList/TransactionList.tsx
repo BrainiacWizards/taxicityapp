@@ -10,12 +10,18 @@ import {
   FaDollarSign,
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
+  FaClipboard,
+  FaCheck,
+  FaTimes,
 } from 'react-icons/fa';
 
 const TransactionList: React.FC<iTransactionListProps> = ({ transactions }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortCriteria, setSortCriteria] = useState('date');
   const [sortOrder, setSortOrder] = useState('asc');
+  const [copyStatus, setCopyStatus] = useState<{
+    [key: string]: 'success' | 'error' | 'idle';
+  }>({});
   const transactionsPerPage = 4;
 
   const sortedTransactions = [...transactions].sort((a, b) => {
@@ -65,6 +71,40 @@ const TransactionList: React.FC<iTransactionListProps> = ({ transactions }) => {
     setCurrentPage(1);
   };
 
+  const formatTransactionForClipboard = (transaction: iTransaction) => {
+    return `Hash: ${transaction.hash}\nFrom: ${transaction.from}\nTo: ${transaction.to}\nDate: ${transaction.date}\nAmount: ${transaction.amount}`;
+  };
+
+  const handleCopyToClipboard = (transaction: iTransaction) => {
+    const formattedTransaction = formatTransactionForClipboard(transaction);
+    navigator.clipboard
+      .writeText(formattedTransaction)
+      .then(() => {
+        setCopyStatus((prevStatus) => ({
+          ...prevStatus,
+          [transaction.hash]: 'success',
+        }));
+        setTimeout(() => {
+          setCopyStatus((prevStatus) => ({
+            ...prevStatus,
+            [transaction.hash]: 'idle',
+          }));
+        }, 2000);
+      })
+      .catch(() => {
+        setCopyStatus((prevStatus) => ({
+          ...prevStatus,
+          [transaction.hash]: 'error',
+        }));
+        setTimeout(() => {
+          setCopyStatus((prevStatus) => ({
+            ...prevStatus,
+            [transaction.hash]: 'idle',
+          }));
+        }, 2000);
+      });
+  };
+
   return (
     <div>
       <div className={styles.sortOptions}>
@@ -99,6 +139,22 @@ const TransactionList: React.FC<iTransactionListProps> = ({ transactions }) => {
             <span>
               <FaDollarSign /> Amount: {transaction.amount}
             </span>
+            <button onClick={() => handleCopyToClipboard(transaction)}>
+              {copyStatus[transaction.hash] === 'success' ? (
+                <>
+                  {' '}
+                  <FaCheck /> {'Copied!'}{' '}
+                </>
+              ) : copyStatus[transaction.hash] === 'error' ? (
+                <>
+                  <FaTimes /> {'Error!'}
+                </>
+              ) : (
+                <>
+                  <FaClipboard /> {'Copy to clipboard'}
+                </>
+              )}
+            </button>
           </li>
         ))}
       </ul>

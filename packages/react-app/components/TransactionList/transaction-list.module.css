@@ -27,6 +27,20 @@
   gap: 10px;
 }
 
+.transactionList li button {
+  background-color: var(--prim-color);
+  color: var(--font-color);
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
 .pagination {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

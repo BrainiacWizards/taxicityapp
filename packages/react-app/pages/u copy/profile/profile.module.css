@@ -1,0 +1,89 @@
+.userProfile {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 10px;
+  gap: 10px;
+  width: 100%;
+}
+
+.userProfile img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: fit;
+}
+
+.userProfile .currencyDetails {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 10px 0;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: var(--prim-color);
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.userProfile .currencyDetails span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--font-color);
+}
+
+.userProfile h1 {
+  font-size: 30px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.userProfile .profileDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 auto;
+  margin-top: 10px;
+  background-color: color-mix(
+    in srgb,
+    var(--prim-color) 30%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: inset 0px 0px 6px var(--neutral-color);
+  backdrop-filter: blur(8px);
+  max-width: 350px;
+}
+
+.userProfile .profileDetails .formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-weight: bold;
+}
+
+.userProfile .profileDetails .formGroup input {
+  padding: 5px;
+  border-radius: 5px;
+  height: 40px;
+  border: 1px solid var(--neutral-color);
+  color: var(--neutral-color);
+}
+
+.userProfile .profileDetails .formGroup input:focus {
+  outline: none;
+  box-shadow: 2px 2px 3px var(--accent-color);
+}
+
+.userProfile .profileDetails .formActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  transition: all 0.3s ease-in-out;
+}

@@ -9,3 +9,21 @@ export interface iTransaction {
 export interface iTransactionListProps {
   transactions: iTransaction[];
 }
+
+export interface iTripCardProps {
+  from: string;
+  to: string;
+  driver: string;
+  reg: string;
+  price: string;
+  date: string;
+}
+
+export interface iTrip {
+  from: string;
+  to: string;
+  driver: string;
+  reg: string;
+  price: string;
+  date: string;
+}
