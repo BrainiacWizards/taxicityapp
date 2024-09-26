@@ -94,6 +94,9 @@ const usePagination = (items: Trip[], itemsPerPage: number) => {
 };
 
 const UserTripHistoryPage: React.FC = () => {
+  const [sortCriteria, setSortCriteria] = useState<keyof Trip>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
   const trips = useMemo(
     () => [
       {
@@ -148,18 +151,55 @@ const UserTripHistoryPage: React.FC = () => {
     []
   );
 
+  const sortedTrips = useMemo(() => {
+    return [...trips].sort((a, b) => {
+      if (sortDirection === 'asc') {
+        return a[sortCriteria] > b[sortCriteria] ? 1 : -1;
+      } else {
+        return a[sortCriteria] < b[sortCriteria] ? 1 : -1;
+      }
+    });
+  }, [trips, sortCriteria, sortDirection]);
+
   const {
     currentItems,
     currentPage,
     totalPages,
     handleNextPage,
     handlePrevPage,
-  } = usePagination(trips, 4);
+  } = usePagination(sortedTrips, 4);
 
   return (
     <UserLayout>
       <div className={styles.userTripPage}>
         <h1>Trip History</h1>
+        <div className={styles.sortOptions}>
+          <label>
+            Sort by:
+            <select
+              value={sortCriteria}
+              onChange={(e) => setSortCriteria(e.target.value as keyof Trip)}
+            >
+              <option value="from">From</option>
+              <option value="to">To</option>
+              <option value="driver">Driver</option>
+              <option value="reg">Registration</option>
+              <option value="price">Price</option>
+              <option value="date">Date</option>
+            </select>
+          </label>
+          <label>
+            <select
+              value={sortDirection}
+              onChange={(e) =>
+                setSortDirection(e.target.value as 'asc' | 'desc')
+              }
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </label>
+        </div>
         <div className={styles.userTripContent}>
           {currentItems.map((trip, index) => (
             <TripCard key={index} {...trip} />
