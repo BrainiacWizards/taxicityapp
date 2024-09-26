@@ -1,0 +1,17 @@
+.userTransactions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.userTransactions h1 {
+  color: var(--prim-color);
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 30px;
+  margin-bottom: 20px;
+  box-shadow: 2px 2px 4px var(--neutral-color);
+  background-color: color-mix(in srgb, var(--bg-color) 50%, #ffffff42 50%);
+  border-radius: 20px;
+}

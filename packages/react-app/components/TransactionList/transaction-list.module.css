@@ -1,0 +1,64 @@
+.transactionList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+  max-width: 90%;
+  margin: 20px auto;
+}
+
+.transactionList li {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  box-shadow: 2px 2px 4px 0 var(--neutral-color);
+  border-radius: 5px;
+  background-color: color-mix(in srgb, var(--prim-color) 70%, #ffffffad 30%);
+  color: var(--font-color);
+}
+
+.transactionList li span {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.sortOptions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  background-color: var(--bg-color);
+  color: var(--prim-color);
+  padding: 5px 2px;
+  border-radius: 5px;
+}
+
+.sortOptions select {
+  padding: 2px;
+  border-radius: 5px;
+  border: 1px solid var(--prim-color);
+}
+
+.sortOptions select:focus,
+.sortOptions select:hover {
+  outline: none;
+}
+
+.sortOptions label {
+  font-weight: bold;
+}
