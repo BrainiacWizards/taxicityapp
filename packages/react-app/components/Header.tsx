@@ -12,6 +12,7 @@ import {
   FaHome,
   FaTimes,
   FaUserCircle,
+  FaCar,
 } from 'react-icons/fa';
 import Link from 'next/link';
 import CustomConnectButton from './CustomConnectBtn/CustomConnectBtn';
@@ -44,6 +45,7 @@ export default function Header() {
     { href: '/faq', icon: <FaQuestionCircle />, label: 'FAQ' },
     { href: '/contact', icon: <FaEnvelope />, label: 'Contact' },
     { href: '/u/profile', icon: <FaUserCircle />, label: 'User Profile' },
+    { href: '/d/profile', icon: <FaCar />, label: 'Driver' }, // Changed icon to FaCar
   ];
 
   const socialPlatforms = [
