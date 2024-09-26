@@ -45,7 +45,7 @@ export default function Header() {
     { href: '/faq', icon: <FaQuestionCircle />, label: 'FAQ' },
     { href: '/contact', icon: <FaEnvelope />, label: 'Contact' },
     { href: '/u/profile', icon: <FaUserCircle />, label: 'User Profile' },
-    { href: '/d/profile', icon: <FaCar />, label: 'Driver' }, // Changed icon to FaCar
+    { href: '/d/profile', icon: <FaCar />, label: 'Driver' },
   ];
 
   const socialPlatforms = [
@@ -78,7 +78,6 @@ export default function Header() {
           <button
             className="dropdownBtn"
             onMouseDown={() => setShowLinks(!showLinks)}
-            // onBlur={() => setShowLinks(false)}
           >
             {showLinks ? (
               <FaTimes aria-hidden="true" />
