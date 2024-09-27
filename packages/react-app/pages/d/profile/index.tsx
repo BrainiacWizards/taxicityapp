@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import UserLayout from '@/components/UserLayout/UserLayout';
 import styles from './profile.module.css';
 import { useChains, useAccount } from 'wagmi';
 import { createPublicClient, formatEther, getContract, http } from 'viem';

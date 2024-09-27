@@ -1,4 +1,3 @@
-import UserLayout from '@/components/UserLayout/UserLayout';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useChains } from 'wagmi';
 import { clearStorage } from '@/lib/storage';

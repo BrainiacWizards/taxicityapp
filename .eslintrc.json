@@ -8,8 +8,6 @@
 	],
 	"plugins": ["@typescript-eslint"],
 	"rules": {
-		// Disallow the use of console
-		"no-console": "warn",
 		// Require the use of === and !==
 		"eqeqeq": ["error", "always"],
 		// Disallow unused variables

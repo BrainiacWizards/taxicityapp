@@ -30,6 +30,7 @@ const TripPage: React.FC = () => {
     }
 
     setPassengers(dummyPassengers);
+    setTripStatus('not started');
   }, []);
 
   const handleRateDriver = () => {

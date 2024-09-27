@@ -2,7 +2,6 @@ import React from 'react';
 
 import TransactionList from '@/components/TransactionList/TransactionList';
 import { iTransaction } from '@/models/UserModels';
-import UserLayout from '@/components/UserLayout/UserLayout';
 import styles from './transactions.module.css';
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
 
