@@ -28,6 +28,8 @@ const TripPage: React.FC = () => {
     if (tripData) {
       setTaxiData(JSON.parse(tripData));
     }
+
+    setPassengers(dummyPassengers);
   }, []);
 
   const handleRateDriver = () => {
