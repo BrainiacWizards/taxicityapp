@@ -17,6 +17,7 @@
     "@taxicityapp/react-app": "file:",
     "@vis.gl/react-google-maps": "^1.2.0",
     "@wagmi/connectors": "4.1.18",
+    "@wagmi/core": "^2.13.7",
     "ethers": "^5.0.0",
     "next": "^13.4.2",
     "react": "18.2.0",
