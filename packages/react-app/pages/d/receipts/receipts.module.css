@@ -66,9 +66,9 @@
 }
 
 .extendButton {
- display: flex;
- justify-content: center;
- align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: var(--prim-color);
   color: var(--font-color);
   padding: 5px;
