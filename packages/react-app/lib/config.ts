@@ -1,5 +1,5 @@
 import { http } from 'viem';
-import { celo, celoAlfajores } from 'viem/chains';
+
 import { createConfig } from 'wagmi';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
@@ -12,6 +12,7 @@ import {
   valoraWallet,
   walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
+import { celo, celoAlfajores } from 'viem/chains';
 
 const connectors = connectorsForWallets(
   [

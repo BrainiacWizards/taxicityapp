@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useChains } from 'wagmi';
+import { Config, useChains } from 'wagmi';
 import { clearStorage } from '@/lib/storage';
 import { Chain } from 'viem';
 import {
@@ -19,7 +19,7 @@ const SettingsPage = () => {
   const [storageSize, setStorageSize] = useState(0);
   const [storageClear, setStorageClear] = useState(false);
   const chains = useChains();
-  const account = getAccount(config);
+  const account = getAccount(config as Config);
   const { openChainModal } = useChainModal();
   const { openAccountModal } = useAccountModal();
   const { openConnectModal } = useConnectModal();
