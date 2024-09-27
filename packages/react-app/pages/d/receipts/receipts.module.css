@@ -63,6 +63,16 @@
   color: var(--prim-color);
   font-size: 16px;
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.receipt.collapsed {
+  height: 80px;
+  overflow: hidden;
+}
+
+.receipt.expanded {
+  height: auto;
 }
 
 .extendButton {
@@ -77,4 +87,11 @@
   bottom: 0;
   width: 100%;
   border-radius: 0 0 10px 10px;
+}
+
+.pagination {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-items: center;
+  margin-top: 20px;
 }
