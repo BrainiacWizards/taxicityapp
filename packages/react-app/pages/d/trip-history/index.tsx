@@ -7,10 +7,29 @@ import {
   FaArrowRight,
   FaMapMarkerAlt,
 } from 'react-icons/fa';
-import { iTripCardProps, iTrip } from '@/models/UserModels';
+
+interface iTripCardProps {
+  from: string;
+  to: string;
+  passengers: number;
+  date: string;
+  totalEarned: string;
+  tripId: string;
+  status: 'completed' | 'cancelled' | 'ongoing';
+}
+
+interface iTrip {
+  from: string;
+  to: string;
+  passengers: number;
+  date: string;
+  totalEarned: string;
+  tripId: string;
+  status: 'completed' | 'cancelled' | 'ongoing';
+}
 
 const TripCard: React.FC<iTripCardProps> = React.memo(
-  ({ from, to, driver, reg, price, date }) => (
+  ({ from, to, passengers, date, totalEarned, tripId, status }) => (
     <div className={styles.tripCard}>
       <div className={styles.tripCardHeader}>
         <h3>
@@ -25,16 +44,19 @@ const TripCard: React.FC<iTripCardProps> = React.memo(
       </div>
       <div className={styles.tripCardBody}>
         <p>
-          Driver: <span>{driver}</span>
-        </p>
-        <p>
-          Registration: <span>{reg}</span>
-        </p>
-        <p>
-          Price: <span>{price}</span>
+          Passengers: <span>{passengers}</span>
         </p>
         <p>
           Date: <span>{date}</span>
+        </p>
+        <p>
+          Total Earned: <span>{totalEarned}</span>
+        </p>
+        <p>
+          Trip ID: <span>{tripId}</span>
+        </p>
+        <p>
+          Status: <span>{status}</span>
         </p>
       </div>
     </div>
@@ -80,61 +102,67 @@ const UserTripHistoryPage: React.FC = () => {
   const [sortCriteria, setSortCriteria] = useState<keyof iTrip>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const trips = useMemo(
+  const trips: iTrip[] = useMemo(
     () => [
       {
         from: 'New York',
         to: 'Boston',
-        driver: 'John Doe',
-        reg: 'ABC1234',
-        price: '$50',
+        passengers: 3,
         date: '2023-01-15',
+        totalEarned: '$150',
+        tripId: 'TRIP1234',
+        status: 'completed',
       },
       {
         from: 'San Francisco',
         to: 'Los Angeles',
-        driver: 'Jane Smith',
-        reg: 'XYZ5678',
-        price: '$75',
+        passengers: 2,
         date: '2023-02-20',
+        totalEarned: '$100',
+        tripId: 'TRIP5678',
+        status: 'completed',
       },
       {
         from: 'Chicago',
         to: 'Detroit',
-        driver: 'Mike Johnson',
-        reg: 'LMN9101',
-        price: '$40',
+        passengers: 4,
         date: '2023-03-10',
+        totalEarned: '$160',
+        tripId: 'TRIP9101',
+        status: 'cancelled',
       },
       {
         from: 'Houston',
         to: 'Dallas',
-        driver: 'Emily Davis',
-        reg: 'QRS2345',
-        price: '$60',
+        passengers: 1,
         date: '2023-04-05',
+        totalEarned: '$60',
+        tripId: 'TRIP2345',
+        status: 'ongoing',
       },
       {
         from: 'Miami',
         to: 'Orlando',
-        driver: 'Chris Brown',
-        reg: 'TUV6789',
-        price: '$45',
+        passengers: 5,
         date: '2023-05-12',
+        totalEarned: '$225',
+        tripId: 'TRIP6789',
+        status: 'completed',
       },
       {
         from: 'Seattle',
         to: 'Portland',
-        driver: 'Patricia Wilson',
-        reg: 'WXY3456',
-        price: '$55',
+        passengers: 3,
         date: '2023-06-18',
+        totalEarned: '$165',
+        tripId: 'TRIP3456',
+        status: 'completed',
       },
     ],
     []
   );
 
-  const sortedTrips = useMemo(() => {
+  const sortedTrips: iTrip[] = useMemo(() => {
     return [...trips].sort((a, b) => {
       if (sortDirection === 'asc') {
         return a[sortCriteria] > b[sortCriteria] ? 1 : -1;
@@ -165,10 +193,11 @@ const UserTripHistoryPage: React.FC = () => {
             >
               <option value="from">From</option>
               <option value="to">To</option>
-              <option value="driver">Driver</option>
-              <option value="reg">Registration</option>
-              <option value="price">Price</option>
+              <option value="passengers">Passengers</option>
               <option value="date">Date</option>
+              <option value="totalEarned">Total Earned</option>
+              <option value="tripId">Trip ID</option>
+              <option value="status">Status</option>
             </select>
           </label>
           <label>
@@ -178,8 +207,8 @@ const UserTripHistoryPage: React.FC = () => {
                 setSortDirection(e.target.value as 'asc' | 'desc')
               }
             >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <option value="asc">Asc</option>
+              <option value="desc">Desc</option>
             </select>
           </label>
         </div>

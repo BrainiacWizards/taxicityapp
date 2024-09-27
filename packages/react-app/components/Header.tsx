@@ -44,7 +44,7 @@ export default function Header() {
     { href: '/how-it-works', icon: <FaCog />, label: 'Help' },
     { href: '/faq', icon: <FaQuestionCircle />, label: 'FAQ' },
     { href: '/contact', icon: <FaEnvelope />, label: 'Contact' },
-    { href: '/u/profile', icon: <FaUserCircle />, label: 'User Profile' },
+    { href: '/u/profile', icon: <FaUserCircle />, label: 'User' },
     { href: '/d/profile', icon: <FaCar />, label: 'Driver' },
   ];
 
