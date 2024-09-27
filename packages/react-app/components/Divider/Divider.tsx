@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './divider.module.css';
 
 interface DividerProps {
-  variant:
+  variant?:
     | 'thin-primary-small'
     | 'thin-primary-medium'
     | 'thin-primary-large'
@@ -34,12 +34,13 @@ interface DividerProps {
 
 const Divider: React.FC<DividerProps> = ({ variant }) => {
   const baseClass = styles.divider;
-  const variantClass = variant
-    .split('-')
-    .map((cls) => {
-      return styles[cls];
-    })
-    .join(' ');
+  const variantClass =
+    variant
+      ?.split('-')
+      .map((cls) => {
+        return styles[cls];
+      })
+      .join(' ') || 'thicker-tertiary-medium';
 
   const className = `${baseClass} ${variantClass}`;
   return <div className={className}></div>;

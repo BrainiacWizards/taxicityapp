@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { parseEther } from 'ethers/lib/utils';
 import { FaCheckDouble, FaCopy } from 'react-icons/fa';
+import { useRouter } from 'next/router';
 
 interface iPayModal {
   TaxiData: iTaxiData;
@@ -27,6 +28,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const [retry, setRetry] = useState<boolean>(false);
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
+  const router = useRouter();
 
   const logPayment = useCallback(
     (status: 'pending' | 'successful' | 'error', message: string) => {
@@ -103,6 +105,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
 
   const handleContinue = useCallback(() => {
     setShowPaymentModal(false);
+    router.push('/trip');
   }, [setShowPaymentModal]);
 
   const handleCopy = useCallback(() => {
