@@ -4,6 +4,7 @@ import TransactionList from '@/components/TransactionList/TransactionList';
 import { iTransaction } from '@/models/UserModels';
 import UserLayout from '@/components/UserLayout/UserLayout';
 import styles from './transactions.module.css';
+import DriverLayout from '@/components/DriverLayout/DriverLayout';
 
 const UserTransactionPage: React.FC = () => {
   const transactions: iTransaction[] = [
@@ -52,12 +53,12 @@ const UserTransactionPage: React.FC = () => {
   ];
 
   return (
-    <UserLayout>
+    <DriverLayout>
       <div className={styles.userTransactions}>
         <h1>Transactions</h1>
         <TransactionList transactions={transactions} />
       </div>
-    </UserLayout>
+    </DriverLayout>
   );
 };
 

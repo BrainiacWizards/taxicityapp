@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import UserLayout from '@/components/UserLayout/UserLayout';
 import styles from './trip-history.module.css';
 import {
   FaAngleDoubleLeft,
@@ -7,6 +6,7 @@ import {
   FaArrowRight,
   FaMapMarkerAlt,
 } from 'react-icons/fa';
+import DriverLayout from '@/components/DriverLayout/DriverLayout';
 
 interface iTripCardProps {
   from: string;
@@ -181,7 +181,7 @@ const UserTripHistoryPage: React.FC = () => {
   } = usePagination(sortedTrips, 4);
 
   return (
-    <UserLayout>
+    <DriverLayout>
       <div className={styles.userTripPage}>
         <h1>Trip History</h1>
         <div className={styles.sortOptions}>
@@ -232,7 +232,7 @@ const UserTripHistoryPage: React.FC = () => {
           </button>
         </div>
       </div>
-    </UserLayout>
+    </DriverLayout>
   );
 };
 

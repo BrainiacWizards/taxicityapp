@@ -6,6 +6,7 @@ import { createPublicClient, formatEther, getContract, http } from 'viem';
 import { celoAlfajores } from 'wagmi/chains';
 import { stableTokenABI } from '@celo/abis';
 import CustomConnectButton from '@/components/CustomConnectBtn/CustomConnectBtn';
+import DriverLayout from '@/components/DriverLayout/DriverLayout';
 
 const STABLE_TOKEN_ADDRESS = '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9';
 
@@ -125,7 +126,7 @@ const ProfilePage: React.FC = () => {
   ];
 
   return (
-    <UserLayout>
+    <DriverLayout>
       <div className={styles.userProfile}>
         <form className={styles.profileForm}>
           <div className={styles.profileDetails}>
@@ -182,7 +183,7 @@ const ProfilePage: React.FC = () => {
           </div>
         </form>
       </div>
-    </UserLayout>
+    </DriverLayout>
   );
 };
 

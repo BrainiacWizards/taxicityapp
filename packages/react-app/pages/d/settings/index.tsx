@@ -12,6 +12,7 @@ import { getAccount } from '@wagmi/core';
 import styles from './settings.module.css';
 import { config } from '@/lib/config';
 import Image from 'next/image';
+import DriverLayout from '@/components/DriverLayout/DriverLayout';
 
 const SettingsPage = () => {
   const [theme, setTheme] = useState('light');
@@ -60,7 +61,7 @@ const SettingsPage = () => {
   };
 
   return (
-    <UserLayout>
+    <DriverLayout>
       <div className={styles.userSettings}>
         <div className={styles.userSetting}>
           <h2 className={styles.settingHeading}>App Configs</h2>
@@ -144,7 +145,7 @@ const SettingsPage = () => {
           </div>
         </div>
       </div>
-    </UserLayout>
+    </DriverLayout>
   );
 };
 

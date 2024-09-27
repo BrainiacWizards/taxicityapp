@@ -1,8 +1,12 @@
-.userSidebar {
+.driverSidebar {
   position: absolute;
   display: grid;
   grid-template-columns: 1fr;
-  background-color: var(--neutral-color);
+  background-color: color-mix(
+    in srgb,
+    var(--prim-color) 60%,
+    rgba(255, 255, 255, 0) 40%
+  );
   width: fit-content;
   height: 100%;
   padding: 20px 10px;
@@ -10,15 +14,15 @@
   transition: transform 0.3s ease-in-out;
 }
 
-.userSidebar ul {
+.driverSidebar ul {
   display: grid;
   grid-template-columns: 1fr;
-  background-color: var(--neutral-color);
+  background-color: transparent;
   width: 100%;
   grid-template-rows: repeat(auto-fill, 60px);
 }
 
-.userSidebar ul li {
+.driverSidebar ul li {
   display: flex;
   width: 100%;
   justify-content: flex-start;
@@ -32,7 +36,7 @@
   overflow: hidden;
 }
 
-.userSidebar ul li a {
+.driverSidebar ul li a {
   color: inherit;
   text-decoration: none;
   display: flex;
@@ -44,28 +48,32 @@
   gap: 10px;
 }
 
-.userSidebar ul li:hover {
+.driverSidebar ul li:hover {
   background-color: var(--accent-color);
   color: var(--font-color) !important;
 }
 
-.userSidebar .openSidebarBtn {
+.driverSidebar .openSidebarBtn {
   width: 40px;
   aspect-ratio: 1/1;
   border-radius: 0 50px 50px 0;
   position: absolute;
-  right: -38px;
+  right: -40px;
   top: 2%;
-  transform: translateY(-5%);
+  transform: translateY(-4%);
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--neutral-color);
+  background-color: color-mix(
+    in srgb,
+    var(--prim-color) 60%,
+    rgba(255, 255, 255, 0) 40%
+  );
   color: var(--prim-color);
   padding: 0;
 }
 
-.userSidebar .openSidebarBtn:hover {
+.driverSidebar .openSidebarBtn:hover {
   background-color: var(--accent-color);
   color: var(--font-color);
 }

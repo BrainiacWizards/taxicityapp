@@ -1,0 +1,80 @@
+.receipts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.receipt {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+  max-width: 800px;
+  background-color: rgb(255, 255, 255);
+  background-image: url('../../../public/star-doddle.png');
+  border-radius: 10px;
+  box-shadow: 0 0 10px var(--neutral-color);
+  position: relative;
+}
+
+.receipt .receiptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.receipt .receiptHeader h1 {
+  margin: 0;
+  font-size: 19px;
+  color: var(--neutral-color);
+}
+
+.receipt .receiptBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.receipt .receiptBody .receiptTable {
+  display: table;
+  width: 90%;
+  border-collapse: separate;
+  border-spacing: 10px;
+  color: color-mix(in srgb, var(--prim-color) 70%, #ffffff 30%);
+}
+
+.receipt .receiptFooter {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  justify-content: start;
+  align-items: center;
+}
+
+.receipt .receiptFooter button {
+  padding: 5px;
+  margin: 10px 0;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  background-color: transparent;
+  color: var(--prim-color);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.extendButton {
+ display: flex;
+ justify-content: center;
+ align-items: center;
+  background-color: var(--prim-color);
+  color: var(--font-color);
+  padding: 5px;
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-radius: 0 0 10px 10px;
+}

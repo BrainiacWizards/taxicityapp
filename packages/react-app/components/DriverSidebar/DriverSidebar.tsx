@@ -7,6 +7,7 @@ import {
   FaCog,
   FaHistory,
   FaMoneyCheckAlt,
+  FaReceipt,
   FaSignOutAlt,
   FaTachometerAlt,
 } from 'react-icons/fa';
@@ -24,7 +25,7 @@ const DriverSidebar: React.FC = () => {
   return (
     <div
       className={
-        styles.userSidebar + ' ' + (isOpen ? styles.open : styles.closed)
+        styles.driverSidebar + ' ' + (isOpen ? styles.open : styles.closed)
       }
       onFocus={openSidebar}
       onBlur={closeSidebar}
@@ -51,6 +52,11 @@ const DriverSidebar: React.FC = () => {
         <li>
           <Link href="./trip-history">
             <FaHistory /> Trip History
+          </Link>
+        </li>
+        <li>
+          <Link href="./receipts">
+            <FaReceipt /> Receipts
           </Link>
         </li>
         <li>

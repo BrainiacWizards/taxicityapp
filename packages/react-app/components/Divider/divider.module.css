@@ -1,7 +1,42 @@
 .divider {
-  background-color: var(--neutral-color);
-  min-height: 2px;
-  width: 90%;
   border-radius: 20px;
   margin: 10px auto;
+}
+
+.thin {
+  height: 1px !important;
+}
+
+.thinker {
+  height: 2px !important;
+}
+
+.thick {
+  height: 4px !important;
+}
+
+/* color */
+.primary {
+  background-color: var(--prim-color);
+}
+
+.secondary {
+  background-color: var(--accent-color);
+}
+
+.tertiary {
+  background-color: var(--neutral-light-color);
+}
+
+/* size */
+.small {
+  width: 50%;
+}
+
+.medium {
+  width: 90%;
+}
+
+.large {
+  width: 100%;
 }
