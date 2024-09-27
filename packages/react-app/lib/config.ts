@@ -1,6 +1,6 @@
 import { http } from 'viem';
 
-import { createConfig } from 'wagmi';
+import { Config, createConfig } from 'wagmi';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
   binanceWallet,
@@ -36,7 +36,7 @@ const connectors = connectorsForWallets(
   }
 );
 
-export const config = createConfig({
+export const config: Config = createConfig({
   connectors,
   chains: [celo, celoAlfajores],
   transports: {
