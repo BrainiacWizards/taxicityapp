@@ -30,6 +30,7 @@ export interface iTaxi {
 }
 
 export interface iTaxiData {
+	tripCode?: string;
 	rankName: string | undefined;
 	registration: string;
 	verified: boolean;

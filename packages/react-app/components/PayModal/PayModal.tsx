@@ -10,10 +10,12 @@ import React, {
 import { iTaxiData } from '@/models/RankMapModels';
 import styles from './paymodal.module.css';
 import Image from 'next/image';
-import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther } from 'ethers/lib/utils';
 import { FaCheckDouble, FaCopy } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import { useWriteContract, useTransaction, BaseError } from 'wagmi';
+import { parseEther } from 'ethers/lib/utils';
+import { contractAddress, abi } from '@/lib/contractConfig';
+import { type UseTransactionParameters } from 'wagmi';
 
 interface iPayModal {
   TaxiData: iTaxiData;
@@ -38,40 +40,65 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     []
   );
 
-  const {
-    data: hash,
-    error,
-    isPending,
-    sendTransaction,
-  } = useSendTransaction();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash });
+  const { writeContract } = useWriteContract();
 
-  const to = '0x0717329C677ab484EAA73F4C8EEd92A2FA948746';
-  const value = '1.2';
-
-  const initiatePayment = useCallback(() => {
-    setPaymentLog('Payment initiated...');
-    sendTransaction({
-      to,
-      value: parseEther(value).toBigInt(),
-      data: '0x0717329c677ab484eaa73f4c8eed92a2fa948746',
+  const createTrip = useCallback(async () => {
+    setPaymentLog('Creating trip...');
+    const { data } = await writeContract({
+      abi: abi,
+      address: contractAddress,
+      functionName: 'createTrip',
+      args: [
+        parseEther(TaxiData.price.toString()).toBigInt(),
+        TaxiData.details,
+      ],
     });
-  }, []);
+    return data;
+  }, [writeContract, TaxiData.price, TaxiData.details]);
+
+  const joinTrip = useCallback(
+    async (tripCode: string) => {
+      setPaymentLog('Joining trip...');
+      await writeContract({
+        abi: abi,
+        address: contractAddress,
+        functionName: 'joinTrip',
+        args: [tripCode],
+      });
+    },
+    [writeContract]
+  );
+
+  const initiatePayment = useCallback(async () => {
+    setPaymentLog('Payment initiated...');
+    let tripCode = TaxiData.tripCode;
+    if (!tripCode) {
+      const data = await createTrip();
+      tripCode = data?.toString();
+    }
+    await joinTrip(tripCode);
+  }, [createTrip, joinTrip, TaxiData.tripCode]);
+
+  const {
+    data,
+    error,
+    isLoading,
+    isSuccess: isConfirmed,
+  }: UseTransactionParameters = useTransaction({
+    hash: data?.hash,
+  });
 
   useEffect(() => {
     if (isConfirmed) {
       logPayment('successful', 'Payment successful');
-    } else if (isPending) {
+    } else if (isLoading) {
       logPayment('pending', 'Processing payment...');
-    } else if (isConfirming) {
-      logPayment('pending', 'Confirming payment...');
     }
 
     if (error) {
-      logPayment('error', error.message);
+      logPayment('error', (error as BaseError).message);
     }
-  }, [isPending, isConfirmed, isConfirming, error, logPayment]);
+  }, [isLoading, isConfirmed, error, logPayment]);
 
   useEffect(() => {
     if (retry) {
@@ -82,7 +109,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     } else {
       initiatePayment();
     }
-  }, [retry]);
+  }, [retry, initiatePayment]);
 
   useEffect(() => {
     if (paymentInfoRef.current) {
