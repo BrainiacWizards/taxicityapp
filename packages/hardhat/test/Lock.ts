@@ -1,127 +1,111 @@
-import {
-  time,
-  loadFixture,
-} from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
-import { expect } from "chai";
-import hre from "hardhat";
+const { expect } = require('chai');
+const { ethers } = require('hardhat');
 
-describe("Lock", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
-  async function deployOneYearLockFixture() {
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const ONE_GWEI = 1_000_000_000;
+describe('TaxiService', function () {
+  let TaxiService;
+  let taxiService;
+  let driver;
+  let passenger;
+  const fare = ethers.utils.parseEther('1');
+  const tripDetails = 'Trip from A to B';
 
-    const lockedAmount = ONE_GWEI;
-    const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS;
-
-    // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await hre.ethers.getSigners();
-
-    const Lock = await hre.ethers.getContractFactory("Lock");
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-    return { lock, unlockTime, lockedAmount, owner, otherAccount };
-  }
-
-  describe("Deployment", function () {
-    it("Should set the right unlockTime", async function () {
-      const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.unlockTime()).to.equal(unlockTime);
-    });
-
-    it("Should set the right owner", async function () {
-      const { lock, owner } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.owner()).to.equal(owner.address);
-    });
-
-    it("Should receive and store the funds to lock", async function () {
-      const { lock, lockedAmount } = await loadFixture(
-        deployOneYearLockFixture
-      );
-
-      expect(await hre.ethers.provider.getBalance(lock.target)).to.equal(
-        lockedAmount
-      );
-    });
-
-    it("Should fail if the unlockTime is not in the future", async function () {
-      // We don't use the fixture here because we want a different deployment
-      const latestTime = await time.latest();
-      const Lock = await hre.ethers.getContractFactory("Lock");
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-        "Unlock time should be in the future"
-      );
-    });
+  beforeEach(async function () {
+    [driver, passenger] = await ethers.getSigners();
+    TaxiService = await ethers.getContractFactory('TaxiService');
+    taxiService = await TaxiService.deploy();
+    await taxiService.deployed();
   });
 
-  describe("Withdrawals", function () {
-    describe("Validations", function () {
-      it("Should revert with the right error if called too soon", async function () {
-        const { lock } = await loadFixture(deployOneYearLockFixture);
+  it('should create a trip', async function () {
+    const tx = await taxiService.connect(driver).createTrip(fare, tripDetails);
+    const receipt = await tx.wait();
+    const tripCode = receipt.events[0].args.tripCode.toNumber();
+    const trip = await taxiService.trips(tripCode);
 
-        await expect(lock.withdraw()).to.be.revertedWith(
-          "You can't withdraw yet"
-        );
-      });
+    expect(trip.driver).to.equal(driver.address);
+    expect(trip.fare).to.equal(fare);
+    expect(trip.details).to.equal(tripDetails);
+    expect(trip.completed).to.equal(false);
+    expect(trip.passengers.length).to.equal(0);
 
-      it("Should revert with the right error if called from another account", async function () {
-        const { lock, unlockTime, otherAccount } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    expect(receipt.events[0].event).to.equal('TripCreated');
+    expect(receipt.events[0].args.tripCode.toNumber()).to.equal(tripCode);
+    expect(receipt.events[0].args.driver).to.equal(driver.address);
+    expect(receipt.events[0].args.fare).to.equal(fare);
+    expect(receipt.events[0].args.details).to.equal(tripDetails);
+  });
 
-        // We can increase the time in Hardhat Network
-        await time.increaseTo(unlockTime);
+  it('should allow a passenger to join a trip', async function () {
+    const txCreate = await taxiService
+      .connect(driver)
+      .createTrip(fare, tripDetails);
+    const receiptCreate = await txCreate.wait();
+    const tripCode = receiptCreate.events[0].args.tripCode.toNumber();
 
-        // We use lock.connect() to send a transaction from another account
-        await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
-          "You aren't the owner"
-        );
-      });
+    const txJoin = await taxiService.connect(passenger).joinTrip(tripCode);
+    const receiptJoin = await txJoin.wait();
+    const trip = await taxiService.trips(tripCode);
 
-      it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
-        const { lock, unlockTime } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    expect(trip.passengers.length).to.equal(1);
+    expect(trip.passengers[0]).to.equal(passenger.address);
 
-        // Transactions are sent using the first signer by default
-        await time.increaseTo(unlockTime);
+    expect(receiptJoin.events[0].event).to.equal('PassengerJoinedTrip');
+    expect(receiptJoin.events[0].args.tripCode.toNumber()).to.equal(tripCode);
+    expect(receiptJoin.events[0].args.passenger).to.equal(passenger.address);
+  });
 
-        await expect(lock.withdraw()).not.to.be.reverted;
-      });
-    });
+  it('should complete a trip', async function () {
+    const txCreate = await taxiService
+      .connect(driver)
+      .createTrip(fare, tripDetails);
+    const receiptCreate = await txCreate.wait();
+    const tripCode = receiptCreate.events[0].args.tripCode.toNumber();
 
-    describe("Events", function () {
-      it("Should emit an event on withdrawals", async function () {
-        const { lock, unlockTime, lockedAmount } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    const initialDriverBalance = await ethers.provider.getBalance(
+      driver.address
+    );
+    const txComplete = await taxiService
+      .connect(passenger)
+      .completeTrip(tripCode, { value: fare });
+    const receiptComplete = await txComplete.wait();
+    const trip = await taxiService.trips(tripCode);
 
-        await time.increaseTo(unlockTime);
+    expect(trip.completed).to.equal(true);
+    expect(trip.transactionHash).to.not.equal(ethers.constants.HashZero);
 
-        await expect(lock.withdraw())
-          .to.emit(lock, "Withdrawal")
-          .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
-      });
-    });
+    const finalDriverBalance = await ethers.provider.getBalance(driver.address);
+    const taxAmount = fare.mul(8).div(100);
+    const paymentAmount = fare.sub(taxAmount);
+    expect(finalDriverBalance.sub(initialDriverBalance)).to.equal(
+      paymentAmount
+    );
 
-    describe("Transfers", function () {
-      it("Should transfer the funds to the owner", async function () {
-        const { lock, unlockTime, lockedAmount, owner } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    expect(receiptComplete.events[0].event).to.equal('PaymentMade');
+    expect(receiptComplete.events[0].args.tripCode.toNumber()).to.equal(
+      tripCode
+    );
+    expect(receiptComplete.events[0].args.passenger).to.equal(
+      passenger.address
+    );
+    expect(receiptComplete.events[0].args.amount).to.equal(paymentAmount);
+    expect(receiptComplete.events[0].args.tax).to.equal(taxAmount);
+  });
 
-        await time.increaseTo(unlockTime);
+  it('should get trip details', async function () {
+    const txCreate = await taxiService
+      .connect(driver)
+      .createTrip(fare, tripDetails);
+    const receiptCreate = await txCreate.wait();
+    const tripCode = receiptCreate.events[0].args.tripCode.toNumber();
 
-        await expect(lock.withdraw()).to.changeEtherBalances(
-          [owner, lock],
-          [lockedAmount, -lockedAmount]
-        );
-      });
-    });
+    const trip = await taxiService.getTripDetails(tripCode);
+
+    expect(trip[0]).to.equal(driver.address);
+    expect(trip[1]).to.equal(fare);
+    expect(trip[2]).to.equal(tripDetails);
+    expect(trip[3]).to.equal(true);
+    expect(trip[4]).to.not.equal(ethers.constants.HashZero);
+    expect(trip[5].length).to.equal(1);
+    expect(trip[5][0]).to.equal(passenger.address);
   });
 });
