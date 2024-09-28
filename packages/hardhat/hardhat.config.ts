@@ -1,5 +1,6 @@
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-verify';
+import '@nomiclabs/hardhat-ethers';
 import { config as dotEnvConfig } from 'dotenv';
 import { HardhatUserConfig } from 'hardhat/config';
 
@@ -43,7 +44,7 @@ const config: HardhatUserConfig = {
   solidity: {
     compilers: [
       {
-        version: '0.8.24',
+        version: '0.8.27',
         settings: {
           optimizer: {
             enabled: true,
