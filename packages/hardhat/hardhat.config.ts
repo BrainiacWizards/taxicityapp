@@ -13,7 +13,7 @@ const config: HardhatUserConfig = {
     },
     customChains: [
       {
-        chainId: 44_787,
+        chainId: 44787,
         network: 'alfajores',
         urls: {
           apiURL: 'https://api-alfajores.celoscan.io/api',
@@ -21,7 +21,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        chainId: 42_220,
+        chainId: 42220,
         network: 'celo',
         urls: {
           apiURL: 'https://api.celoscan.io/api',
@@ -40,7 +40,19 @@ const config: HardhatUserConfig = {
       url: 'https://forno.celo.org',
     },
   },
-  solidity: '0.8.24',
+  solidity: {
+    compilers: [
+      {
+        version: '0.8.24',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+    ],
+  },
 };
 
 export default config;
