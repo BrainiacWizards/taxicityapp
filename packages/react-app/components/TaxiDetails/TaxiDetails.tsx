@@ -12,6 +12,8 @@ const TaxiDetails: React.FC<{
 }> = ({ TaxiData, showTaxiDetails, type = 'popup' }) => {
   if (!TaxiData) return <></>;
 
+  console.log('TaxiData', TaxiData);
+
   let clsName = '';
   if (type === 'fitted') {
     clsName = 'TaxiDetails';
@@ -21,6 +23,16 @@ const TaxiDetails: React.FC<{
 
   const storeTripOnLocal = () => {
     sessionStorage.setItem('trip', JSON.stringify(TaxiData));
+  };
+
+  const formatDriverName = () => {
+    return TaxiData?.driver
+      ? TaxiData.driver.length === 42 && TaxiData.driver.startsWith('0x')
+        ? `${TaxiData.driver.substring(0, 4)}...${TaxiData.driver.substring(
+            TaxiData.driver.length - 4
+          )}`
+        : TaxiData.driver
+      : '';
   };
 
   return (
@@ -36,7 +48,7 @@ const TaxiDetails: React.FC<{
         <div className={styles.TaxiDetailsPopUpInfo}>
           <div className={styles.TaxiDetailsPopUpInfoRow}>
             <span>Driver:</span>
-            <p>{TaxiData?.driver}</p>
+            <p>{formatDriverName()}</p>
           </div>
           <div className={styles.TaxiDetailsPopUpInfoRow}>
             <span>Rank:</span>
@@ -48,11 +60,11 @@ const TaxiDetails: React.FC<{
           </div>
           <div className={styles.TaxiDetailsPopUpInfoRow}>
             <span>Price:</span>
-            <p>R{TaxiData.price}</p>
+            <p>R{TaxiData.price.toString().substring(0, 4)}</p>
           </div>
           <div className={styles.TaxiDetailsPopUpInfoRow}>
             <span>Capacity:</span>
-            <p>{TaxiData.capacity}</p>
+            <p>{TaxiData.capacity.toString()}</p>
           </div>
           <div className={styles.TaxiDetailsPopUpInfoRow}>
             <span>Verified:</span>

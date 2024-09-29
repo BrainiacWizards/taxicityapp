@@ -39,7 +39,29 @@ const TripPage: React.FC = () => {
         return;
       }
 
-      const [, , , completed, , passengers] = tripDetails;
+      const {
+        tripCode: code,
+        rankName,
+        registration,
+        verified,
+        route,
+        price,
+        capacity,
+        driver,
+        passengers,
+        completed,
+      } = tripDetails;
+
+      setTaxiData({
+        tripCode: code,
+        rankName,
+        registration,
+        verified,
+        route,
+        price: price.toString(),
+        capacity: capacity.toString(),
+        driver,
+      });
 
       setPassengers(
         passengers.map((address: string) => `Passenger: ${address}`)

@@ -47,11 +47,17 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const createTrip = useCallback(async () => {
     setPaymentLog('Creating trip...');
     try {
-      const details = `Route: ${TaxiData.route}, Verified: ${TaxiData.verified}, Capacity: ${TaxiData.capacity}`;
+      const details = TaxiData.route;
+      const rankName = TaxiData.rankName;
+      const registration = TaxiData.registration;
+      const verified = TaxiData.verified;
 
       const tx = await contract.createTrip(
         ethers.utils.parseEther(TaxiData.price.toString()),
-        details
+        details,
+        rankName,
+        registration,
+        verified
       );
       const receipt = await tx.wait();
       console.log('Transaction receipt:', receipt); // Log the receipt to debug
@@ -60,7 +66,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
       const event = receipt.events?.find(
         (event: any) => event.event === 'TripCreated'
       );
-      const tripCounter = event?.args.tripCode?.toString();
+      const tripCounter = event?.args.tripCounter?.toString();
 
       console.log(event, tripCounter);
 
@@ -79,32 +85,14 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     async (tripCode: number) => {
       setPaymentLog('Joining trip...');
       try {
-        const tx = await contract.joinTrip(tripCode);
+        const tx = await contract.joinTrip(tripCode, {
+          value: ethers.utils.parseEther(TaxiData.price.toString()),
+        });
         await tx.wait();
         logPayment('successful', `Joined trip with code: ${tripCode}`);
         return tripCode;
       } catch (error) {
         logPayment('error', `Error joining trip: ${(error as Error).message}`);
-        throw error;
-      }
-    },
-    [contract, logPayment]
-  );
-
-  const completeTrip = useCallback(
-    async (tripCode: number) => {
-      setPaymentLog('Completing trip (payment)...');
-      try {
-        const tx = await contract.completeTrip(tripCode, {
-          value: ethers.utils.parseEther(TaxiData.price.toString()), //  (just for test purposes)
-        });
-        await tx.wait();
-        logPayment('successful', `Completed trip with code: ${tripCode}`);
-      } catch (error) {
-        logPayment(
-          'error',
-          `Error completing trip: ${(error as Error).message}`
-        );
         throw error;
       }
     },
@@ -117,26 +105,26 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     setPaymentLog('Payment initiated...');
     try {
       if (TaxiData.tripCode) {
-        const tripCode = await joinTrip(TaxiData.tripCode);
-        await completeTrip(tripCode);
+        await joinTrip(TaxiData.tripCode);
       } else {
-        logPayment('error', 'Error creating trip, invalid trip code');
+        throw new Error('Trip code is undefined');
       }
     } catch (error) {
-      logPayment(
-        'error',
-        `Error initiating payment: ${(error as Error).message}`
-      );
+      if (error instanceof Error && 'data' in error) {
+        logPayment(
+          'error',
+          `Error initiating payment: ${(error.data as Error).message}`
+        );
+      } else {
+        logPayment(
+          'error',
+          `Error initiating payment: ${(error as Error).message}`
+        );
+      }
     } finally {
       setIsTransactionInProgress(false);
     }
-  }, [
-    createTrip,
-    joinTrip,
-    completeTrip,
-    TaxiData.tripCode,
-    isTransactionInProgress,
-  ]);
+  }, [createTrip, joinTrip, TaxiData.tripCode, isTransactionInProgress]);
 
   useEffect(() => {
     initiatePayment();

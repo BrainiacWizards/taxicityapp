@@ -10,17 +10,6 @@ import {
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
 import { abi, contractAddress } from '@/lib/contractConfig';
 
-// interface iTripCardProps {
-//   rankName: string;
-//   registration: string;
-//   route: string;
-//   price: string;
-//   capacity: number;
-//   date: string;
-//   tripId: string;
-//   status: 'completed' | 'ongoing';
-// }
-
 interface iTrip {
   rankName: string;
   registration: string;
@@ -49,7 +38,9 @@ const TripCard: React.FC<{ trip: iTrip }> = React.memo(({ trip }) => (
       <p>
         Registration: <span>{trip.registration}</span>
       </p>
-      <p>{/* Capacity: <span>{trip.capacity}</span> */}</p>
+      <p>
+        Capacity: <span>{trip.capacity.toString()}</span>
+      </p>
       <p>
         Date: <span>{trip.date}</span>
       </p>
