@@ -1,0 +1,33 @@
+.loader {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 150px; /* 8em * 16px */
+  height: 50px; /* 1.5em * 16px */
+  padding-block: 2.4px; /* 0.15em * 16px */
+  border: 2px solid var(--accent-color);
+  border-radius: 240px; /* 15em * 16px */
+  background: var(--prim-color);
+}
+
+.dot {
+  width: 30px;
+  height: 30px;
+  background: var(--accent-color);
+  border-radius: 320px; /* 20em * 16px */
+  filter: brightness(1.5);
+  animation: stretch 1.2s linear alternate infinite;
+}
+
+@keyframes stretch {
+  100% {
+    transform: translateX(calc(112px - 2px)); /* 7em * 16px */
+  }
+  35% {
+    width: 48px; /* 3em * 16px */
+  }
+}

@@ -6,6 +6,7 @@ import { taxis, ranks } from '@/lib/data';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import PopUpLoader from '@/components/PopupLoader/'; // Import the PopUpLoader component
 
 const CreateTrip: React.FC = () => {
   const [driverName, setDriverName] = useState('');
@@ -180,6 +181,7 @@ const CreateTrip: React.FC = () => {
           </form>
         )}
         {message && <p>{message}</p>}
+        {loading && <PopUpLoader />}
       </div>
     </DriverLayout>
   );

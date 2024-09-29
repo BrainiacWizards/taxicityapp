@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import UserLayout from '@/components/UserLayout/UserLayout';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { ethers } from 'ethers';
 import styles from './trip-history.module.css';
 import {
   FaAngleDoubleLeft,
@@ -7,39 +7,56 @@ import {
   FaArrowRight,
   FaMapMarkerAlt,
 } from 'react-icons/fa';
-import { iTripCardProps, iTrip } from '@/models/UserModels';
+import UserLayout from '@/components/UserLayout/UserLayout';
+import { abi, contractAddress } from '@/lib/contractConfig';
+import PopUpLoader from '@/components/PopupLoader'; // Import the PopUpLoader component
 
-const TripCard: React.FC<iTripCardProps> = React.memo(
-  ({ from, to, driver, reg, price, date }) => (
-    <div className={styles.tripCard}>
-      <div className={styles.tripCardHeader}>
-        <h3>
-          <FaMapMarkerAlt />
-          <span>{from}</span>
-        </h3>
-        <FaArrowRight />
-        <h3>
-          <FaMapMarkerAlt />
-          <span>{to}</span>
-        </h3>
-      </div>
-      <div className={styles.tripCardBody}>
-        <p>
-          Driver: <span>{driver}</span>
-        </p>
-        <p>
-          Registration: <span>{reg}</span>
-        </p>
-        <p>
-          Price: <span>{price}</span>
-        </p>
-        <p>
-          Date: <span>{date}</span>
-        </p>
-      </div>
+interface iTrip {
+  rankName: string;
+  registration: string;
+  route: string;
+  price: string;
+  passengers: [];
+  date: string;
+  tripId: string;
+  status: 'completed' | 'ongoing';
+}
+
+const TripCard: React.FC<{ trip: iTrip }> = React.memo(({ trip }) => (
+  <div className={styles.tripCard}>
+    <div className={styles.tripCardHeader}>
+      <h3>
+        <FaMapMarkerAlt />
+        <span>{trip.route.split(' - ')[0]}</span>
+      </h3>
+      <FaArrowRight />
+      <h3>
+        <FaMapMarkerAlt />
+        <span>{trip.route.split(' - ')[1]}</span>
+      </h3>
     </div>
-  )
-);
+    <div className={styles.tripCardBody}>
+      <p>
+        Registration: <span>{trip.registration}</span>
+      </p>
+      <p>
+        Passengers: <span>{trip.passengers.length}</span>
+      </p>
+      <p>
+        Date: <span>{trip.date}</span>
+      </p>
+      <p>
+        Price: <span>{trip.price}</span>
+      </p>
+      <p>
+        Trip ID: <span>{trip.tripId}</span>
+      </p>
+      <p>
+        Status: <span>{trip.status}</span>
+      </p>
+    </div>
+  </div>
+));
 
 const usePagination = (items: iTrip[], itemsPerPage: number) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,64 +94,51 @@ const usePagination = (items: iTrip[], itemsPerPage: number) => {
 };
 
 const UserTripHistoryPage: React.FC = () => {
+  const [trips, setTrips] = useState<iTrip[]>([]);
+  const [loading, setLoading] = useState(true); // Add loading state
   const [sortCriteria, setSortCriteria] = useState<keyof iTrip>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const trips = useMemo(
-    () => [
-      {
-        from: 'New York',
-        to: 'Boston',
-        driver: 'John Doe',
-        reg: 'ABC1234',
-        price: '$50',
-        date: '2023-01-15',
-      },
-      {
-        from: 'San Francisco',
-        to: 'Los Angeles',
-        driver: 'Jane Smith',
-        reg: 'XYZ5678',
-        price: '$75',
-        date: '2023-02-20',
-      },
-      {
-        from: 'Chicago',
-        to: 'Detroit',
-        driver: 'Mike Johnson',
-        reg: 'LMN9101',
-        price: '$40',
-        date: '2023-03-10',
-      },
-      {
-        from: 'Houston',
-        to: 'Dallas',
-        driver: 'Emily Davis',
-        reg: 'QRS2345',
-        price: '$60',
-        date: '2023-04-05',
-      },
-      {
-        from: 'Miami',
-        to: 'Orlando',
-        driver: 'Chris Brown',
-        reg: 'TUV6789',
-        price: '$45',
-        date: '2023-05-12',
-      },
-      {
-        from: 'Seattle',
-        to: 'Portland',
-        driver: 'Patricia Wilson',
-        reg: 'WXY3456',
-        price: '$55',
-        date: '2023-06-18',
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    const fetchTrips = async () => {
+      setLoading(true); // Set loading to true when fetching starts
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(contractAddress, abi, provider);
 
-  const sortedTrips = useMemo(() => {
+      const tripCounter = await contract.tripCounter();
+      const tripPromises: Promise<any>[] = [];
+
+      for (let i = 1; i <= tripCounter; i++) {
+        tripPromises.push(contract.getTripDetails(i));
+      }
+
+      const tripResults = await Promise.all(tripPromises);
+      const fetchedTrips: iTrip[] = tripResults.map((trip, index) => {
+        const { rankName, registration, route, price, passengers, completed } =
+          trip;
+        const date = new Date().toISOString().split('T')[0]; // Placeholder for date
+        const status = completed ? 'completed' : 'ongoing';
+
+        return {
+          rankName,
+          registration,
+          route,
+          price: `$${price.toString()}`,
+          passengers,
+          date,
+          tripId: (index + 1).toString(),
+          status,
+        };
+      });
+
+      setTrips(fetchedTrips);
+      setLoading(false); // Set loading to false when fetching ends
+    };
+
+    fetchTrips();
+  }, []);
+
+  const sortedTrips: iTrip[] = useMemo(() => {
     return [...trips].sort((a, b) => {
       if (sortDirection === 'asc') {
         return a[sortCriteria] > b[sortCriteria] ? 1 : -1;
@@ -163,12 +167,14 @@ const UserTripHistoryPage: React.FC = () => {
               value={sortCriteria}
               onChange={(e) => setSortCriteria(e.target.value as keyof iTrip)}
             >
-              <option value="from">From</option>
-              <option value="to">To</option>
-              <option value="driver">Driver</option>
-              <option value="reg">Registration</option>
+              <option value="rankName">Rank Name</option>
+              <option value="registration">Registration</option>
+              <option value="route">Route</option>
               <option value="price">Price</option>
+              <option value="passengers">Passengers</option>
               <option value="date">Date</option>
+              <option value="tripId">Trip ID</option>
+              <option value="status">Status</option>
             </select>
           </label>
           <label>
@@ -178,30 +184,36 @@ const UserTripHistoryPage: React.FC = () => {
                 setSortDirection(e.target.value as 'asc' | 'desc')
               }
             >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <option value="asc">Asc</option>
+              <option value="desc">Desc</option>
             </select>
           </label>
         </div>
-        <div className={styles.userTripContent}>
-          {currentItems.map((trip, index) => (
-            <TripCard key={index} {...trip} />
-          ))}
-        </div>
-        <div className={styles.pagination}>
-          <button onClick={handlePrevPage} disabled={currentPage === 1}>
-            <FaAngleDoubleLeft />
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-          >
-            <FaAngleDoubleRight />
-          </button>
-        </div>
+        {loading ? (
+          <PopUpLoader /> // Show PopUpLoader when loading
+        ) : (
+          <>
+            <div className={styles.userTripContent}>
+              {currentItems.map((trip, index) => (
+                <TripCard key={index} trip={trip} />
+              ))}
+            </div>
+            <div className={styles.pagination}>
+              <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                <FaAngleDoubleLeft />
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                <FaAngleDoubleRight />
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </UserLayout>
   );

@@ -9,13 +9,14 @@ import {
 } from 'react-icons/fa';
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
 import { abi, contractAddress } from '@/lib/contractConfig';
+import PopUpLoader from '@/components/PopupLoader';
 
 interface iTrip {
   rankName: string;
   registration: string;
   route: string;
   price: string;
-  passengers: [];
+  passengers: any[]; //TODO: Replace 'any' with the actual type if known
   date: string;
   tripId: string;
   status: 'completed' | 'ongoing';
@@ -55,8 +56,6 @@ const TripCard: React.FC<{ trip: iTrip }> = React.memo(({ trip }) => (
       </p>
     </div>
   </div>
-
-  // <div className={styles.tripCard}>{JSON.stringify(trip)}</div>
 ));
 
 const usePagination = (items: iTrip[], itemsPerPage: number) => {
@@ -98,39 +97,53 @@ const UserTripHistoryPage: React.FC = () => {
   const [trips, setTrips] = useState<iTrip[]>([]);
   const [sortCriteria, setSortCriteria] = useState<keyof iTrip>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTrips = async () => {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const contract = new ethers.Contract(contractAddress, abi, provider);
+      setLoading(true);
+      try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const tripCount = await contract.tripCounter();
 
-      const tripCounter = await contract.tripCounter();
-      const tripPromises: Promise<any>[] = [];
+        const tripPromises = Array.from(
+          { length: tripCount.toNumber() },
+          (_, i) => contract.getTripDetails(i + 1)
+        );
 
-      for (let i = 1; i <= tripCounter; i++) {
-        tripPromises.push(contract.getTripDetails(i));
+        const tripResults = await Promise.all(tripPromises);
+
+        const fetchedTrips: iTrip[] = tripResults.map((trip, index) => {
+          const {
+            rankName,
+            registration,
+            route,
+            price,
+            passengers,
+            completed,
+          } = trip;
+          const date = new Date().toLocaleDateString();
+          const status = completed ? 'completed' : 'ongoing';
+
+          return {
+            rankName,
+            registration,
+            route,
+            price: `$${price.toString()}`,
+            passengers,
+            date,
+            tripId: (index + 1).toString(),
+            status,
+          };
+        });
+
+        setTrips(fetchedTrips);
+      } catch (error) {
+        console.error('Error fetching trips:', error);
+      } finally {
+        setLoading(false);
       }
-
-      const tripResults = await Promise.all(tripPromises);
-      const fetchedTrips: iTrip[] = tripResults.map((trip, index) => {
-        const { rankName, registration, route, price, passengers, completed } =
-          trip;
-        const date = new Date().toISOString().split('T')[0]; // Placeholder for date
-        const status = completed ? 'completed' : 'ongoing';
-
-        return {
-          rankName,
-          registration,
-          route,
-          price: `$${price.toString()}`,
-          passengers,
-          date,
-          tripId: (index + 1).toString(),
-          status,
-        };
-      });
-
-      setTrips(fetchedTrips);
     };
 
     fetchTrips();
@@ -206,6 +219,7 @@ const UserTripHistoryPage: React.FC = () => {
             <FaAngleDoubleRight />
           </button>
         </div>
+        {loading && <PopUpLoader />}
       </div>
     </DriverLayout>
   );

@@ -7,6 +7,7 @@ import { stableTokenABI } from '@celo/abis';
 import CustomConnectButton from '@/components/CustomConnectBtn/CustomConnectBtn';
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
 import Image from 'next/image';
+import PopUpLoader from '@/components/PopupLoader/'; // Import the PopUpLoader component
 
 const STABLE_TOKEN_ADDRESS = '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9';
 
@@ -22,6 +23,7 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(userProfile.name);
   const [userBalance, setUserBalance] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
   const chains = useChains();
   const account = useAccount();
 
@@ -46,6 +48,8 @@ const ProfilePage: React.FC = () => {
       return;
     }
 
+    setIsLoading(true); // Set loading state to true
+
     try {
       const StableTokenContract = getContract({
         abi: stableTokenABI,
@@ -67,6 +71,8 @@ const ProfilePage: React.FC = () => {
       }));
     } catch (error) {
       console.error('Error fetching balance:', error);
+    } finally {
+      setIsLoading(false); // Set loading state to false
     }
   };
 
@@ -184,6 +190,7 @@ const ProfilePage: React.FC = () => {
             )}
           </div>
         </form>
+        {isLoading && <PopUpLoader />} {/* Show PopUpLoader when loading */}
       </div>
     </DriverLayout>
   );
