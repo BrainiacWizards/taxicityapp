@@ -24,7 +24,15 @@ export default function Header() {
   const { connect } = useConnect();
 
   useEffect(() => {
-    setShowLinks(window.innerWidth > 800);
+    const handleResize = () => {
+      if (window.innerWidth >= 800) {
+        setShowLinks(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   useEffect(() => {
@@ -32,11 +40,6 @@ export default function Header() {
       setHideConnectBtn(true);
       connect({ connector: injected({ target: 'metaMask' }) });
     }
-
-    const handleResize = () => setShowLinks(window.innerWidth > 800);
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
   }, [connect]);
 
   const navLinks = [
@@ -89,7 +92,12 @@ export default function Header() {
         {showLinks && (
           <ul className="nav-links">
             {navLinks.map((link) => (
-              <li key={link.href}>
+              <li
+                key={link.href}
+                onClick={() => {
+                  setShowLinks(false);
+                }}
+              >
                 <Link href={link.href}>
                   {link.icon} {link.label}
                 </Link>

@@ -9,6 +9,7 @@ import PayModal from '@/components/PayModal/PayModal';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
 import { abi, contractAddress } from '@/lib/contractConfig';
+import PopUpLoader from '@/components/PopupLoader/'; // Import PopUpLoader
 
 const dummyTaxiData: iTaxiData = {
   capacity: 0,
@@ -116,6 +117,7 @@ const Checkout: React.FC = () => {
 
   return (
     <div className={styles.checkoutContainer}>
+      {isVerifying && <PopUpLoader />}
       {showPaymentModal && (
         <PayModal
           TaxiData={taxiData}
@@ -129,9 +131,7 @@ const Checkout: React.FC = () => {
           showTaxiDetails={() => {}}
         />
       </div>
-
       <Divider />
-
       {!isCodeEntered ? (
         <div className={styles.accessCodeContainer}>
           <h2>Enter Trip Access Code or Scan QR</h2>
