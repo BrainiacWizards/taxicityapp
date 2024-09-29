@@ -3,16 +3,16 @@ import { ethers } from 'ethers';
 import styles from './create-trip.module.css';
 import { abi, contractAddress } from '@/lib/contractConfig';
 import { taxis, ranks } from '@/lib/data';
-import { iRank, iRoute, iTaxi } from '@/models/RankMapModels';
+import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
-import DriverLayout from "@/components/DriverLayout/DriverLayout";
+import DriverLayout from '@/components/DriverLayout/DriverLayout';
 
 const CreateTrip: React.FC = () => {
   const [driverName, setDriverName] = useState('');
   const [routeID, setRouteID] = useState('');
   const [registration, setRegistration] = useState('');
   const [filteredTaxis, setFilteredTaxis] = useState<iTaxi[]>([]);
-  const [selectedTaxi, setSelectedTaxi] = useState<iTaxi | null>(null);
+  const [selectedTaxi, setSelectedTaxi] = useState<iTaxiData | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [tripCode, setTripCode] = useState<string | null>(null);
@@ -57,7 +57,8 @@ const CreateTrip: React.FC = () => {
   };
 
   const handleSelectTaxi = (taxi: iTaxi) => {
-    setSelectedTaxi(taxi);
+    const taxiData = getFilteredTaxiData([taxi])[0];
+    setSelectedTaxi(taxiData);
   };
 
   const handleCreateTrip = async (event: React.FormEvent) => {
@@ -72,14 +73,12 @@ const CreateTrip: React.FC = () => {
       const signer = provider.getSigner();
       const contract = new ethers.Contract(contractAddress, abi, signer);
 
-      const route = rankMap[selectedTaxi.rankId]?.routes.find(
-        (route) => route.routeId === selectedTaxi.routeId
-      );
+      const route = selectedTaxi.route;
       if (!route) throw new Error('Route not found');
 
       const tx = await contract.createTrip(
-        ethers.utils.parseEther(route.price.toString()),
-        `From ${route.toTown} to ${route.toCity}`
+        ethers.utils.parseEther(selectedTaxi.price.toString()),
+        `Route: ${route}, Driver: ${selectedTaxi.driver}, Registration: ${selectedTaxi.registration}, Rank: ${selectedTaxi.rankName}`
       );
       const receipt = await tx.wait();
       console.log('Transaction receipt:', receipt); // Log the receipt to debug
@@ -103,95 +102,83 @@ const CreateTrip: React.FC = () => {
     }
   };
 
- return (
-   <DriverLayout>
-     <div className={styles.createTrip}>
-       <h1>Create a New Trip</h1>
-       {!tripCode ? (
-         <>
-           <div className={styles.searchTaxi}>
-             <input
-               type="text"
-               placeholder="Enter driver name"
-               value={driverName}
-               onChange={(e) => setDriverName(e.target.value)}
-             />
-             <input
-               type="text"
-               placeholder="Enter route ID"
-               value={routeID}
-               onChange={(e) => setRouteID(e.target.value)}
-             />
-             <input
-               type="text"
-               placeholder="Enter registration"
-               value={registration}
-               onChange={(e) => setRegistration(e.target.value)}
-             />
-             <button onClick={handleSearchTaxi}>Search Taxi</button>
-           </div>
-           <div className={styles.taxiList}>
-             {filteredTaxis.map((taxi) => (
-               <div key={taxi.registration} className={styles.taxiItem}>
-                 <TaxiDetails
-                   type="fitted"
-                   TaxiData={getFilteredTaxiData([taxi])[0]}
-                   showTaxiDetails={() => {}}
-                 />
-                 <button onClick={() => handleSelectTaxi(taxi)}>
-                   Select Taxi
-                 </button>
-               </div>
-             ))}
-           </div>
-         </>
-       ) : (
-         <div className={styles.tripDetails}>
-           <h2>Trip Created Successfully!</h2>
-           <p>Trip Code: {tripCode}</p>
-         </div>
-       )}
-       {selectedTaxi && !tripCode && (
-         <form className={styles.formDetails} onSubmit={handleCreateTrip}>
-           <div className={styles.formGroup}>
-             <label htmlFor="fare">Fare (ETH):</label>
-             <input
-               type="text"
-               id="fare"
-               value={
-                 rankMap[selectedTaxi.rankId]?.routes.find(
-                   (route) => route.routeId === selectedTaxi.routeId
-                 )?.price || ''
-               }
-               readOnly
-             />
-           </div>
-           <div className={styles.formGroup}>
-             <label htmlFor="details">Details:</label>
-             <input
-               type="text"
-               id="details"
-               value={`From ${
-                 rankMap[selectedTaxi.rankId]?.routes.find(
-                   (route) => route.routeId === selectedTaxi.routeId
-                 )?.toTown || 'N/A'
-               } to ${
-                 rankMap[selectedTaxi.rankId]?.routes.find(
-                   (route) => route.routeId === selectedTaxi.routeId
-                 )?.toCity || 'N/A'
-               }`}
-               readOnly
-             />
-           </div>
-           <button type="submit" disabled={loading}>
-             {loading ? 'Creating...' : 'Create Trip'}
-           </button>
-         </form>
-       )}
-       {message && <p>{message}</p>}
-     </div>
-   </DriverLayout>
- );
+  return (
+    <DriverLayout>
+      <div className={styles.createTrip}>
+        <h1>Create a New Trip</h1>
+        {!tripCode ? (
+          <>
+            <div className={styles.searchTaxi}>
+              <input
+                type="text"
+                placeholder="Enter driver name"
+                value={driverName}
+                onChange={(e) => setDriverName(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Enter route ID"
+                value={routeID}
+                onChange={(e) => setRouteID(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Enter registration"
+                value={registration}
+                onChange={(e) => setRegistration(e.target.value)}
+              />
+              <button onClick={handleSearchTaxi}>Search Taxi</button>
+            </div>
+            <div className={styles.taxiList}>
+              {filteredTaxis.map((taxi) => (
+                <div key={taxi.registration} className={styles.taxiItem}>
+                  <TaxiDetails
+                    type="fitted"
+                    TaxiData={getFilteredTaxiData([taxi])[0]}
+                    showTaxiDetails={() => {}}
+                  />
+                  <button onClick={() => handleSelectTaxi(taxi)}>
+                    Select Taxi
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className={styles.tripDetails}>
+            <h2>Trip Created Successfully!</h2>
+            <p>Trip Code: {tripCode}</p>
+          </div>
+        )}
+        {selectedTaxi && !tripCode && (
+          <form className={styles.formDetails} onSubmit={handleCreateTrip}>
+            <div className={styles.formGroup}>
+              <label htmlFor="fare">Fare (ETH):</label>
+              <input
+                type="text"
+                id="fare"
+                value={selectedTaxi.price}
+                readOnly
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="details">Details:</label>
+              <input
+                type="text"
+                id="details"
+                value={selectedTaxi.route}
+                readOnly
+              />
+            </div>
+            <button type="submit" disabled={loading}>
+              {loading ? 'Creating...' : 'Create Trip'}
+            </button>
+          </form>
+        )}
+        {message && <p>{message}</p>}
+      </div>
+    </DriverLayout>
+  );
 };
 
 export default CreateTrip;

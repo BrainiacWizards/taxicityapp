@@ -7,6 +7,8 @@ import Divider from '@/components/Divider/Divider';
 import { useConnect, useAccount } from 'wagmi';
 import PayModal from '@/components/PayModal/PayModal';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { ethers } from 'ethers';
+import { abi, contractAddress } from '@/lib/contractConfig';
 
 const dummyTaxiData: iTaxiData = {
   capacity: 0,
@@ -26,21 +28,10 @@ const Checkout: React.FC = () => {
   const [taxiData, setTaxiData] = useState<iTaxiData>(dummyTaxiData);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const code = 'ABC1235';
-  useConnect();
+  const [isVerifying, setIsVerifying] = useState(false);
   const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
-
-  useEffect(() => {
-    if (accessCode.trim() === '') {
-      setCodeError('');
-    } else if (code === accessCode) {
-      setIsCodeEntered(true);
-      setCodeError('Code Correct');
-    } else {
-      setCodeError('Incorrect code');
-    }
-  }, [accessCode]);
+  const { connectors } = useConnect();
 
   useEffect(() => {
     setIsMounted(true);
@@ -64,6 +55,61 @@ const Checkout: React.FC = () => {
     }
   };
 
+  const checkTripCode = async () => {
+    if (!connectors) return;
+
+    setIsVerifying(true);
+    setCodeError('Verifying code...');
+
+    try {
+      const provider = new ethers.providers.Web3Provider(
+        (await connectors[0].getProvider()) as ethers.providers.ExternalProvider
+      );
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const tripCode = parseInt(accessCode);
+      const tripDetails = await contract.getTripDetails(tripCode);
+
+      if (tripDetails.driver !== ethers.constants.AddressZero) {
+        setIsCodeEntered(true);
+        setCodeError('Code Correct');
+        setTaxiData({
+          ...taxiData,
+          driver: tripDetails.driver,
+          price: tripDetails.fare,
+          route: tripDetails.details,
+          verified: !tripDetails.completed,
+        });
+      } else {
+        setCodeError('Incorrect code');
+      }
+    } catch (error) {
+      console.error(error);
+      setCodeError('Error checking code');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const joinTrip = async () => {
+    if (!connectors) return;
+
+    try {
+      const provider = new ethers.providers.Web3Provider(
+        (await connectors[0].getProvider()) as ethers.providers.ExternalProvider
+      );
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+      const tripCode = parseInt(accessCode);
+      await contract.joinTrip(tripCode);
+      setShowPaymentModal(true);
+    } catch (error) {
+      console.error(error);
+      alert('Error joining trip');
+    }
+  };
+
   if (!isMounted) {
     return null;
   }
@@ -73,7 +119,7 @@ const Checkout: React.FC = () => {
       alert('Please connect your wallet first.');
       return;
     }
-    setShowPaymentModal(true);
+    joinTrip();
   };
 
   return (
@@ -103,7 +149,11 @@ const Checkout: React.FC = () => {
               value={accessCode}
               onChange={handleAccessCodeChange}
               placeholder="Enter Trip Code"
+              disabled={isVerifying}
             />
+            <button onClick={checkTripCode} disabled={isVerifying}>
+              Verify Code
+            </button>
             <span className={styles.codeError}>{codeError}</span>
           </div>
           <span>Or</span>
