@@ -3,75 +3,126 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 contract TaxiService {
-    uint256 public constant taxRate = 8; 
+  uint256 public constant taxRate = 8;
 
-    struct Trip {
-        address driver;                     
-        uint256 fare;                       
-        string details;                     
-        bool completed;                     
-        bytes32 transactionHash;            
-        address[] passengers;               
-    }
+  struct Trip {
+    uint256 tripCode;
+    string rankName;
+    string registration;
+    bool verified;
+    string route;
+    uint256 price;
+    uint256 capacity;
+    address driver;
+    address[] passengers;
+    bytes32 transactionHash;
+    bool completed;
+  }
 
-    mapping(uint256 => Trip) public trips;  
-    uint256 public tripCounter;             
+  mapping(uint256 => Trip) public trips;
+  uint256 public tripCounter;
 
-    event TripCreated(uint256 tripCode, address driver, uint256 fare, string details);
-    event PassengerJoinedTrip(uint256 tripCode, address passenger);
-    event PaymentMade(uint256 tripCode, address passenger, uint256 amount, uint256 tax, bytes32 transactionHash);
+  event TripCreated(
+    uint256 tripCounter,
+    address driver,
+    uint256 fare,
+    string details
+  );
+  event PassengerJoinedTrip(
+    uint256 tripCode,
+    address passenger,
+    uint256 amount,
+    uint256 tax,
+    bytes32 transactionHash
+  );
+  event TripCompleted(uint256 tripCode);
 
-    constructor() {
-        tripCounter = 0;  
-    }
+  constructor() {
+    tripCounter = 0;
+  }
 
-    
-    function createTrip(uint256 _fare, string memory _details) public returns (uint256) {
-        tripCounter++;  
-        trips[tripCounter] = Trip({
-            driver: msg.sender,
-            fare: _fare,
-            details: _details,
-            completed: false,
-            transactionHash: bytes32(0),  
-            passengers: new address[](0)   
-        });
+  modifier onlyDriver(uint256 _tripCode) {
+    require(
+      trips[_tripCode].driver == msg.sender,
+      'Only the driver can perform this action'
+    );
+    _;
+  }
 
-        emit TripCreated(tripCounter, msg.sender, _fare, _details);
-        return tripCounter;  
-    }
+  modifier tripExists(uint256 _tripCode) {
+    require(trips[_tripCode].driver != address(0), 'Trip does not exist');
+    _;
+  }
 
-    
-    function joinTrip(uint256 _tripCode) public {
-        Trip storage trip = trips[_tripCode];
-        require(trip.driver != address(0), "Trip does not exist");  
-        require(!trip.completed, "Trip already completed");         
+  modifier tripNotCompleted(uint256 _tripCode) {
+    require(!trips[_tripCode].completed, 'Trip already completed');
+    _;
+  }
 
-        trip.passengers.push(msg.sender); 
+  function createTrip(
+    uint256 _fare,
+    string memory _details,
+    string memory _rankName,
+    string memory _registration,
+    bool _verified
+  ) public returns (uint256) {
+    tripCounter++;
+    trips[tripCounter] = Trip({
+      tripCode: tripCounter,
+      rankName: _rankName,
+      registration: _registration,
+      verified: _verified,
+      route: _details,
+      price: _fare,
+      capacity: 0,
+      driver: msg.sender,
+      passengers: new address[](0),
+      transactionHash: bytes32(0),
+      completed: false
+    });
 
-        emit PassengerJoinedTrip(_tripCode, msg.sender);
-    }
+    emit TripCreated(tripCounter, msg.sender, _fare, _details);
+    return tripCounter;
+  }
 
-    
-    function completeTrip(uint256 _tripCode) public payable {
-        Trip storage trip = trips[_tripCode];
-        require(!trip.completed, "Trip already completed");
-        require(msg.value == trip.fare, "Exact fare required");
+  function joinTrip(
+    uint256 _tripCode
+  ) public payable tripExists(_tripCode) tripNotCompleted(_tripCode) {
+    Trip storage trip = trips[_tripCode];
+    require(msg.value == trip.price, 'Exact fare required');
 
-        uint256 taxAmount = (trip.fare * taxRate) / 100;  
-        uint256 paymentAmount = trip.fare - taxAmount;
+    uint256 taxAmount = (trip.price * taxRate) / 100;
+    uint256 paymentAmount = trip.price - taxAmount;
 
-        payable(trip.driver).transfer(paymentAmount);  
+    payable(trip.driver).transfer(paymentAmount);
 
-        trip.completed = true;
-        trip.transactionHash = blockhash(block.number - 1);  
+    trip.passengers.push(msg.sender);
+    trip.transactionHash = blockhash(block.number - 1);
 
-        emit PaymentMade(_tripCode, msg.sender, paymentAmount, taxAmount, trip.transactionHash);
-    }
+    emit PassengerJoinedTrip(
+      _tripCode,
+      msg.sender,
+      paymentAmount,
+      taxAmount,
+      trip.transactionHash
+    );
+  }
 
-    
-    function getTripDetails(uint256 _tripCode) public view returns (address, uint256, string memory, bool, bytes32, address[] memory) {
-        Trip memory trip = trips[_tripCode];
-        return (trip.driver, trip.fare, trip.details, trip.completed, trip.transactionHash, trip.passengers);
-    }
+  function completeTrip(
+    uint256 _tripCode
+  )
+    public
+    tripExists(_tripCode)
+    tripNotCompleted(_tripCode)
+    onlyDriver(_tripCode)
+  {
+    Trip storage trip = trips[_tripCode];
+    trip.completed = true;
+
+    emit TripCompleted(_tripCode);
+  }
+
+  function getTripDetails(uint256 _tripCode) public view returns (Trip memory) {
+    return trips[_tripCode];
+  }
 }

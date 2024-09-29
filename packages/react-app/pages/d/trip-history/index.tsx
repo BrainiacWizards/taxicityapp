@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { ethers } from 'ethers';
 import styles from './trip-history.module.css';
 import {
   FaAngleDoubleLeft,
@@ -7,61 +8,56 @@ import {
   FaMapMarkerAlt,
 } from 'react-icons/fa';
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
-
-interface iTripCardProps {
-  from: string;
-  to: string;
-  passengers: number;
-  date: string;
-  totalEarned: string;
-  tripId: string;
-  status: 'completed' | 'cancelled' | 'ongoing';
-}
+import { abi, contractAddress } from '@/lib/contractConfig';
 
 interface iTrip {
-  from: string;
-  to: string;
-  passengers: number;
+  rankName: string;
+  registration: string;
+  route: string;
+  price: string;
+  capacity: number;
   date: string;
-  totalEarned: string;
   tripId: string;
-  status: 'completed' | 'cancelled' | 'ongoing';
+  status: 'completed' | 'ongoing';
 }
 
-const TripCard: React.FC<iTripCardProps> = React.memo(
-  ({ from, to, passengers, date, totalEarned, tripId, status }) => (
-    <div className={styles.tripCard}>
-      <div className={styles.tripCardHeader}>
-        <h3>
-          <FaMapMarkerAlt />
-          <span>{from}</span>
-        </h3>
-        <FaArrowRight />
-        <h3>
-          <FaMapMarkerAlt />
-          <span>{to}</span>
-        </h3>
-      </div>
-      <div className={styles.tripCardBody}>
-        <p>
-          Passengers: <span>{passengers}</span>
-        </p>
-        <p>
-          Date: <span>{date}</span>
-        </p>
-        <p>
-          Total Earned: <span>{totalEarned}</span>
-        </p>
-        <p>
-          Trip ID: <span>{tripId}</span>
-        </p>
-        <p>
-          Status: <span>{status}</span>
-        </p>
-      </div>
+const TripCard: React.FC<{ trip: iTrip }> = React.memo(({ trip }) => (
+  <div className={styles.tripCard}>
+    <div className={styles.tripCardHeader}>
+      <h3>
+        <FaMapMarkerAlt />
+        <span>{trip.route.split(' - ')[0]}</span>
+      </h3>
+      <FaArrowRight />
+      <h3>
+        <FaMapMarkerAlt />
+        <span>{trip.route.split(' - ')[1]}</span>
+      </h3>
     </div>
-  )
-);
+    <div className={styles.tripCardBody}>
+      <p>
+        Registration: <span>{trip.registration}</span>
+      </p>
+      <p>
+        Capacity: <span>{trip.capacity.toString()}</span>
+      </p>
+      <p>
+        Date: <span>{trip.date}</span>
+      </p>
+      <p>
+        Price: <span>{trip.price}</span>
+      </p>
+      <p>
+        Trip ID: <span>{trip.tripId}</span>
+      </p>
+      <p>
+        Status: <span>{trip.status}</span>
+      </p>
+    </div>
+  </div>
+
+  // <div className={styles.tripCard}>{JSON.stringify(trip)}</div>
+));
 
 const usePagination = (items: iTrip[], itemsPerPage: number) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -99,68 +95,46 @@ const usePagination = (items: iTrip[], itemsPerPage: number) => {
 };
 
 const UserTripHistoryPage: React.FC = () => {
+  const [trips, setTrips] = useState<iTrip[]>([]);
   const [sortCriteria, setSortCriteria] = useState<keyof iTrip>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const trips: iTrip[] = useMemo(
-    () => [
-      {
-        from: 'New York',
-        to: 'Boston',
-        passengers: 3,
-        date: '2023-01-15',
-        totalEarned: '$150',
-        tripId: 'TRIP1234',
-        status: 'completed',
-      },
-      {
-        from: 'San Francisco',
-        to: 'Los Angeles',
-        passengers: 2,
-        date: '2023-02-20',
-        totalEarned: '$100',
-        tripId: 'TRIP5678',
-        status: 'completed',
-      },
-      {
-        from: 'Chicago',
-        to: 'Detroit',
-        passengers: 4,
-        date: '2023-03-10',
-        totalEarned: '$160',
-        tripId: 'TRIP9101',
-        status: 'cancelled',
-      },
-      {
-        from: 'Houston',
-        to: 'Dallas',
-        passengers: 1,
-        date: '2023-04-05',
-        totalEarned: '$60',
-        tripId: 'TRIP2345',
-        status: 'ongoing',
-      },
-      {
-        from: 'Miami',
-        to: 'Orlando',
-        passengers: 5,
-        date: '2023-05-12',
-        totalEarned: '$225',
-        tripId: 'TRIP6789',
-        status: 'completed',
-      },
-      {
-        from: 'Seattle',
-        to: 'Portland',
-        passengers: 3,
-        date: '2023-06-18',
-        totalEarned: '$165',
-        tripId: 'TRIP3456',
-        status: 'completed',
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    const fetchTrips = async () => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+
+      const tripCounter = await contract.tripCounter();
+      const tripPromises: Promise<any>[] = [];
+
+      for (let i = 1; i <= tripCounter; i++) {
+        tripPromises.push(contract.getTripDetails(i));
+      }
+
+      const tripResults = await Promise.all(tripPromises);
+      const fetchedTrips: iTrip[] = tripResults.map((trip, index) => {
+        const { rankName, registration, route, price, capacity, completed } =
+          trip;
+        const date = new Date().toISOString().split('T')[0]; // Placeholder for date
+        const status = completed ? 'completed' : 'ongoing';
+
+        return {
+          rankName,
+          registration,
+          route,
+          price: `$${price.toString()}`,
+          capacity,
+          date,
+          tripId: (index + 1).toString(),
+          status,
+        };
+      });
+
+      setTrips(fetchedTrips);
+    };
+
+    fetchTrips();
+  }, []);
 
   const sortedTrips: iTrip[] = useMemo(() => {
     return [...trips].sort((a, b) => {
@@ -191,11 +165,12 @@ const UserTripHistoryPage: React.FC = () => {
               value={sortCriteria}
               onChange={(e) => setSortCriteria(e.target.value as keyof iTrip)}
             >
-              <option value="from">From</option>
-              <option value="to">To</option>
-              <option value="passengers">Passengers</option>
+              <option value="rankName">Rank Name</option>
+              <option value="registration">Registration</option>
+              <option value="route">Route</option>
+              <option value="price">Price</option>
+              <option value="capacity">Capacity</option>
               <option value="date">Date</option>
-              <option value="totalEarned">Total Earned</option>
               <option value="tripId">Trip ID</option>
               <option value="status">Status</option>
             </select>
@@ -214,7 +189,8 @@ const UserTripHistoryPage: React.FC = () => {
         </div>
         <div className={styles.userTripContent}>
           {currentItems.map((trip, index) => (
-            <TripCard key={index} {...trip} />
+            <TripCard key={index} trip={trip} />
+            // <>{JSON.stringify(trip)}</>
           ))}
         </div>
         <div className={styles.pagination}>

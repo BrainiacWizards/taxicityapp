@@ -10,10 +10,10 @@ import React, {
 import { iTaxiData } from '@/models/RankMapModels';
 import styles from './paymodal.module.css';
 import Image from 'next/image';
-import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther } from 'ethers/lib/utils';
 import { FaCheckDouble, FaCopy } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import { ethers } from 'ethers';
+import { contractAddress, abi } from '@/lib/contractConfig';
 
 interface iPayModal {
   TaxiData: iTaxiData;
@@ -21,11 +21,13 @@ interface iPayModal {
 }
 
 const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
+  console.log('TaxiData', TaxiData);
   const [paymentStatus, setPaymentStatus] = useState<
     'pending' | 'successful' | 'error'
   >('pending');
   const [paymentLog, setPaymentLog] = useState<string>('No log info yet..');
-  const [retry, setRetry] = useState<boolean>(false);
+  const [isTransactionInProgress, setIsTransactionInProgress] =
+    useState<boolean>(false);
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
   const router = useRouter();
@@ -38,51 +40,95 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     []
   );
 
-  const {
-    data: hash,
-    error,
-    isPending,
-    sendTransaction,
-  } = useSendTransaction();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash });
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const contract = new ethers.Contract(contractAddress, abi, signer);
 
-  const to = '0x0717329C677ab484EAA73F4C8EEd92A2FA948746';
-  const value = '1.2';
+  const createTrip = useCallback(async () => {
+    setPaymentLog('Creating trip...');
+    try {
+      const details = TaxiData.route;
+      const rankName = TaxiData.rankName;
+      const registration = TaxiData.registration;
+      const verified = TaxiData.verified;
 
-  const initiatePayment = useCallback(() => {
+      const tx = await contract.createTrip(
+        ethers.utils.parseEther(TaxiData.price.toString()),
+        details,
+        rankName,
+        registration,
+        verified
+      );
+      const receipt = await tx.wait();
+      console.log('Transaction receipt:', receipt); // Log the receipt to debug
+
+      // Parse the TripCreated event from the receipt
+      const event = receipt.events?.find(
+        (event: any) => event.event === 'TripCreated'
+      );
+      const tripCounter = event?.args.tripCounter?.toString();
+
+      console.log(event, tripCounter);
+
+      if (!tripCounter) {
+        throw new Error('Trip counter is undefined');
+      }
+      logPayment('successful', `Trip created with Code: ${tripCounter}`);
+      return tripCounter;
+    } catch (error: unknown) {
+      logPayment('error', `Error creating trip: ${(error as Error).message}`);
+      throw error;
+    }
+  }, [contract, TaxiData.price, TaxiData, logPayment]);
+
+  const joinTrip = useCallback(
+    async (tripCode: number) => {
+      setPaymentLog('Joining trip...');
+      try {
+        const tx = await contract.joinTrip(tripCode, {
+          value: ethers.utils.parseEther(TaxiData.price.toString()),
+        });
+        await tx.wait();
+        logPayment('successful', `Joined trip with code: ${tripCode}`);
+        return tripCode;
+      } catch (error) {
+        logPayment('error', `Error joining trip: ${(error as Error).message}`);
+        throw error;
+      }
+    },
+    [contract, logPayment, TaxiData.price]
+  );
+
+  const initiatePayment = useCallback(async () => {
+    if (isTransactionInProgress) return;
+    setIsTransactionInProgress(true);
     setPaymentLog('Payment initiated...');
-    sendTransaction({
-      to,
-      value: parseEther(value).toBigInt(),
-      data: '0x0717329c677ab484eaa73f4c8eed92a2fa948746',
-    });
-  }, []);
+    try {
+      if (TaxiData.tripCode) {
+        await joinTrip(TaxiData.tripCode);
+      } else {
+        throw new Error('Trip code is undefined');
+      }
+    } catch (error) {
+      if (error instanceof Error && 'data' in error) {
+        logPayment(
+          'error',
+          `Error initiating payment: ${(error.data as Error).message}`
+        );
+      } else {
+        logPayment(
+          'error',
+          `Error initiating payment: ${(error as Error).message}`
+        );
+      }
+    } finally {
+      setIsTransactionInProgress(false);
+    }
+  }, [createTrip, joinTrip, TaxiData.tripCode, isTransactionInProgress]);
 
   useEffect(() => {
-    if (isConfirmed) {
-      logPayment('successful', 'Payment successful');
-    } else if (isPending) {
-      logPayment('pending', 'Processing payment...');
-    } else if (isConfirming) {
-      logPayment('pending', 'Confirming payment...');
-    }
-
-    if (error) {
-      logPayment('error', error.message);
-    }
-  }, [isPending, isConfirmed, isConfirming, error, logPayment]);
-
-  useEffect(() => {
-    if (retry) {
-      setPaymentStatus('pending');
-      setPaymentLog('Retrying payment...');
-      initiatePayment();
-      setRetry(false);
-    } else {
-      initiatePayment();
-    }
-  }, [retry]);
+    initiatePayment();
+  }, []); // Call initiatePayment only once when the component mounts
 
   useEffect(() => {
     if (paymentInfoRef.current) {
@@ -94,8 +140,10 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, [paymentLog]);
 
   const handleRetry = useCallback(() => {
-    setRetry(true);
-  }, []);
+    setPaymentStatus('pending');
+    setPaymentLog('Retrying payment...');
+    initiatePayment();
+  }, [initiatePayment]);
 
   const handleCancel = useCallback(() => {
     setPaymentStatus('error');
