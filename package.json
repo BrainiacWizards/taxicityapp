@@ -34,6 +34,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@sentry/nextjs": "^8.32.0",
     "taxicityapp": "file:"
   },
   "devDependencies": {
