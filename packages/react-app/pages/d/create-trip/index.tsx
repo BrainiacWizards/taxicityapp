@@ -83,6 +83,7 @@ const CreateTrip: React.FC = () => {
         selectedTaxi.registration,
         selectedTaxi.verified
       );
+      setMessage('decoding transaction');
       const receipt = await tx.wait();
       console.log('Transaction receipt:', receipt); // Log the receipt to debug
 

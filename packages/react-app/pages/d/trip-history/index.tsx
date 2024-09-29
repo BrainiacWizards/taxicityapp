@@ -15,7 +15,7 @@ interface iTrip {
   registration: string;
   route: string;
   price: string;
-  capacity: number;
+  passengers: [];
   date: string;
   tripId: string;
   status: 'completed' | 'ongoing';
@@ -39,7 +39,7 @@ const TripCard: React.FC<{ trip: iTrip }> = React.memo(({ trip }) => (
         Registration: <span>{trip.registration}</span>
       </p>
       <p>
-        Capacity: <span>{trip.capacity.toString()}</span>
+        Passengers: <span>{trip.passengers.length}</span>
       </p>
       <p>
         Date: <span>{trip.date}</span>
@@ -113,7 +113,7 @@ const UserTripHistoryPage: React.FC = () => {
 
       const tripResults = await Promise.all(tripPromises);
       const fetchedTrips: iTrip[] = tripResults.map((trip, index) => {
-        const { rankName, registration, route, price, capacity, completed } =
+        const { rankName, registration, route, price, passengers, completed } =
           trip;
         const date = new Date().toISOString().split('T')[0]; // Placeholder for date
         const status = completed ? 'completed' : 'ongoing';
@@ -123,7 +123,7 @@ const UserTripHistoryPage: React.FC = () => {
           registration,
           route,
           price: `$${price.toString()}`,
-          capacity,
+          passengers,
           date,
           tripId: (index + 1).toString(),
           status,
@@ -169,7 +169,7 @@ const UserTripHistoryPage: React.FC = () => {
               <option value="registration">Registration</option>
               <option value="route">Route</option>
               <option value="price">Price</option>
-              <option value="capacity">Capacity</option>
+              <option value="passengers">Passengers</option>
               <option value="date">Date</option>
               <option value="tripId">Trip ID</option>
               <option value="status">Status</option>
@@ -190,7 +190,6 @@ const UserTripHistoryPage: React.FC = () => {
         <div className={styles.userTripContent}>
           {currentItems.map((trip, index) => (
             <TripCard key={index} trip={trip} />
-            // <>{JSON.stringify(trip)}</>
           ))}
         </div>
         <div className={styles.pagination}>
