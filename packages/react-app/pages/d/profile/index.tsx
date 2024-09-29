@@ -6,6 +6,7 @@ import { celoAlfajores } from 'wagmi/chains';
 import { stableTokenABI } from '@celo/abis';
 import CustomConnectButton from '@/components/CustomConnectBtn/CustomConnectBtn';
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import Image from 'next/image';
 
 const STABLE_TOKEN_ADDRESS = '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9';
 
@@ -134,10 +135,12 @@ const ProfilePage: React.FC = () => {
                 <h1>{userProfile.name}</h1>
                 <div className={styles.currencyDetails}>
                   <span key={chain.id} className={styles.balance}>
-                    <img
+                    <Image
                       src={chain.iconUrl}
                       alt="Celo Icon"
                       className={styles.icon}
+                      width={20}
+                      height={20}
                     />
                     {userBalance.substring(0, 4)}{' '}
                     {chains[0].nativeCurrency.symbol}
