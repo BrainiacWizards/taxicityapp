@@ -73,7 +73,7 @@ const Checkout: React.FC = () => {
 
       console.log('tripDetails', tripDetails);
 
-      if (tripDetails[0] !== ethers.constants.AddressZero) {
+      if (tripDetails.driver !== ethers.constants.AddressZero) {
         setIsCodeEntered(true);
         setCodeError('Code Correct');
         setTaxiData({

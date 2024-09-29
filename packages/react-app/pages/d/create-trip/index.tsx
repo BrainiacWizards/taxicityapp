@@ -160,7 +160,7 @@ const CreateTrip: React.FC = () => {
               <input
                 type="text"
                 id="fare"
-                value={ethers.utils.formatEther(selectedTaxi.price)}
+                value={selectedTaxi.price}
                 readOnly
               />
             </div>
