@@ -78,7 +78,10 @@ const CreateTrip: React.FC = () => {
 
       const tx = await contract.createTrip(
         ethers.utils.parseEther(selectedTaxi.price.toString()),
-        `Route: ${route}, Driver: ${selectedTaxi.driver}, Registration: ${selectedTaxi.registration}, Rank: ${selectedTaxi.rankName}`
+        route,
+        selectedTaxi.rankName,
+        selectedTaxi.registration,
+        selectedTaxi.verified
       );
       const receipt = await tx.wait();
       console.log('Transaction receipt:', receipt); // Log the receipt to debug
@@ -87,7 +90,7 @@ const CreateTrip: React.FC = () => {
       const event = receipt.events?.find(
         (event: any) => event.event === 'TripCreated'
       );
-      const tripCounter = event?.args.tripCode?.toString();
+      const tripCounter = event?.args.tripCounter?.toString();
 
       if (!tripCounter) {
         throw new Error('Trip counter is undefined');
@@ -157,7 +160,7 @@ const CreateTrip: React.FC = () => {
               <input
                 type="text"
                 id="fare"
-                value={selectedTaxi.price}
+                value={ethers.utils.formatEther(selectedTaxi.price)}
                 readOnly
               />
             </div>

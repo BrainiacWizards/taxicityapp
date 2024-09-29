@@ -2,9 +2,12 @@ import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
 import { iTaxiData } from '@/models/RankMapModels';
 import React, { useEffect, useState } from 'react';
 import { FaStar, FaUser, FaRoute } from 'react-icons/fa';
+import { ethers } from 'ethers';
 import styles from './trip.module.css';
+import { abi, contractAddress } from '@/lib/contractConfig';
 
 const dummyTaxiData: iTaxiData = {
+  tripCode: 0,
   capacity: 0,
   driver: 'NA',
   price: 70,
@@ -14,23 +17,44 @@ const dummyTaxiData: iTaxiData = {
   verified: false,
 };
 
-const dummyPassengers = ['Passenger 1', 'Passenger 2', 'Passenger 3'];
-
 const TripPage: React.FC = () => {
   const [taxiData, setTaxiData] = useState<iTaxiData>(dummyTaxiData);
-  const [passengers, setPassengers] = useState<string[]>(dummyPassengers);
+  const [passengers, setPassengers] = useState<string[]>([]);
   const [rating, setRating] = useState<number>(0);
   const [hover, setHover] = useState<number>(0);
   const [tripStatus, setTripStatus] = useState<string>('not started');
 
   useEffect(() => {
-    const tripData = sessionStorage.getItem('trip');
-    if (tripData) {
-      setTaxiData(JSON.parse(tripData));
-    }
+    const fetchTripData = async () => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
 
-    setPassengers(dummyPassengers);
-    setTripStatus('not started');
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const tripCode = taxiData.tripCode;
+      const tripDetails = await contract.getTripDetails(tripCode);
+
+      if (!tripDetails) {
+        alert('Trip not found');
+        return;
+      }
+
+      const [, , , completed, , passengers] = tripDetails;
+
+      setPassengers(
+        passengers.map((address: string) => `Passenger: ${address}`)
+      );
+      setTripStatus(completed ? 'completed' : 'in progress');
+    };
+
+    // read taxiData from sessionStorage
+    const taxiData: iTaxiData =
+      typeof window !== 'undefined' && sessionStorage.getItem('trip')
+        ? JSON.parse(sessionStorage.getItem('trip') || '')
+        : dummyTaxiData;
+
+    setTaxiData(taxiData);
+    fetchTripData();
   }, []);
 
   const handleRateDriver = () => {
