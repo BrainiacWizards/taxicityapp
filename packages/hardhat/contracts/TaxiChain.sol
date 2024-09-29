@@ -89,7 +89,7 @@ contract TaxiService {
     uint256 _tripCode
   ) public payable tripExists(_tripCode) tripNotCompleted(_tripCode) {
     Trip storage trip = trips[_tripCode];
-    require(msg.value == trip.price, 'Exact fare required');
+    // require(msg.value == trip.price, 'Exact fare required');
 
     uint256 taxAmount = (trip.price * taxRate) / 100;
     uint256 paymentAmount = trip.price - taxAmount;
