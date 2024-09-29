@@ -71,16 +71,25 @@ const Checkout: React.FC = () => {
       const tripCode = parseInt(accessCode);
       const tripDetails = await contract.getTripDetails(tripCode);
 
-      if (tripDetails.driver !== ethers.constants.AddressZero) {
+      console.log('tripDetails', tripDetails);
+
+      if (tripDetails[0] !== ethers.constants.AddressZero) {
         setIsCodeEntered(true);
         setCodeError('Code Correct');
         setTaxiData({
           ...taxiData,
-          driver: tripDetails.driver,
-          price: tripDetails.fare,
-          route: tripDetails.details,
-          verified: !tripDetails.completed,
+          tripCode,
         });
+
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem(
+            'trip',
+            JSON.stringify({
+              ...taxiData,
+              tripCode,
+            })
+          );
+        }
       } else {
         setCodeError('Incorrect code');
       }
@@ -89,24 +98,6 @@ const Checkout: React.FC = () => {
       setCodeError('Error checking code');
     } finally {
       setIsVerifying(false);
-    }
-  };
-
-  const joinTrip = async () => {
-    if (!connectors) return;
-
-    try {
-      const provider = new ethers.providers.Web3Provider(
-        (await connectors[0].getProvider()) as ethers.providers.ExternalProvider
-      );
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, abi, signer);
-      const tripCode = parseInt(accessCode);
-      await contract.joinTrip(tripCode);
-      setShowPaymentModal(true);
-    } catch (error) {
-      console.error(error);
-      alert('Error joining trip');
     }
   };
 
@@ -119,7 +110,8 @@ const Checkout: React.FC = () => {
       alert('Please connect your wallet first.');
       return;
     }
-    joinTrip();
+
+    setShowPaymentModal(true);
   };
 
   return (

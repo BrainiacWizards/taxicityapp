@@ -21,6 +21,7 @@ interface iPayModal {
 }
 
 const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
+  console.log('TaxiData', TaxiData);
   const [paymentStatus, setPaymentStatus] = useState<
     'pending' | 'successful' | 'error'
   >('pending');
@@ -75,12 +76,13 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, [contract, TaxiData.price, TaxiData, logPayment]);
 
   const joinTrip = useCallback(
-    async (tripCode: string) => {
+    async (tripCode: number) => {
       setPaymentLog('Joining trip...');
       try {
         const tx = await contract.joinTrip(tripCode);
         await tx.wait();
         logPayment('successful', `Joined trip with code: ${tripCode}`);
+        return tripCode;
       } catch (error) {
         logPayment('error', `Error joining trip: ${(error as Error).message}`);
         throw error;
@@ -89,15 +91,34 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     [contract, logPayment]
   );
 
+  const completeTrip = useCallback(
+    async (tripCode: number) => {
+      setPaymentLog('Completing trip (payment)...');
+      try {
+        const tx = await contract.completeTrip(tripCode, {
+          value: ethers.utils.parseEther(TaxiData.price.toString()), //  (just for test purposes)
+        });
+        await tx.wait();
+        logPayment('successful', `Completed trip with code: ${tripCode}`);
+      } catch (error) {
+        logPayment(
+          'error',
+          `Error completing trip: ${(error as Error).message}`
+        );
+        throw error;
+      }
+    },
+    [contract, logPayment, TaxiData.price]
+  );
+
   const initiatePayment = useCallback(async () => {
     if (isTransactionInProgress) return;
     setIsTransactionInProgress(true);
     setPaymentLog('Payment initiated...');
-    let tripCode = TaxiData.tripCode;
     try {
-      tripCode = await createTrip();
-      if (tripCode) {
-        await joinTrip(tripCode);
+      if (TaxiData.tripCode) {
+        const tripCode = await joinTrip(TaxiData.tripCode);
+        await completeTrip(tripCode);
       } else {
         logPayment('error', 'Error creating trip, invalid trip code');
       }
@@ -109,7 +130,13 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     } finally {
       setIsTransactionInProgress(false);
     }
-  }, [createTrip, joinTrip, TaxiData.tripCode, isTransactionInProgress]);
+  }, [
+    createTrip,
+    joinTrip,
+    completeTrip,
+    TaxiData.tripCode,
+    isTransactionInProgress,
+  ]);
 
   useEffect(() => {
     initiatePayment();
