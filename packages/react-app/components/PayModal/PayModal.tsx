@@ -59,7 +59,9 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
       const event = receipt.events?.find(
         (event: any) => event.event === 'TripCreated'
       );
-      const tripCounter = event?.args?.tripCounter?.toString();
+      const tripCounter = event?.args.tripCode?.toString();
+
+      console.log(event, tripCounter);
 
       if (!tripCounter) {
         throw new Error('Trip counter is undefined');

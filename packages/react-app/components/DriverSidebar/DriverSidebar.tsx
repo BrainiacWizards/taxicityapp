@@ -55,6 +55,11 @@ const DriverSidebar: React.FC = () => {
           </Link>
         </li>
         <li>
+          <Link href="./create-trip">
+            <FaTachometerAlt /> Create Trip
+          </Link>
+        </li>
+        <li>
           <Link href="./receipts">
             <FaReceipt /> Receipts
           </Link>

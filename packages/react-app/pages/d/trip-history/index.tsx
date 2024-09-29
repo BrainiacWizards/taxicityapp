@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { ethers } from 'ethers';
 import styles from './trip-history.module.css';
 import {
   FaAngleDoubleLeft,
@@ -7,6 +8,7 @@ import {
   FaMapMarkerAlt,
 } from 'react-icons/fa';
 import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import { abi, contractAddress } from '@/lib/contractConfig';
 
 interface iTripCardProps {
   from: string;
@@ -99,68 +101,50 @@ const usePagination = (items: iTrip[], itemsPerPage: number) => {
 };
 
 const UserTripHistoryPage: React.FC = () => {
+  const [trips, setTrips] = useState<iTrip[]>([]);
   const [sortCriteria, setSortCriteria] = useState<keyof iTrip>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const trips: iTrip[] = useMemo(
-    () => [
-      {
-        from: 'New York',
-        to: 'Boston',
-        passengers: 3,
-        date: '2023-01-15',
-        totalEarned: '$150',
-        tripId: 'TRIP1234',
-        status: 'completed',
-      },
-      {
-        from: 'San Francisco',
-        to: 'Los Angeles',
-        passengers: 2,
-        date: '2023-02-20',
-        totalEarned: '$100',
-        tripId: 'TRIP5678',
-        status: 'completed',
-      },
-      {
-        from: 'Chicago',
-        to: 'Detroit',
-        passengers: 4,
-        date: '2023-03-10',
-        totalEarned: '$160',
-        tripId: 'TRIP9101',
-        status: 'cancelled',
-      },
-      {
-        from: 'Houston',
-        to: 'Dallas',
-        passengers: 1,
-        date: '2023-04-05',
-        totalEarned: '$60',
-        tripId: 'TRIP2345',
-        status: 'ongoing',
-      },
-      {
-        from: 'Miami',
-        to: 'Orlando',
-        passengers: 5,
-        date: '2023-05-12',
-        totalEarned: '$225',
-        tripId: 'TRIP6789',
-        status: 'completed',
-      },
-      {
-        from: 'Seattle',
-        to: 'Portland',
-        passengers: 3,
-        date: '2023-06-18',
-        totalEarned: '$165',
-        tripId: 'TRIP3456',
-        status: 'completed',
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    const fetchTrips = async () => {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const contract = new ethers.Contract(contractAddress, abi, provider);
+
+      const tripCounter = await contract.tripCounter();
+      const tripPromises: Promise<any>[] = [];
+
+      for (let i = 1; i <= tripCounter; i++) {
+        tripPromises.push(contract.getTripDetails(i));
+      }
+
+      const tripResults = await Promise.all(tripPromises);
+      const fetchedTrips: iTrip[] = tripResults.map((trip, index) => {
+        const [, fare, details, completed, , passengers] = trip;
+        const [from, to] = details
+          ?.split(',')[0]
+          ?.split(':')
+          ?.map((s) => s.trim())[1]
+          ?.split(' - ') || ['Unknown', 'Unknown'];
+        const date = new Date().toISOString().split('T')[0]; // Placeholder for date
+        const totalEarned = `$${fare.toString()}`;
+        const status = completed ? 'completed' : 'ongoing';
+
+        return {
+          from,
+          to,
+          passengers: passengers.length,
+          date,
+          totalEarned,
+          tripId: (index + 1).toString(),
+          status,
+        };
+      });
+
+      setTrips(fetchedTrips);
+    };
+
+    fetchTrips();
+  }, []);
 
   const sortedTrips: iTrip[] = useMemo(() => {
     return [...trips].sort((a, b) => {
