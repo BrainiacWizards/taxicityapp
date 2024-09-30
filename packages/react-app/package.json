@@ -30,7 +30,7 @@
     "wagmi": "^2.9.0"
   },
   "devDependencies": {
-    "@types/node": "^20.2.1",
+    "@types/node": "^22.7.4",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
     "@types/react-qr-reader": "^2.1.7",
