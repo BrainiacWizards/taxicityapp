@@ -21,6 +21,28 @@
   </a>
 </p>
 
+<h2 align="center">Code Quality</h2>
+
+<p align="center">
+  <a href="https://codeclimate.com/github/BrainiacWizards/taxicityapp">
+    <img src="https://codeclimate.com/github/BrainiacWizards/taxicityapp/badges/gpa.svg" alt="Code Climate" />
+  </a>
+  <a href="https://www.codefactor.io/repository/github/brainiacwizards/taxicityapp">
+    <img src="https://www.codefactor.io/repository/github/brainiacwizards/taxicityapp/badge" alt="CodeFactor" />
+  </a>
+  <a href="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/github-code-scanning/codeql">
+    <img src="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/github-code-scanning/codeql/badge.svg" alt="CodeQL" />
+  </a>
+  <a href="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/sonarcloud.yml">
+    <img src="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/sonarcloud.yml/badge.svg" alt="SonarCloud analysis" />
+  </a>
+  <a href="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/dependabot/dependabot-updates">
+    <img src="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/dependabot/dependabot-updates/badge.svg" alt="Dependabot Updates" />
+  </a>
+  <a href="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/lint.yml">
+    <img src="https://github.com/BrainiacWizards/taxicityapp/actions/workflows/lint.yml/badge.svg" alt="Lint Code" />
+  </a>
+</p>
 <!-- TABLE OF CONTENTS -->
 
 <details>
