@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@celo/abis": "^11.0.0",
-    "@headlessui/react": "^1.7.14",
+    "@headlessui/react": "^2.1.8",
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^2.1.6",
     "@sentry/nextjs": "^8.32.0",
