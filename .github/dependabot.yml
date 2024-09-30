@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "npm" # Possible values: bundler, cargo, composer, docker, elm, gitsubmodule, github-actions, go, gradle, maven, mix, npm, nuget, pip, terraform
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly" # Possible values: daily, weekly, monthly
+    commit-message:
+      prefix: "chore(deps)"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
