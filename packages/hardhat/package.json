@@ -20,7 +20,7 @@
     "ethereum-waffle": "^4.0.10",
     "ethers": "^6.13.2",
     "hardhat": "^2.22.12",
-    "hardhat-gas-reporter": "^1.0.8",
+    "hardhat-gas-reporter": "^2.2.1",
     "solidity-coverage": "^0.8.1",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2",
