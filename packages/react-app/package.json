@@ -35,7 +35,7 @@
     "@types/react-dom": "^18.2.4",
     "@types/react-qr-reader": "^2.1.7",
     "autoprefixer": "^10.4.14",
-    "eslint": "^8.40.0",
+    "eslint": "^9.12.0",
     "eslint-config-next": "^14.2.14",
     "eslint-config-oclif": "^5.2.1",
     "postcss": "^8.4.23",
