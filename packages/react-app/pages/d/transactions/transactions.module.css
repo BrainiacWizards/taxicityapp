@@ -13,5 +13,5 @@
   margin-bottom: 20px;
   box-shadow: 2px 2px 4px var(--neutral-color);
   background-color: color-mix(in srgb, var(--bg-color) 50%, #ffffff42 50%);
-  border-radius: 20px;
+  border-radius: 10px;
 }

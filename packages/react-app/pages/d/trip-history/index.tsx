@@ -7,7 +7,7 @@ import {
   FaArrowRight,
   FaMapMarkerAlt,
 } from 'react-icons/fa';
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import DriverLayout from '@/components/DriverLayout';
 import { abi, contractAddress } from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader';
 

@@ -22,6 +22,10 @@
   caret-color: var(--accent-color);
   font-family: 'Poppins', sans-serif;
   hyphens: auto;
+
+  /* Scrollbar Styles */
+  scrollbar-width: thin;
+  scrollbar-color: var(--prim-color) var(--bg-color);
 }
 
 body {
@@ -43,6 +47,8 @@ button {
   border-radius: 10px;
   color: #ffffff;
   background-color: var(--prim-color);
+  max-width: 250px;
+  max-height: 50px;
 }
 
 button:hover {

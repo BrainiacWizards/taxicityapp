@@ -1,4 +1,4 @@
-import RankLocator from '@/components/RankLocator/RankLocator';
+import RankLocator from '@/components/RankLocator';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 

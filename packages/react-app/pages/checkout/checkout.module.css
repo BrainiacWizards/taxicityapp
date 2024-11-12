@@ -1,8 +1,9 @@
 .checkoutContainer {
   padding: 20px 10px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
+  justify-content: center;
 }
 
 .accessCodeContainer {
@@ -11,6 +12,9 @@
   gap: 20px;
   align-items: center;
   width: 100%;
+  box-shadow: 2px 2px 5px 0 var(--neutral-color);
+  background-color: var(--bg-color);
+  border-radius: 10px;
 }
 
 .accessCodeContainer h2 {
@@ -50,9 +54,9 @@
   max-width: calc(100% - 20px);
 }
 
-/* .QrReader {
+.QrReader {
   display: none;
-} */
+}
 
 .tripDetailsContainer {
   display: flex;

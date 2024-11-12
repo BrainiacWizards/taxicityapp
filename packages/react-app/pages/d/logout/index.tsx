@@ -1,4 +1,4 @@
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import DriverLayout from '@/components/DriverLayout';
 import React from 'react';
 
 const LogoutPage: React.FC = () => {

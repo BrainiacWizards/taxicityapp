@@ -15,23 +15,38 @@ import {
   FaCar,
 } from 'react-icons/fa';
 import Link from 'next/link';
-import CustomConnectButton from './CustomConnectBtn/CustomConnectBtn';
+import CustomConnectButton from './CustomConnectBtn';
+
+const navLinks = [
+  { href: '/', icon: <FaHome />, label: 'Home' },
+  { href: '/how-it-works', icon: <FaCog />, label: 'Help' },
+  { href: '/faq', icon: <FaQuestionCircle />, label: 'FAQ' },
+  { href: '/contact', icon: <FaEnvelope />, label: 'Contact' },
+  { href: '/u/profile', icon: <FaUserCircle />, label: 'User' },
+  { href: '/d/profile', icon: <FaCar />, label: 'Driver' },
+];
+
+const socialPlatforms = [
+  { name: 'facebook', icon: <FaFacebook /> },
+  { name: 'twitter', icon: <FaTwitter /> },
+  { name: 'instagram', icon: <FaInstagram /> },
+];
 
 export default function Header() {
   const [hideConnectBtn, setHideConnectBtn] = useState(false);
   const [showLinks, setShowLinks] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const { connect } = useConnect();
 
+  const handleResize = () => {
+    setShowLinks(window.innerWidth >= 1100);
+    setIsMobile(window.innerWidth < 1100);
+  };
+
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 800) {
-        setShowLinks(true);
-      }
-    };
-
+    handleResize();
     window.addEventListener('resize', handleResize);
-
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -41,21 +56,6 @@ export default function Header() {
       connect({ connector: injected({ target: 'metaMask' }) });
     }
   }, [connect]);
-
-  const navLinks = [
-    { href: '/', icon: <FaHome />, label: 'Home' },
-    { href: '/how-it-works', icon: <FaCog />, label: 'Help' },
-    { href: '/faq', icon: <FaQuestionCircle />, label: 'FAQ' },
-    { href: '/contact', icon: <FaEnvelope />, label: 'Contact' },
-    { href: '/u/profile', icon: <FaUserCircle />, label: 'User' },
-    { href: '/d/profile', icon: <FaCar />, label: 'Driver' },
-  ];
-
-  const socialPlatforms = [
-    { name: 'facebook', icon: <FaFacebook /> },
-    { name: 'twitter', icon: <FaTwitter /> },
-    { name: 'instagram', icon: <FaInstagram /> },
-  ];
 
   return (
     <header>
@@ -77,25 +77,27 @@ export default function Header() {
         </div>
       </div>
       <nav className="main-navbar">
-        <ul className="dropdown">
-          <button
-            className="dropdownBtn"
-            onMouseDown={() => setShowLinks(!showLinks)}
-          >
-            {showLinks ? (
-              <FaTimes aria-hidden="true" />
-            ) : (
-              <Bars3Icon aria-hidden="true" />
-            )}
-          </button>
-        </ul>
-        {showLinks && (
+        {isMobile && (
+          <ul className="dropdown">
+            <button
+              className="dropdownBtn"
+              onMouseDown={() => setShowLinks(!showLinks)}
+            >
+              {showLinks ? (
+                <FaTimes aria-hidden="true" />
+              ) : (
+                <Bars3Icon aria-hidden="true" />
+              )}
+            </button>
+          </ul>
+        )}
+        {(showLinks || !isMobile) && (
           <ul className="nav-links">
             {navLinks.map((link) => (
               <li
                 key={link.href}
                 onClick={() => {
-                  setShowLinks(false);
+                  if (isMobile) setShowLinks(false);
                 }}
               >
                 <Link href={link.href}>

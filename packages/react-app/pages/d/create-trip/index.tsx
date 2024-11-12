@@ -4,8 +4,8 @@ import styles from './create-trip.module.css';
 import { abi, contractAddress } from '@/lib/contractConfig';
 import { taxis, ranks } from '@/lib/data';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
-import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import TaxiDetails from '@/components/TaxiDetails';
+import DriverLayout from '@/components/DriverLayout';
 import PopUpLoader from '@/components/PopupLoader/'; // Import the PopUpLoader component
 
 const CreateTrip: React.FC = () => {

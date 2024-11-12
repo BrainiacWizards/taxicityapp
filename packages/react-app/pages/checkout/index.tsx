@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import QRCodeScanner from '@/components/QRCodeScanner/QRCodeScanner';
+import QRCodeScanner from '@/components/QRCodeScanner';
 import styles from './checkout.module.css';
 import { iTaxiData } from '@/models/RankMapModels';
-import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
-import Divider from '@/components/Divider/Divider';
+import TaxiDetails from '@/components/TaxiDetails';
+import Divider from '@/components/Divider';
 import { useConnect, useAccount } from 'wagmi';
-import PayModal from '@/components/PayModal/PayModal';
+import PayModal from '@/components/PayModal';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
 import { abi, contractAddress } from '@/lib/contractConfig';
@@ -72,8 +72,6 @@ const Checkout: React.FC = () => {
       const tripCode = parseInt(accessCode);
       const tripDetails = await contract.getTripDetails(tripCode);
 
-      console.log('tripDetails', tripDetails);
-
       if (tripDetails.driver !== ethers.constants.AddressZero) {
         setIsCodeEntered(true);
         setCodeError('Code Correct');
@@ -131,8 +129,8 @@ const Checkout: React.FC = () => {
           showTaxiDetails={() => {}}
         />
       </div>
-      <Divider />
-      {!isCodeEntered ? (
+      {/* <Divider /> */}
+      {!isCodeEntered && isWalletConnected ? (
         <div className={styles.accessCodeContainer}>
           <h2>Enter Trip Access Code or Scan QR</h2>
           <div className={styles.accessCodeForm}>

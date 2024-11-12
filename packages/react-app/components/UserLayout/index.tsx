@@ -1,7 +1,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
-import UserSideBar from '../UserSidebar/UserSidebar';
+import UserSideBar from '../UserSidebar';
 import styles from './userLayout.module.css';
 
 interface iUserLayoutProps {

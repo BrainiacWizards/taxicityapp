@@ -4,12 +4,12 @@ import { useChains, useAccount } from 'wagmi';
 import { createPublicClient, formatEther, getContract, http } from 'viem';
 import { celoAlfajores } from 'wagmi/chains';
 import { stableTokenABI } from '@celo/abis';
-import CustomConnectButton from '@/components/CustomConnectBtn/CustomConnectBtn';
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import CustomConnectButton from '@/components/CustomConnectBtn';
+import DriverLayout from '@/components/DriverLayout';
 import Image from 'next/image';
-import PopUpLoader from '@/components/PopupLoader/'; // Import the PopUpLoader component
+import PopUpLoader from '@/components/PopupLoader'; // Import the PopUpLoader component
 
-const STABLE_TOKEN_ADDRESS = '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9';
+const STABLE_TOKEN_ADDRESS = process.env.STABLE_TOKEN_ADDRESS || '0x12345';
 
 const ProfilePage: React.FC = () => {
   const [userProfile, setUserProfile] = useState({
@@ -53,7 +53,7 @@ const ProfilePage: React.FC = () => {
     try {
       const StableTokenContract = getContract({
         abi: stableTokenABI,
-        address: STABLE_TOKEN_ADDRESS,
+        address: (STABLE_TOKEN_ADDRESS || '0x123456') as `0x${string}`,
         client: publicClient,
       });
 
