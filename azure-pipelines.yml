@@ -25,4 +25,16 @@ stages:
           dockerfile: '**/Dockerfile'
           tags: |
             $(Build.BuildNumber)
+            
+      - script: |
+          npm install --legacy-peer-deps
+          mv packages/react-app/.env.template packages/react-app/.env
+          cd packages/react-app
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: .next
+          ArtifactName: 'tax-web-site'
+          publishLocation: Container
+
+
           
