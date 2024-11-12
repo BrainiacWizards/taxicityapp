@@ -18,6 +18,23 @@ const RankLocator: React.FC = () => {
   );
   const [visibleFields, setVisibleFields] = useState<number>(1);
 
+  useEffect(() => {
+    const updateVisibleFields = () => {
+      if (window.innerWidth < 600) {
+        setVisibleFields(1);
+      } else {
+        setVisibleFields(3);
+      }
+    };
+
+    updateVisibleFields();
+    window.addEventListener('resize', updateVisibleFields);
+
+    return () => {
+      window.removeEventListener('resize', updateVisibleFields);
+    };
+  }, []);
+
   const provinces = Array.from(
     new Set(ranks.map((rank: iRank) => rank.province))
   );

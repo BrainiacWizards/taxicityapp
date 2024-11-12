@@ -131,8 +131,8 @@ const Checkout: React.FC = () => {
           showTaxiDetails={() => {}}
         />
       </div>
-      <Divider />
-      {!isCodeEntered ? (
+      {/* <Divider /> */}
+      {!isCodeEntered && isWalletConnected ? (
         <div className={styles.accessCodeContainer}>
           <h2>Enter Trip Access Code or Scan QR</h2>
           <div className={styles.accessCodeForm}>
