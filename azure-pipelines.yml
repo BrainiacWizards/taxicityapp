@@ -30,6 +30,7 @@ stages:
           npm install --legacy-peer-deps
           mv packages/react-app/.env.template packages/react-app/.env
           cd packages/react-app
+        displayName: Installing dependencies
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: packages/react-app/.next
