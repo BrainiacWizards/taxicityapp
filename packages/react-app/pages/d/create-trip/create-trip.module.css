@@ -44,7 +44,7 @@
   justify-content: start;
   align-items: start;
   margin: 0 auto;
-  padding: 0 10px;
+  padding: 10px;
   overflow-x: auto;
 }
 
@@ -58,8 +58,10 @@
   height: 100%;
   padding-bottom: 10px;
   background-color: var(--bg-color);
-  border: 2px solid var(--neutral-light-color);
+  /* border: 2px solid var(--neutral-light-color); */
   border-radius: 10px;
+  box-shadow: 2px 2px 4px 0 var(--neutral-color);
+  padding: -10px;
 }
 
 .taxiList .taxiItem button {

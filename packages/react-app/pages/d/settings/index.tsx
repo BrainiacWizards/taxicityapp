@@ -11,7 +11,7 @@ import { getAccount } from '@wagmi/core';
 import styles from './settings.module.css';
 import { config } from '@/lib/config';
 import Image from 'next/image';
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import DriverLayout from '@/components/DriverLayout';
 
 const SettingsPage = () => {
   const [theme, setTheme] = useState('light');

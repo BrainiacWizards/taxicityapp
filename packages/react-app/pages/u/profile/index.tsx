@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import UserLayout from '@/components/UserLayout/UserLayout';
+import UserLayout from '@/components/UserLayout';
 import styles from './profile.module.css';
 import { useChains, useAccount } from 'wagmi';
 import { createPublicClient, formatEther, getContract, http } from 'viem';
 import { celoAlfajores } from 'wagmi/chains';
 import { stableTokenABI } from '@celo/abis';
-import CustomConnectButton from '@/components/CustomConnectBtn/CustomConnectBtn';
+import CustomConnectButton from '@/components/CustomConnectBtn';
 import Image from 'next/image';
 const STABLE_TOKEN_ADDRESS = '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9';
 

@@ -7,7 +7,7 @@ import {
   FaArrowRight,
   FaMapMarkerAlt,
 } from 'react-icons/fa';
-import UserLayout from '@/components/UserLayout/UserLayout';
+import UserLayout from '@/components/UserLayout';
 import { abi, contractAddress } from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader'; // Import the PopUpLoader component
 

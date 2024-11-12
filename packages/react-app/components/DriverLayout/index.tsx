@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import DriverSidebar from '../DriverSidebar/DriverSidebar';
+import DriverSidebar from '../DriverSidebar';
 import styles from './drive-layout.module.css';
 
 interface DriverLayoutProps {

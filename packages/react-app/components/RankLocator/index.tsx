@@ -1,13 +1,13 @@
 'use client';
 import { ranks, taxis } from '@/lib/data';
 import styles from './rankLocator.module.css';
-import GoogleMap from '../Map/Map';
+import GoogleMap from '../Map';
 import React, { useState, useEffect } from 'react';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
-import TaxiDetails from '../TaxiDetails/TaxiDetails';
-import Divider from '../Divider/Divider';
+import TaxiDetails from '../TaxiDetails';
+import Divider from '../Divider';
 
 const RankLocator: React.FC = () => {
   const [filteredRanks, setFilteredRanks] = useState<iRank[]>([]);

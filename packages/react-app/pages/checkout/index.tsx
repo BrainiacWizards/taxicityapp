@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import QRCodeScanner from '@/components/QRCodeScanner/QRCodeScanner';
+import QRCodeScanner from '@/components/QRCodeScanner';
 import styles from './checkout.module.css';
 import { iTaxiData } from '@/models/RankMapModels';
-import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
-import Divider from '@/components/Divider/Divider';
+import TaxiDetails from '@/components/TaxiDetails';
+import Divider from '@/components/Divider';
 import { useConnect, useAccount } from 'wagmi';
-import PayModal from '@/components/PayModal/PayModal';
+import PayModal from '@/components/PayModal';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
 import { abi, contractAddress } from '@/lib/contractConfig';

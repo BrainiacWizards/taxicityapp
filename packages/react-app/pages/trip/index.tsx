@@ -1,4 +1,4 @@
-import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
+import TaxiDetails from '@/components/TaxiDetails';
 import { iTaxiData } from '@/models/RankMapModels';
 import React, { useEffect, useState } from 'react';
 import { FaStar, FaUser, FaRoute } from 'react-icons/fa';

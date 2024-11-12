@@ -4,10 +4,10 @@ import { useChains, useAccount } from 'wagmi';
 import { createPublicClient, formatEther, getContract, http } from 'viem';
 import { celoAlfajores } from 'wagmi/chains';
 import { stableTokenABI } from '@celo/abis';
-import CustomConnectButton from '@/components/CustomConnectBtn/CustomConnectBtn';
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import CustomConnectButton from '@/components/CustomConnectBtn';
+import DriverLayout from '@/components/DriverLayout';
 import Image from 'next/image';
-import PopUpLoader from '@/components/PopupLoader/'; // Import the PopUpLoader component
+import PopUpLoader from '@/components/PopupLoader'; // Import the PopUpLoader component
 
 const STABLE_TOKEN_ADDRESS = '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9';
 
