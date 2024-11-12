@@ -72,8 +72,6 @@ const Checkout: React.FC = () => {
       const tripCode = parseInt(accessCode);
       const tripDetails = await contract.getTripDetails(tripCode);
 
-      console.log('tripDetails', tripDetails);
-
       if (tripDetails.driver !== ethers.constants.AddressZero) {
         setIsCodeEntered(true);
         setCodeError('Code Correct');

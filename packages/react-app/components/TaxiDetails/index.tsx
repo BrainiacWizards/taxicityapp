@@ -12,8 +12,6 @@ const TaxiDetails: React.FC<{
 }> = ({ TaxiData, showTaxiDetails, type = 'popup' }) => {
   if (!TaxiData) return <></>;
 
-  console.log('TaxiData', TaxiData);
-
   let clsName = '';
   if (type === 'fitted') {
     clsName = 'TaxiDetails';

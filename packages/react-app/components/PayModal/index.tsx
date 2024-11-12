@@ -21,7 +21,6 @@ interface iPayModal {
 }
 
 const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
-  console.log('TaxiData', TaxiData);
   const [paymentStatus, setPaymentStatus] = useState<
     'pending' | 'successful' | 'error'
   >('pending');
@@ -60,7 +59,6 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         verified
       );
       const receipt = await tx.wait();
-      console.log('Transaction receipt:', receipt); // Log the receipt to debug
 
       // Parse the TripCreated event from the receipt
       const event = receipt.events?.find(
