@@ -32,9 +32,6 @@ stages:
           cd packages/react-app
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: .next
+          PathtoPublish: packages/react-app/.next
           ArtifactName: 'tax-web-site'
-          publishLocation: Container
-
-
-          
+          publishLocation: Container          
