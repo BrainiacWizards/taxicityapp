@@ -33,13 +33,10 @@ stages:
         displayName: Installing dependencies
       
       - script: |
-         ls
-         cd packages
-         ls
-         cd react-app
-         ls
+         ls packages/react-app
+
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: packages/react-app/.next/
+          PathtoPublish: packages/react-app
           ArtifactName: 'tax-web-site'
           publishLocation: Container
