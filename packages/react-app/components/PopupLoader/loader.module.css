@@ -11,13 +11,13 @@
   padding-block: 2.4px; /* 0.15em * 16px */
   border: 2px solid var(--accent-color);
   border-radius: 240px; /* 15em * 16px */
-  background: var(--prim-color);
+  background: var(--dark-gradient-bg);
 }
 
 .dot {
   width: 30px;
   height: 30px;
-  background: var(--accent-color);
+  background: var(--light-gradient-bg);
   border-radius: 320px; /* 20em * 16px */
   filter: brightness(1.5);
   animation: stretch 1.2s linear alternate infinite;

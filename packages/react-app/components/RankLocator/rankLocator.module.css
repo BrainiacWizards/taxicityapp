@@ -126,8 +126,11 @@
   border-collapse: collapse;
 }
 
+.availableTaxis thead tr {
+  background: var(--dark-gradient-bg);
+}
+
 .availableTaxis th {
-  background-color: var(--sec-color);
   color: var(--font-color);
   padding: 10px;
 }
