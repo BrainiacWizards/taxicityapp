@@ -18,7 +18,7 @@ const sentryConfig = withSentryConfig(nextConfig, {
 	// https://github.com/getsentry/sentry-webpack-plugin#options
 
 	org: "cput-devs",
-	project: "taxicityapp",
+	project: "taxicity",
 
 	// Only print logs for uploading source maps in CI
 	silent: !process.env.CI,

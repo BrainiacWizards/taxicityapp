@@ -20,64 +20,29 @@ interface iPayModal {
   setShowPaymentModal: Dispatch<SetStateAction<boolean>>;
 }
 
+type PaymentStatus = 'pending' | 'successful' | 'error';
+
+let calls = 0;
+
 const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
-  const [paymentStatus, setPaymentStatus] = useState<
-    'pending' | 'successful' | 'error'
-  >('pending');
+  /*********States******************/
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('pending');
   const [paymentLog, setPaymentLog] = useState<string>('No log info yet..');
   const [isTransactionInProgress, setIsTransactionInProgress] =
     useState<boolean>(false);
+  const [isPaymentInitiated, setIsPaymentInitiated] = useState<boolean>(false);
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
   const router = useRouter();
 
-  const logPayment = useCallback(
-    (status: 'pending' | 'successful' | 'error', message: string) => {
-      setPaymentStatus(status);
-      setPaymentLog((prevLog) => `${prevLog}\n${message}`);
-    },
-    []
-  );
+  const logPayment = useCallback((status: PaymentStatus, message: string) => {
+    setPaymentStatus(status);
+    setPaymentLog((prevLog) => `${prevLog}\n${message}`);
+  }, []);
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
   const contract = new ethers.Contract(contractAddress, abi, signer);
-
-  const createTrip = useCallback(async () => {
-    setPaymentLog('Creating trip...');
-    try {
-      const details = TaxiData.route;
-      const rankName = TaxiData.rankName;
-      const registration = TaxiData.registration;
-      const verified = TaxiData.verified;
-
-      const tx = await contract.createTrip(
-        ethers.utils.parseEther(TaxiData.price.toString()),
-        details,
-        rankName,
-        registration,
-        verified
-      );
-      const receipt = await tx.wait();
-
-      // Parse the TripCreated event from the receipt
-      const event = receipt.events?.find(
-        (event: any) => event.event === 'TripCreated'
-      );
-      const tripCounter = event?.args.tripCounter?.toString();
-
-      console.log(event, tripCounter);
-
-      if (!tripCounter) {
-        throw new Error('Trip counter is undefined');
-      }
-      logPayment('successful', `Trip created with Code: ${tripCounter}`);
-      return tripCounter;
-    } catch (error: unknown) {
-      logPayment('error', `Error creating trip: ${(error as Error).message}`);
-      throw error;
-    }
-  }, [contract, TaxiData.price, TaxiData, logPayment]);
 
   const joinTrip = useCallback(
     async (tripCode: number) => {
@@ -90,7 +55,8 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         logPayment('successful', `Joined trip with code: ${tripCode}`);
         return tripCode;
       } catch (error) {
-        logPayment('error', `Error joining trip: ${(error as Error).message}`);
+        const errorMessage = (error as Error).message.split('(')[0].trim();
+        logPayment('error', `Error joining trip: ${errorMessage}`);
         throw error;
       }
     },
@@ -98,8 +64,13 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   );
 
   const initiatePayment = useCallback(async () => {
-    if (isTransactionInProgress) return;
+    if (isTransactionInProgress || isPaymentInitiated) {
+      console.log('Payment already initiated');
+      return;
+    }
+
     setIsTransactionInProgress(true);
+    setIsPaymentInitiated(true);
     setPaymentLog('Payment initiated...');
     try {
       if (TaxiData.tripCode) {
@@ -122,10 +93,31 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     } finally {
       setIsTransactionInProgress(false);
     }
-  }, [createTrip, joinTrip, TaxiData.tripCode, isTransactionInProgress]);
+  }, [
+    joinTrip,
+    TaxiData.tripCode,
+    isTransactionInProgress,
+    isPaymentInitiated,
+  ]);
 
   useEffect(() => {
+    calls++;
+    console.log(
+      'PayModal Called',
+      new Date().toLocaleTimeString('en-US', { hour12: false }),
+      calls
+    );
+
     initiatePayment();
+
+    return () => {
+      // Cleanup function to reset states
+      setPaymentStatus('pending');
+      setPaymentLog('No log info yet..');
+      setIsTransactionInProgress(false);
+      setIsPaymentInitiated(false);
+      setCopyIcon(<FaCopy size={20} />);
+    };
   }, []); // Call initiatePayment only once when the component mounts
 
   useEffect(() => {
@@ -140,12 +132,16 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const handleRetry = useCallback(() => {
     setPaymentStatus('pending');
     setPaymentLog('Retrying payment...');
+    setIsPaymentInitiated(false);
+    setIsTransactionInProgress(false);
     initiatePayment();
   }, [initiatePayment]);
 
   const handleCancel = useCallback(() => {
     setPaymentStatus('error');
     setPaymentLog((prevLog) => `${prevLog}\nPayment was cancelled.`);
+    setIsPaymentInitiated(false);
+    setIsTransactionInProgress(false);
     setShowPaymentModal(false);
   }, [setShowPaymentModal]);
 

@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import QRCodeScanner from '@/components/QRCodeScanner';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+// import QRCodeScanner from '@/components/QRCodeScanner';
 import styles from './checkout.module.css';
 import { iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails';
-import Divider from '@/components/Divider';
 import { useConnect, useAccount } from 'wagmi';
 import PayModal from '@/components/PayModal';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
 import { abi, contractAddress } from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader/'; // Import PopUpLoader
+
+let checkoutCalls = 0;
 
 const dummyTaxiData: iTaxiData = {
   capacity: 0,
@@ -22,47 +23,40 @@ const dummyTaxiData: iTaxiData = {
 };
 
 const Checkout: React.FC = () => {
-  const [accessCode, setAccessCode] = useState('');
+  checkoutCalls++;
   const [codeError, setCodeError] = useState('');
   const [isCodeEntered, setIsCodeEntered] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [taxiData, setTaxiData] = useState<iTaxiData>(dummyTaxiData);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { connectors } = useConnect();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
     const tripData = sessionStorage.getItem('trip');
-    if (tripData) {
-      setTaxiData(JSON.parse(tripData));
-    }
+    if (tripData) setTaxiData(JSON.parse(tripData));
   }, []);
 
-  useEffect(() => {
-    setIsWalletConnected(isConnected);
-  }, [isConnected]);
-
-  const handleAccessCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAccessCode(e.target.value);
-  };
-
-  const handleScan = (data: string | null) => {
-    if (data) {
-      setAccessCode(data);
-    }
-  };
-
-  const checkTripCode = async () => {
+  const checkTripCode = useCallback(async () => {
     if (!connectors) return;
-
-    setIsVerifying(true);
-    setCodeError('Verifying code...');
+    if (!isVerifying) setIsVerifying(true);
 
     try {
+      const accessCode = inputRef.current?.value || '-1';
+
+      if (
+        accessCode.trim() === '' ||
+        isNaN(parseInt(accessCode)) ||
+        parseInt(accessCode) < 0
+      ) {
+        setCodeError('Enter a code');
+        return;
+      }
+
       const provider = new ethers.providers.Web3Provider(
         (await connectors[0].getProvider()) as ethers.providers.ExternalProvider
       );
@@ -75,10 +69,10 @@ const Checkout: React.FC = () => {
       if (tripDetails.driver !== ethers.constants.AddressZero) {
         setIsCodeEntered(true);
         setCodeError('Code Correct');
-        setTaxiData({
-          ...taxiData,
+        setTaxiData((prevTaxiData) => ({
+          ...prevTaxiData,
           tripCode,
-        });
+        }));
 
         if (typeof window !== 'undefined') {
           sessionStorage.setItem(
@@ -98,20 +92,22 @@ const Checkout: React.FC = () => {
     } finally {
       setIsVerifying(false);
     }
-  };
+  }, [connectors, isVerifying]);
 
-  if (!isMounted) {
-    return null;
-  }
+  const payForTrip = useCallback(() => {
+    if (!isConnected) return;
+    if (!showPaymentModal) setShowPaymentModal(true);
+  }, [isConnected, showPaymentModal]);
 
-  const payForTrip = () => {
-    if (!isWalletConnected) {
-      alert('Please connect your wallet first.');
-      return;
-    }
-
-    setShowPaymentModal(true);
-  };
+  console.log('checkout component rendered', checkoutCalls, {
+    codeError,
+    isCodeEntered,
+    isMounted,
+    taxiData,
+    showPaymentModal,
+    isConnected,
+    isVerifying,
+  });
 
   return (
     <div className={styles.checkoutContainer}>
@@ -130,16 +126,15 @@ const Checkout: React.FC = () => {
         />
       </div>
       {/* <Divider /> */}
-      {!isCodeEntered && isWalletConnected ? (
+      {!isCodeEntered && isConnected ? (
         <div className={styles.accessCodeContainer}>
           <h2>Enter Trip Access Code or Scan QR</h2>
           <div className={styles.accessCodeForm}>
             <input
               type="text"
-              value={accessCode}
-              onChange={handleAccessCodeChange}
               placeholder="Enter Trip Code"
               disabled={isVerifying}
+              ref={inputRef}
             />
             <button onClick={checkTripCode} disabled={isVerifying}>
               Verify Code
@@ -147,11 +142,13 @@ const Checkout: React.FC = () => {
             <span className={styles.codeError}>{codeError}</span>
           </div>
           <span>Or</span>
-          <QRCodeScanner onScan={handleScan} styles={styles} />
+          <span>Scan QR Code</span>
+          {/* <QRCodeScanner onScan={handleScan} styles={styles} /> */}
         </div>
       ) : (
-        <>
-          {!isWalletConnected ? (
+        <div className={styles.accessCodeContainer}>
+          <h3>Trip Code correct: Proceed to pay.</h3>
+          {!isConnected ? (
             <button
               onClick={() => {
                 if (openConnectModal) openConnectModal();
@@ -162,7 +159,7 @@ const Checkout: React.FC = () => {
           ) : (
             <button onClick={payForTrip}>Pay with Wallet</button>
           )}
-        </>
+        </div>
       )}
     </div>
   );

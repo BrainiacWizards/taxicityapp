@@ -3,7 +3,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
-  justify-content: center;
+  align-items: start;
+  justify-items: center;
 }
 
 .accessCodeContainer {
@@ -11,7 +12,9 @@
   flex-direction: column;
   gap: 20px;
   align-items: center;
-  width: 100%;
+  justify-content: center;
+  padding: 20px;
+  width: calc(100% - 40px);
   box-shadow: 2px 2px 5px 0 var(--neutral-color);
   background-color: var(--bg-color);
   border-radius: 10px;
