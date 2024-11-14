@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './transaction-list.module.css';
 import { iTransaction, iTransactionListProps } from '@/models/UserModels';
 
@@ -22,7 +22,30 @@ const TransactionList: React.FC<iTransactionListProps> = ({ transactions }) => {
   const [copyStatus, setCopyStatus] = useState<{
     [key: string]: 'success' | 'error' | 'idle';
   }>({});
-  const transactionsPerPage = 4;
+  const [transactionsPerPage, setTransactionsPerPage] = useState(4);
+  const [onMobile, setOnMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 800 : false
+  );
+
+  useEffect(() => {
+    console.log('initial ', onMobile);
+
+    const updateTransactionsPerPage = () => {
+      setOnMobile(window.innerWidth < 800);
+    };
+
+    updateTransactionsPerPage();
+    window.addEventListener('resize', updateTransactionsPerPage);
+
+    return () => {
+      window.removeEventListener('resize', updateTransactionsPerPage);
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('setTransaction', onMobile);
+    setTransactionsPerPage(onMobile ? 4 : 8);
+  }, [onMobile]);
 
   const sortedTransactions = [...transactions].sort((a, b) => {
     let comparison = 0;

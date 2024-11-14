@@ -1,7 +1,10 @@
 .receipts {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
   gap: 20px;
+  justify-content: center;
+  max-width: 90%;
+  margin: 0 auto;
 }
 
 .receipt {
@@ -12,7 +15,7 @@
   width: 100%;
   max-width: 800px;
   background-color: rgb(255, 255, 255);
-  background-image: url('../../../public/star-doddle.png');
+  /* background-image: url('../../../public/star-doddle.png'); */
   border-radius: 10px;
   box-shadow: 0 0 10px var(--neutral-color);
   position: relative;

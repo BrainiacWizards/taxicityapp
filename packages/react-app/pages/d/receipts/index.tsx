@@ -1,7 +1,7 @@
-import React, { useState, memo, useCallback } from 'react';
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import React, { useState, useEffect, memo, useCallback } from 'react';
+import DriverLayout from '@/components/DriverLayout';
 import styles from './receipts.module.css';
-import Divider from '@/components/Divider/Divider';
+import Divider from '@/components/Divider';
 import {
   FaAngleDoubleDown,
   FaAngleDoubleUp,
@@ -94,10 +94,99 @@ const receipts: Receipt[] = [
     to: 'Location P',
     regNumber: 'VWX234',
   },
+  {
+    id: '9',
+    user: 'George King',
+    date: '2023-01-09',
+    amount: 500.0,
+    from: 'Location Q',
+    to: 'Location R',
+    regNumber: 'YZA567',
+  },
+  {
+    id: '10',
+    user: 'Hannah Lee',
+    date: '2023-01-10',
+    amount: 550.0,
+    from: 'Location S',
+    to: 'Location T',
+    regNumber: 'BCD890',
+  },
+  {
+    id: '11',
+    user: 'Ian Miller',
+    date: '2023-01-11',
+    amount: 600.0,
+    from: 'Location U',
+    to: 'Location V',
+    regNumber: 'EFG123',
+  },
+  {
+    id: '12',
+    user: 'Jessica Nelson',
+    date: '2023-01-12',
+    amount: 650.0,
+    from: 'Location W',
+    to: 'Location X',
+    regNumber: 'HIJ456',
+  },
+  {
+    id: '13',
+    user: 'Kevin Owens',
+    date: '2023-01-13',
+    amount: 700.0,
+    from: 'Location Y',
+    to: 'Location Z',
+    regNumber: 'KLM789',
+  },
+  {
+    id: '14',
+    user: 'Laura Perez',
+    date: '2023-01-14',
+    amount: 750.0,
+    from: 'Location AA',
+    to: 'Location BB',
+    regNumber: 'NOP012',
+  },
+  {
+    id: '15',
+    user: 'Michael Quinn',
+    date: '2023-01-15',
+    amount: 800.0,
+    from: 'Location CC',
+    to: 'Location DD',
+    regNumber: 'QRS345',
+  },
+  {
+    id: '16',
+    user: 'Natalie Roberts',
+    date: '2023-01-16',
+    amount: 850.0,
+    from: 'Location EE',
+    to: 'Location FF',
+    regNumber: 'TUV678',
+  },
+  {
+    id: '17',
+    user: 'Oliver Scott',
+    date: '2023-01-17',
+    amount: 900.0,
+    from: 'Location GG',
+    to: 'Location HH',
+    regNumber: 'WXY901',
+  },
+  {
+    id: '18',
+    user: 'Paula Turner',
+    date: '2023-01-18',
+    amount: 950.0,
+    from: 'Location II',
+    to: 'Location JJ',
+    regNumber: 'ZAB234',
+  },
 ];
 
 const COPY_TIMEOUT = 1000;
-const RECEIPTS_PER_PAGE = 5;
 
 const ReceiptComponent: React.FC<{ receipt: Receipt }> = memo(({ receipt }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -173,8 +262,26 @@ const ReceiptComponent: React.FC<{ receipt: Receipt }> = memo(({ receipt }) => {
 
 const ReceiptsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [receiptsPerPage, setReceiptsPerPage] = useState(12);
 
-  const totalPages = Math.ceil(receipts.length / RECEIPTS_PER_PAGE);
+  useEffect(() => {
+    const updateReceiptsPerPage = () => {
+      if (window.innerWidth < 800) {
+        setReceiptsPerPage(6);
+      } else {
+        setReceiptsPerPage(12);
+      }
+    };
+
+    updateReceiptsPerPage();
+    window.addEventListener('resize', updateReceiptsPerPage);
+
+    return () => {
+      window.removeEventListener('resize', updateReceiptsPerPage);
+    };
+  }, []);
+
+  const totalPages = Math.ceil(receipts.length / receiptsPerPage);
 
   const handlePreviousPage = useCallback(() => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -184,10 +291,10 @@ const ReceiptsPage: React.FC = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   }, [totalPages]);
 
-  const startIndex = (currentPage - 1) * RECEIPTS_PER_PAGE;
+  const startIndex = (currentPage - 1) * receiptsPerPage;
   const currentReceipts = receipts.slice(
     startIndex,
-    startIndex + RECEIPTS_PER_PAGE
+    startIndex + receiptsPerPage
   );
 
   return (

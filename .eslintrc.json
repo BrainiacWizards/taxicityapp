@@ -7,16 +7,9 @@
 		"plugin:@next/next/recommended"
 	],
 	"plugins": ["@typescript-eslint"],
-	"rules": {
-		// Require the use of === and !==
-		"eqeqeq": ["error", "always"],
-		// Disallow unused variables
-		"@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-		// Enforce consistent semicolon usage
-		"semi": ["error", "always"],
-		// Enforce consistent spacing inside braces
-		"object-curly-spacing": ["error", "always"],
-		// Allow the use of 'any' as a type
-		"@typescript-eslint/no-explicit-any": "off"
+	"overrideConfig": {
+		"linterOptions": {
+			"reportUnusedDisableDirectives": true
+		}
 	}
 }

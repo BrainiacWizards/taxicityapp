@@ -1,4 +1,4 @@
-import TaxiDetails from '@/components/TaxiDetails/TaxiDetails';
+import TaxiDetails from '@/components/TaxiDetails';
 import { iTaxiData } from '@/models/RankMapModels';
 import React, { useEffect, useState } from 'react';
 import { FaStar, FaUser, FaRoute } from 'react-icons/fa';
@@ -91,17 +91,19 @@ const TripPage: React.FC = () => {
         type="fitted"
         showTaxiDetails={() => {}}
       />
-      <div className={styles.passengersSection}>
-        <h3>
-          <FaUser /> Passengers
-        </h3>
-        <p>Passenger Count: {passengers.length}</p>
-      </div>
-      <div className={styles.tripStatusSection}>
-        <h3>
-          <FaRoute /> Trip Status
-        </h3>
-        <p>{tripStatus}</p>
+      <div className={styles.details}>
+        <div className={styles.passengersSection}>
+          <h3>
+            <FaUser /> Passengers
+          </h3>
+          <p>Passenger Count: {passengers.length}</p>
+        </div>
+        <div className={styles.tripStatusSection}>
+          <h3>
+            <FaRoute /> Trip Status
+          </h3>
+          <p>{tripStatus}</p>
+        </div>
       </div>
       <div className={styles.ratingSection}>
         <h3>

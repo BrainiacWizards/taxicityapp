@@ -1,13 +1,13 @@
 'use client';
 import { ranks, taxis } from '@/lib/data';
 import styles from './rankLocator.module.css';
-import GoogleMap from '../Map/Map';
+import GoogleMap from '../Map';
 import React, { useState, useEffect } from 'react';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
-import TaxiDetails from '../TaxiDetails/TaxiDetails';
-import Divider from '../Divider/Divider';
+import TaxiDetails from '../TaxiDetails';
+import Divider from '../Divider';
 
 const RankLocator: React.FC = () => {
   const [filteredRanks, setFilteredRanks] = useState<iRank[]>([]);
@@ -17,6 +17,23 @@ const RankLocator: React.FC = () => {
     undefined
   );
   const [visibleFields, setVisibleFields] = useState<number>(1);
+
+  useEffect(() => {
+    const updateVisibleFields = () => {
+      if (window.innerWidth < 600) {
+        setVisibleFields(1);
+      } else {
+        setVisibleFields(3);
+      }
+    };
+
+    updateVisibleFields();
+    window.addEventListener('resize', updateVisibleFields);
+
+    return () => {
+      window.removeEventListener('resize', updateVisibleFields);
+    };
+  }, []);
 
   const provinces = Array.from(
     new Set(ranks.map((rank: iRank) => rank.province))

@@ -4,17 +4,17 @@
 <p align="center">A decentralized Taxi App built using Celo Composer, Next.js, TypeScript, and CSS.</p>
 
 <p align="center">
-  <a href="https://github.com/BrainiacWizards/taxicity/graphs/stars">
-    <img alt="GitHub Contributors" src="https://img.shields.io/github/stars/BrainiacWizards/taxicity?color=FCFF52" />
+  <a href="https://github.com/BrainiacWizards/taxicityapp/graphs/stars">
+    <img alt="GitHub Contributors" src="https://img.shields.io/github/stars/BrainiacWizards/taxicityapp?color=FCFF52" />
   </a>
-  <a href="https://github.com/BrainiacWizards/taxicity/graphs/contributors">
-    <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/BrainiacWizards/taxicity?color=E7E3D4" />
+  <a href="https://github.com/BrainiacWizards/taxicityapp/graphs/contributors">
+    <img alt="GitHub Contributors" src="https://img.shields.io/github/contributors/BrainiacWizards/taxicityapp?color=E7E3D4" />
   </a>
-  <a href="https://github.com/BrainiacWizards/taxicity/issues">
-    <img alt="Issues" src="https://img.shields.io/github/issues/BrainiacWizards/taxicity?color=E7E3D4" />
+  <a href="https://github.com/BrainiacWizards/taxicityapp/issues">
+    <img alt="Issues" src="https://img.shields.io/github/issues/BrainiacWizards/taxicityapp?color=E7E3D4" />
   </a>
-  <a href="https://github.com/BrainiacWizards/taxicity/pulls">
-    <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/BrainiacWizards/taxicity?color=E7E3D4" />
+  <a href="https://github.com/BrainiacWizards/taxicityapp/pulls">
+    <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/BrainiacWizards/taxicityapp?color=E7E3D4" />
   </a>
   <a href="https://opensource.org/license/mit/">
     <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-yellow.svg" />

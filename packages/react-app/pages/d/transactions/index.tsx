@@ -1,9 +1,9 @@
 import React from 'react';
 
-import TransactionList from '@/components/TransactionList/TransactionList';
+import TransactionList from '@/components/TransactionList';
 import { iTransaction } from '@/models/UserModels';
 import styles from './transactions.module.css';
-import DriverLayout from '@/components/DriverLayout/DriverLayout';
+import DriverLayout from '@/components/DriverLayout';
 
 const UserTransactionPage: React.FC = () => {
   const transactions: iTransaction[] = [

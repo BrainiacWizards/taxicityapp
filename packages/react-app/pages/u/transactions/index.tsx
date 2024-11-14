@@ -1,8 +1,8 @@
 import React from 'react';
 
-import TransactionList from '@/components/TransactionList/TransactionList';
+import TransactionList from '@/components/TransactionList';
 import { iTransaction } from '@/models/UserModels';
-import UserLayout from '@/components/UserLayout/UserLayout';
+import UserLayout from '@/components/UserLayout';
 import styles from './transactions.module.css';
 
 const UserTransactionPage: React.FC = () => {

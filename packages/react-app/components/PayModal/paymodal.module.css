@@ -16,7 +16,7 @@
   box-shadow: 2px 2px 4px 0 var(--neutral-color);
   background-color: var(--bg-color);
   padding: 20px 10px;
-  border-radius: 20px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -10,7 +10,7 @@ import '../styles/header.css';
 import '../styles/footer.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Loader from '@/components/Loader/Loader';
+import Loader from '@/components/Loader';
 import { useEffect, useState } from 'react';
 import { config } from '@/lib/config';
 
