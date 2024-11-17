@@ -124,6 +124,7 @@
 .availableTaxis table {
   width: 100%;
   border-collapse: collapse;
+  box-shadow: 2px 2px 4px var(--prim-color);
 }
 
 .availableTaxis thead tr {

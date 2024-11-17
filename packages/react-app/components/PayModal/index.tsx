@@ -20,23 +20,18 @@ interface iPayModal {
   setShowPaymentModal: Dispatch<SetStateAction<boolean>>;
 }
 
-type PaymentStatus = 'pending' | 'successful' | 'error';
-
-let calls = 0;
+type PaymentState = 'idle' | 'processing' | 'success' | 'error';
 
 const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   /*********States******************/
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('pending');
+  const [paymentState, setPaymentState] = useState<PaymentState>('idle');
   const [paymentLog, setPaymentLog] = useState<string>('No log info yet..');
-  const [isTransactionInProgress, setIsTransactionInProgress] =
-    useState<boolean>(false);
-  const [isPaymentInitiated, setIsPaymentInitiated] = useState<boolean>(false);
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
   const router = useRouter();
 
-  const logPayment = useCallback((status: PaymentStatus, message: string) => {
-    setPaymentStatus(status);
+  const logPayment = useCallback((status: PaymentState, message: string) => {
+    setPaymentState(status);
     setPaymentLog((prevLog) => `${prevLog}\n${message}`);
   }, []);
 
@@ -52,7 +47,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
           value: ethers.utils.parseEther(TaxiData.price.toString()),
         });
         await tx.wait();
-        logPayment('successful', `Joined trip with code: ${tripCode}`);
+        logPayment('success', `Joined trip with code: ${tripCode}`);
         return tripCode;
       } catch (error) {
         const errorMessage = (error as Error).message.split('(')[0].trim();
@@ -64,13 +59,12 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   );
 
   const initiatePayment = useCallback(async () => {
-    if (isTransactionInProgress || isPaymentInitiated) {
-      console.log('Payment already initiated');
+    if (paymentState === 'processing') {
+      console.log('Payment already in progress');
       return;
     }
 
-    setIsTransactionInProgress(true);
-    setIsPaymentInitiated(true);
+    setPaymentState('processing');
     setPaymentLog('Payment initiated...');
     try {
       if (TaxiData.tripCode) {
@@ -79,46 +73,17 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         throw new Error('Trip code is undefined');
       }
     } catch (error) {
-      if (error instanceof Error && 'data' in error) {
-        logPayment(
-          'error',
-          `Error initiating payment: ${(error.data as Error).message}`
-        );
-      } else {
-        logPayment(
-          'error',
-          `Error initiating payment: ${(error as Error).message}`
-        );
-      }
-    } finally {
-      setIsTransactionInProgress(false);
+      logPayment(
+        'error',
+        `Error initiating payment: ${(error as Error).message}`
+      );
     }
-  }, [
-    joinTrip,
-    TaxiData.tripCode,
-    isTransactionInProgress,
-    isPaymentInitiated,
-  ]);
+  }, [joinTrip, TaxiData.tripCode, paymentState, logPayment]);
 
   useEffect(() => {
-    calls++;
-    console.log(
-      'PayModal Called',
-      new Date().toLocaleTimeString('en-US', { hour12: false }),
-      calls
-    );
-
     initiatePayment();
-
-    return () => {
-      // Cleanup function to reset states
-      setPaymentStatus('pending');
-      setPaymentLog('No log info yet..');
-      setIsTransactionInProgress(false);
-      setIsPaymentInitiated(false);
-      setCopyIcon(<FaCopy size={20} />);
-    };
-  }, []); // Call initiatePayment only once when the component mounts
+    return () => setPaymentState('idle');
+  }, [initiatePayment]);
 
   useEffect(() => {
     if (paymentInfoRef.current) {
@@ -130,25 +95,21 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, [paymentLog]);
 
   const handleRetry = useCallback(() => {
-    setPaymentStatus('pending');
+    setPaymentState('idle');
     setPaymentLog('Retrying payment...');
-    setIsPaymentInitiated(false);
-    setIsTransactionInProgress(false);
     initiatePayment();
   }, [initiatePayment]);
 
   const handleCancel = useCallback(() => {
-    setPaymentStatus('error');
+    setPaymentState('error');
     setPaymentLog((prevLog) => `${prevLog}\nPayment was cancelled.`);
-    setIsPaymentInitiated(false);
-    setIsTransactionInProgress(false);
     setShowPaymentModal(false);
   }, [setShowPaymentModal]);
 
   const handleContinue = useCallback(() => {
     setShowPaymentModal(false);
     router.push('/trip');
-  }, [setShowPaymentModal]);
+  }, [setShowPaymentModal, router]);
 
   const handleCopy = useCallback(() => {
     setCopyIcon(<FaCheckDouble size={20} />);
@@ -160,8 +121,8 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, [paymentLog]);
 
   const renderStatusIcon = useMemo(() => {
-    switch (paymentStatus) {
-      case 'pending':
+    switch (paymentState) {
+      case 'processing':
         return (
           <Image
             src="/loader.gif"
@@ -171,7 +132,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
             height={150}
           />
         );
-      case 'successful':
+      case 'success':
         return (
           <Image
             src="/success-icon.png"
@@ -194,33 +155,33 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
       default:
         return null;
     }
-  }, [paymentStatus]);
+  }, [paymentState]);
 
   const renderActions = useMemo(() => {
-    switch (paymentStatus) {
+    switch (paymentState) {
       case 'error':
         return (
           <>
-            <button onClick={() => handleCancel()}>Cancel</button>
-            <button onClick={() => handleCopy()} className={styles.copyButton}>
+            <button onClick={handleCancel}>Cancel</button>
+            <button onClick={handleCopy} className={styles.copyButton}>
               {copyIcon}
             </button>
-            <button onClick={() => handleRetry()}>Retry</button>
+            <button onClick={handleRetry}>Retry</button>
           </>
         );
-      case 'successful':
+      case 'success':
         return (
           <>
-            <button onClick={() => handleCopy()} className={styles.copyButton}>
+            <button onClick={handleCopy} className={styles.copyButton}>
               <FaCopy size={24} />
             </button>
-            <button onClick={() => handleContinue()}>Continue</button>
+            <button onClick={handleContinue}>Continue</button>
           </>
         );
-      case 'pending':
+      case 'processing':
         return (
           <>
-            <button onClick={() => handleCopy()} className={styles.copyButton}>
+            <button onClick={handleCopy} className={styles.copyButton}>
               <FaCopy size={24} />
             </button>
             <button onClick={handleCancel}>Cancel</button>
@@ -230,7 +191,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         return null;
     }
   }, [
-    paymentStatus,
+    paymentState,
     handleCancel,
     handleCopy,
     handleRetry,
