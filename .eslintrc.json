@@ -7,9 +7,7 @@
 		"plugin:@next/next/recommended"
 	],
 	"plugins": ["@typescript-eslint"],
-	"overrideConfig": {
-		"linterOptions": {
-			"reportUnusedDisableDirectives": true
-		}
+	"linterOptions": {
+		"reportUnusedDisableDirectives": true
 	}
 }
