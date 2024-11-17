@@ -45,7 +45,7 @@
     "@typescript-eslint/parser": "^8.14.0",
     "eslint": "^9.11.1",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-next": "^14.2.13",
+    "eslint-config-next": "^15.0.3",
     "eslint-config-oclif": "^5.2.1",
     "eslint-config-oclif-typescript": "^3.1.11",
     "eslint-config-prettier": "^9.1.0",
