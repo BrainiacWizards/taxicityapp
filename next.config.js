@@ -1,4 +1,5 @@
-const { withSentryConfig } = require("@sentry/nextjs");
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const process = require("process");
 
 /** @type {import('next').NextConfig} */
@@ -13,7 +14,11 @@ const nextConfig = {
 	},
 };
 
-const sentryConfig = withSentryConfig(nextConfig, {
+// Injected content via Sentry wizard below
+
+const { withSentryConfig } = require("@sentry/nextjs");
+
+module.exports = withSentryConfig(nextConfig, {
 	// For all available options, see:
 	// https://github.com/getsentry/sentry-webpack-plugin#options
 
@@ -52,5 +57,3 @@ const sentryConfig = withSentryConfig(nextConfig, {
 	// https://vercel.com/docs/cron-jobs
 	automaticVercelMonitors: true,
 });
-
-module.exports = sentryConfig;
