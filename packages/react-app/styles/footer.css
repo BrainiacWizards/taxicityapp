@@ -1,7 +1,7 @@
 /* styles/footer.css */
 
 footer {
-  background-color: var(--prim-color);
+  background: var(--dark-gradient-bg);
   color: var(--font-color);
   padding: 20px 0;
   text-align: center;
@@ -50,4 +50,15 @@ footer {
 .footer-bottom {
   margin-top: 10px;
   font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .social-icons {
+    justify-content: center;
+  }
 }

@@ -1,7 +1,7 @@
 /* styles/header.css */
 
 header {
-  background-color: var(--prim-color);
+  background: var(--dark-gradient-bg);
   color: var(--font-color);
   padding-bottom: 10px;
   max-width: 100%;
@@ -115,7 +115,7 @@ header {
 
 .nav-links li:hover {
   color: var(--font-color);
-  background-color: var(--prim-color);
+  background: var(--dark-gradient-bg);
 }
 
 .user-actions {

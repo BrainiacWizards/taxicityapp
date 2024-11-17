@@ -20,64 +20,24 @@ interface iPayModal {
   setShowPaymentModal: Dispatch<SetStateAction<boolean>>;
 }
 
+type PaymentState = 'idle' | 'processing' | 'success' | 'error';
+
 const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
-  const [paymentStatus, setPaymentStatus] = useState<
-    'pending' | 'successful' | 'error'
-  >('pending');
+  /*********States******************/
+  const [paymentState, setPaymentState] = useState<PaymentState>('idle');
   const [paymentLog, setPaymentLog] = useState<string>('No log info yet..');
-  const [isTransactionInProgress, setIsTransactionInProgress] =
-    useState<boolean>(false);
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
   const router = useRouter();
 
-  const logPayment = useCallback(
-    (status: 'pending' | 'successful' | 'error', message: string) => {
-      setPaymentStatus(status);
-      setPaymentLog((prevLog) => `${prevLog}\n${message}`);
-    },
-    []
-  );
+  const logPayment = useCallback((status: PaymentState, message: string) => {
+    setPaymentState(status);
+    setPaymentLog((prevLog) => `${prevLog}\n${message}`);
+  }, []);
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
   const contract = new ethers.Contract(contractAddress, abi, signer);
-
-  const createTrip = useCallback(async () => {
-    setPaymentLog('Creating trip...');
-    try {
-      const details = TaxiData.route;
-      const rankName = TaxiData.rankName;
-      const registration = TaxiData.registration;
-      const verified = TaxiData.verified;
-
-      const tx = await contract.createTrip(
-        ethers.utils.parseEther(TaxiData.price.toString()),
-        details,
-        rankName,
-        registration,
-        verified
-      );
-      const receipt = await tx.wait();
-
-      // Parse the TripCreated event from the receipt
-      const event = receipt.events?.find(
-        (event: any) => event.event === 'TripCreated'
-      );
-      const tripCounter = event?.args.tripCounter?.toString();
-
-      console.log(event, tripCounter);
-
-      if (!tripCounter) {
-        throw new Error('Trip counter is undefined');
-      }
-      logPayment('successful', `Trip created with Code: ${tripCounter}`);
-      return tripCounter;
-    } catch (error: unknown) {
-      logPayment('error', `Error creating trip: ${(error as Error).message}`);
-      throw error;
-    }
-  }, [contract, TaxiData.price, TaxiData, logPayment]);
 
   const joinTrip = useCallback(
     async (tripCode: number) => {
@@ -87,10 +47,11 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
           value: ethers.utils.parseEther(TaxiData.price.toString()),
         });
         await tx.wait();
-        logPayment('successful', `Joined trip with code: ${tripCode}`);
+        logPayment('success', `Joined trip with code: ${tripCode}`);
         return tripCode;
       } catch (error) {
-        logPayment('error', `Error joining trip: ${(error as Error).message}`);
+        const errorMessage = (error as Error).message.split('(')[0].trim();
+        logPayment('error', `Error joining trip: ${errorMessage}`);
         throw error;
       }
     },
@@ -98,8 +59,12 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   );
 
   const initiatePayment = useCallback(async () => {
-    if (isTransactionInProgress) return;
-    setIsTransactionInProgress(true);
+    if (paymentState === 'processing') {
+      console.log('Payment already in progress');
+      return;
+    }
+
+    setPaymentState('processing');
     setPaymentLog('Payment initiated...');
     try {
       if (TaxiData.tripCode) {
@@ -108,25 +73,17 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         throw new Error('Trip code is undefined');
       }
     } catch (error) {
-      if (error instanceof Error && 'data' in error) {
-        logPayment(
-          'error',
-          `Error initiating payment: ${(error.data as Error).message}`
-        );
-      } else {
-        logPayment(
-          'error',
-          `Error initiating payment: ${(error as Error).message}`
-        );
-      }
-    } finally {
-      setIsTransactionInProgress(false);
+      logPayment(
+        'error',
+        `Error initiating payment: ${(error as Error).message}`
+      );
     }
-  }, [createTrip, joinTrip, TaxiData.tripCode, isTransactionInProgress]);
+  }, [joinTrip, TaxiData.tripCode, paymentState, logPayment]);
 
   useEffect(() => {
     initiatePayment();
-  }, []); // Call initiatePayment only once when the component mounts
+    return () => setPaymentState('idle');
+  }, [initiatePayment]);
 
   useEffect(() => {
     if (paymentInfoRef.current) {
@@ -138,13 +95,13 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, [paymentLog]);
 
   const handleRetry = useCallback(() => {
-    setPaymentStatus('pending');
+    setPaymentState('idle');
     setPaymentLog('Retrying payment...');
     initiatePayment();
   }, [initiatePayment]);
 
   const handleCancel = useCallback(() => {
-    setPaymentStatus('error');
+    setPaymentState('error');
     setPaymentLog((prevLog) => `${prevLog}\nPayment was cancelled.`);
     setShowPaymentModal(false);
   }, [setShowPaymentModal]);
@@ -152,7 +109,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const handleContinue = useCallback(() => {
     setShowPaymentModal(false);
     router.push('/trip');
-  }, [setShowPaymentModal]);
+  }, [setShowPaymentModal, router]);
 
   const handleCopy = useCallback(() => {
     setCopyIcon(<FaCheckDouble size={20} />);
@@ -164,8 +121,8 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, [paymentLog]);
 
   const renderStatusIcon = useMemo(() => {
-    switch (paymentStatus) {
-      case 'pending':
+    switch (paymentState) {
+      case 'processing':
         return (
           <Image
             src="/loader.gif"
@@ -175,7 +132,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
             height={150}
           />
         );
-      case 'successful':
+      case 'success':
         return (
           <Image
             src="/success-icon.png"
@@ -198,33 +155,33 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
       default:
         return null;
     }
-  }, [paymentStatus]);
+  }, [paymentState]);
 
   const renderActions = useMemo(() => {
-    switch (paymentStatus) {
+    switch (paymentState) {
       case 'error':
         return (
           <>
-            <button onClick={() => handleCancel()}>Cancel</button>
-            <button onClick={() => handleCopy()} className={styles.copyButton}>
+            <button onClick={handleCancel}>Cancel</button>
+            <button onClick={handleCopy} className={styles.copyButton}>
               {copyIcon}
             </button>
-            <button onClick={() => handleRetry()}>Retry</button>
+            <button onClick={handleRetry}>Retry</button>
           </>
         );
-      case 'successful':
+      case 'success':
         return (
           <>
-            <button onClick={() => handleCopy()} className={styles.copyButton}>
+            <button onClick={handleCopy} className={styles.copyButton}>
               <FaCopy size={24} />
             </button>
-            <button onClick={() => handleContinue()}>Continue</button>
+            <button onClick={handleContinue}>Continue</button>
           </>
         );
-      case 'pending':
+      case 'processing':
         return (
           <>
-            <button onClick={() => handleCopy()} className={styles.copyButton}>
+            <button onClick={handleCopy} className={styles.copyButton}>
               <FaCopy size={24} />
             </button>
             <button onClick={handleCancel}>Cancel</button>
@@ -234,7 +191,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         return null;
     }
   }, [
-    paymentStatus,
+    paymentState,
     handleCancel,
     handleCopy,
     handleRetry,

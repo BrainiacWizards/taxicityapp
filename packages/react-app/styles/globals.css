@@ -13,6 +13,18 @@
   --neutral-color: #a0a7af; /* Bright Neutral Color */
   --neutral-light-color: #d4d4d4; /* Light Neutral Color */
   --font-color: #ffffff; /* Font Color */
+  --dark-gradient-bg: linear-gradient(
+    to right,
+    var(--prim-color),
+    var(--sec-color),
+    var(--prim-color)
+  );
+  --light-gradient-bg: linear-gradient(
+    to right,
+    var(--sec-color),
+    var(--accent-color),
+    var(--sec-color)
+  );
 }
 
 * {
@@ -29,7 +41,7 @@
 }
 
 body {
-  background-color: var(--bg-color);
+  background: var(--bg-color);
   color: var(--prim-color);
   width: 100%;
   background-image: url('../public/background_pattern.png') !important;
@@ -38,7 +50,7 @@ body {
 }
 
 main {
-  min-height: 82vh;
+  min-height: 85vh;
 }
 
 button {
@@ -46,13 +58,16 @@ button {
   border: none;
   border-radius: 10px;
   color: #ffffff;
-  background-color: var(--prim-color);
+  background: var(--prim-color);
   max-width: 250px;
   max-height: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
 button:hover {
-  background-color: var(--accent-color);
+  background: var(--light-gradient-bg);
+  color: var(--bg-color) !important;
 }
 
 button:active {
@@ -60,16 +75,16 @@ button:active {
 }
 
 .button {
-  background-color: var(--sec-color);
+  background: var(--sec-color);
   color: #ffffff;
 }
 
 .button:hover {
-  background-color: var(--accent-color);
+  background: var(--accent-color);
 }
 
 .card {
-  background-color: #ffffff;
+  background: #ffffff;
   border: 1px solid var(--neutral-color);
 }
 
@@ -77,7 +92,14 @@ a {
   color: var(--accent-color);
 }
 
+.inline-span {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
+}
+
 footer {
-  background-color: var(--prim-color);
+  background: var(--prim-color);
   color: #ffffff;
 }
