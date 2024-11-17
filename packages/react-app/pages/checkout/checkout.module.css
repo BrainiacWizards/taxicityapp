@@ -33,6 +33,7 @@
   border-radius: 10px;
   font-size: 20px;
   box-shadow: 2px 2px 3px 0 var(--neutral-color);
+  text-align: center;
 }
 
 .accessCodeContainer button {
@@ -52,9 +53,20 @@
 }
 
 .QrScanner {
-  background-color: red;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  align-items: center;
+  gap: 20px;
+  background-color: var(--neutral-color);
   padding: 10px;
-  max-width: calc(100% - 20px);
+  width: calc(100% - 20px);
+  border-radius: 10px;
+}
+
+.QrScanner button {
+  background-color: var(--bg-color);
+  color: var(--prim-color);
 }
 
 .QrReader {

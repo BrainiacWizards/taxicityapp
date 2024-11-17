@@ -36,6 +36,7 @@
   "dependencies": {
     "@sentry/nextjs": "^8.32.0",
     "next": "^15.0.3",
+    "react-qr-reader": "^3.0.0-beta-1",
     "taxicityapp": "file:"
   },
   "devDependencies": {

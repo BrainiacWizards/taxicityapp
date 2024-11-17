@@ -9,6 +9,8 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
 import { abi, contractAddress } from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader/'; // Import PopUpLoader
+import QRCodeScanner from '@/components/QRCodeScanner';
+import { FaQrcode } from 'react-icons/fa';
 
 let checkoutCalls = 0;
 
@@ -109,6 +111,10 @@ const Checkout: React.FC = () => {
     isVerifying,
   });
 
+  function handleScan(data: string | null): void {
+    console.log(data);
+  }
+
   return (
     <div className={styles.checkoutContainer}>
       {isVerifying && <PopUpLoader />}
@@ -142,12 +148,13 @@ const Checkout: React.FC = () => {
             <span className={styles.codeError}>{codeError}</span>
           </div>
           <span>Or</span>
-          <span>Scan QR Code</span>
-          {/* <QRCodeScanner onScan={handleScan} styles={styles} /> */}
+          <span className="inline-span">
+            Scan QR Code <FaQrcode />
+          </span>
+          <QRCodeScanner onScan={handleScan} styles={styles} />
         </div>
       ) : (
         <div className={styles.accessCodeContainer}>
-          <h3>Trip Code correct: Proceed to pay.</h3>
           {!isConnected ? (
             <button
               onClick={() => {
@@ -157,7 +164,10 @@ const Checkout: React.FC = () => {
               Connect Wallet
             </button>
           ) : (
-            <button onClick={payForTrip}>Pay with Wallet</button>
+            <>
+              <h3>Trip Code correct: Proceed to pay.</h3>
+              <button onClick={payForTrip}>Pay with Wallet</button>
+            </>
           )}
         </div>
       )}

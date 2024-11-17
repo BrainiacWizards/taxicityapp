@@ -67,6 +67,7 @@ button {
 
 button:hover {
   background: var(--light-gradient-bg);
+  color: var(--bg-color) !important;
 }
 
 button:active {
@@ -89,6 +90,13 @@ button:active {
 
 a {
   color: var(--accent-color);
+}
+
+.inline-span {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: center;
 }
 
 footer {
