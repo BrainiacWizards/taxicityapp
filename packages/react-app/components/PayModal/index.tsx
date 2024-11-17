@@ -35,10 +35,15 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     setPaymentLog((prevLog) => `${prevLog}\n${message}`);
   }, []);
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(contractAddress, abi, signer);
+  // initialize contract and signer
+  const { provider, signer, contract } = useMemo(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    return { provider, signer, contract };
+  }, [contractAddress, abi]);
 
+  /*******Trip and payment functions***************/
   const joinTrip = useCallback(
     async (tripCode: number) => {
       setPaymentLog('Joining trip...');
@@ -80,10 +85,15 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     }
   }, [joinTrip, TaxiData.tripCode, paymentState, logPayment]);
 
+  const hasInitiatedPayment = useRef(false);
+
   useEffect(() => {
-    initiatePayment();
+    if (!hasInitiatedPayment.current) {
+      initiatePayment();
+      hasInitiatedPayment.current = true;
+    }
     return () => setPaymentState('idle');
-  }, [initiatePayment]);
+  }, []);
 
   useEffect(() => {
     if (paymentInfoRef.current) {
