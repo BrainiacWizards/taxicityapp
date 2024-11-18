@@ -16,27 +16,27 @@ stages:
       pool:
         name: ProdPool
       steps:
-      # - task: Docker@2
-      #   displayName: Build and Push an image to the container registry
-      #   inputs:
-      #     containerRegistry: $(docker_registry)
-      #     repository: $(registry_repo)
-      #     command: buildAndPush
-      #     dockerfile: '**/Dockerfile'
-      #     tags: |
-      #       $(Build.BuildNumber)
-            
-      - script: |
-          npm install --legacy-peer-deps
-          mv packages/react-app/.env.template packages/react-app/.env
-          cd packages/react-app
-        displayName: Installing dependencies
-      
-      - script: |
-         ls packages/react-app
-
-      - task: PublishBuildArtifacts@1
+      - task: Docker@2
+        displayName: Build and Push an image to the container registry
         inputs:
-          PathtoPublish: packages/react-app
-          ArtifactName: 'tax-web-site'
-          publishLocation: Container
+          containerRegistry: $(docker_registry)
+          repository: $(registry_repo)
+          command: buildAndPush
+          dockerfile: '**/Dockerfile'
+          tags: |
+            $(Build.BuildNumber)
+            
+      # - script: |
+      #     npm install --legacy-peer-deps
+      #     mv packages/react-app/.env.template packages/react-app/.env
+      #     cd packages/react-app
+      #   displayName: Installing dependencies
+      
+      # - script: |
+      #    ls packages/react-app
+
+      # - task: PublishBuildArtifacts@1
+      #   inputs:
+      #     PathtoPublish: packages/react-app
+      #     ArtifactName: 'tax-web-site'
+      #     publishLocation: Container
