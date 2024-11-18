@@ -19,10 +19,42 @@ interface iTrip {
   passengers: any[]; //TODO: Replace 'any' with the actual type if known
   date: string;
   tripId: string;
-  status: 'completed' | 'ongoing';
+  status: 'completed' | 'ongoing' | 'not started';
 }
 
-const TripCard: React.FC<{ trip: iTrip }> = React.memo(({ trip }) => (
+const updateTripStatus = async (
+  tripId: string,
+  newStatus: 'completed' | 'ongoing' | 'not started',
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  setTrips: React.Dispatch<React.SetStateAction<iTrip[]>>
+) => {
+  try {
+    setLoading(true);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+
+    await contract.updateTripStatus(tripId, newStatus === 'completed');
+
+    setTrips((prevTrips) =>
+      prevTrips.map((trip) =>
+        trip.tripId === tripId ? { ...trip, status: newStatus } : trip
+      )
+    );
+  } catch (error) {
+    console.error('Error updating trip status:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const TripCard: React.FC<{
+  trip: iTrip;
+  handleStatusChange: (
+    tripId: string,
+    newStatus: 'completed' | 'ongoing' | 'not started'
+  ) => void;
+}> = React.memo(({ trip, handleStatusChange }) => (
   <div className={styles.tripCard}>
     <div className={styles.tripCardHeader}>
       <h3>
@@ -52,7 +84,21 @@ const TripCard: React.FC<{ trip: iTrip }> = React.memo(({ trip }) => (
         Trip ID: <span>{trip.tripId}</span>
       </p>
       <p>
-        Status: <span>{trip.status}</span>
+        Status:
+        <select
+          className={styles.statusSelect}
+          value={trip.status}
+          onChange={(e) =>
+            handleStatusChange(
+              trip.tripId,
+              e.target.value as 'completed' | 'ongoing' | 'not started'
+            )
+          }
+        >
+          <option value="not started">Not Started</option>
+          <option value="ongoing">Ongoing</option>
+          <option value="completed">Completed</option>
+        </select>
       </p>
     </div>
   </div>
@@ -167,6 +213,13 @@ const UserTripHistoryPage: React.FC = () => {
     handlePrevPage,
   } = usePagination(sortedTrips, 4);
 
+  const handleStatusChange = (
+    tripId: string,
+    newStatus: 'completed' | 'ongoing' | 'not started'
+  ) => {
+    updateTripStatus(tripId, newStatus, setLoading, setTrips);
+  };
+
   return (
     <DriverLayout>
       <div className={styles.userTripPage}>
@@ -202,7 +255,11 @@ const UserTripHistoryPage: React.FC = () => {
         </div>
         <div className={styles.userTripContent}>
           {currentItems.map((trip, index) => (
-            <TripCard key={index} trip={trip} />
+            <TripCard
+              key={index}
+              trip={trip}
+              handleStatusChange={handleStatusChange}
+            />
           ))}
         </div>
         <div className={styles.pagination}>
