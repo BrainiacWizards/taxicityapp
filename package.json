@@ -33,6 +33,10 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5"
+  }
 }

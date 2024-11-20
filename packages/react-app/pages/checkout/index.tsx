@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-// import QRCodeScanner from '@/components/QRCodeScanner';
 import styles from './checkout.module.css';
 import { iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails';
@@ -8,9 +7,9 @@ import PayModal from '@/components/PayModal';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
 import { abi, contractAddress } from '@/lib/contractConfig';
-import PopUpLoader from '@/components/PopupLoader/'; // Import PopUpLoader
-import QRCodeScanner from '@/components/QRCodeScanner';
+import PopUpLoader from '@/components/PopupLoader/';
 import { FaQrcode } from 'react-icons/fa';
+import { QRScanner } from '@/components/QRScanner'; // Import the new QRScanner component
 
 let checkoutCalls = 0;
 
@@ -43,58 +42,59 @@ const Checkout: React.FC = () => {
     if (tripData) setTaxiData(JSON.parse(tripData));
   }, []);
 
-  const checkTripCode = useCallback(async () => {
-    if (!connectors) return;
-    if (!isVerifying) setIsVerifying(true);
+  const checkTripCode = useCallback(
+    async (accessCode: string) => {
+      if (!connectors) return;
+      if (!isVerifying) setIsVerifying(true);
 
-    try {
-      const accessCode = inputRef.current?.value || '-1';
-
-      if (
-        accessCode.trim() === '' ||
-        isNaN(parseInt(accessCode)) ||
-        parseInt(accessCode) < 0
-      ) {
-        setCodeError('Enter a code');
-        return;
-      }
-
-      const provider = new ethers.providers.Web3Provider(
-        (await connectors[0].getProvider()) as ethers.providers.ExternalProvider
-      );
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, abi, signer);
-
-      const tripCode = parseInt(accessCode);
-      const tripDetails = await contract.getTripDetails(tripCode);
-
-      if (tripDetails.driver !== ethers.constants.AddressZero) {
-        setIsCodeEntered(true);
-        setCodeError('Code Correct');
-        setTaxiData((prevTaxiData) => ({
-          ...prevTaxiData,
-          tripCode,
-        }));
-
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem(
-            'trip',
-            JSON.stringify({
-              ...taxiData,
-              tripCode,
-            })
-          );
+      try {
+        if (
+          accessCode.trim() === '' ||
+          isNaN(parseInt(accessCode)) ||
+          parseInt(accessCode) < 0
+        ) {
+          setCodeError('Enter a code');
+          return;
         }
-      } else {
-        setCodeError('Incorrect code');
+
+        const provider = new ethers.providers.Web3Provider(
+          (await connectors[0].getProvider()) as ethers.providers.ExternalProvider
+        );
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
+
+        const tripCode = parseInt(accessCode);
+        const tripDetails = await contract.getTripDetails(tripCode);
+
+        if (tripDetails.driver !== ethers.constants.AddressZero) {
+          setIsCodeEntered(true);
+          setCodeError('Code Correct');
+          setTaxiData((prevTaxiData) => ({
+            ...prevTaxiData,
+            tripCode,
+          }));
+
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem(
+              'trip',
+              JSON.stringify({
+                ...taxiData,
+                tripCode,
+              })
+            );
+          }
+        } else {
+          setCodeError('Incorrect code');
+        }
+      } catch (error) {
+        console.error(error);
+        setCodeError('Error checking code');
+      } finally {
+        setIsVerifying(false);
       }
-    } catch (error) {
-      console.error(error);
-      setCodeError('Error checking code');
-    } finally {
-      setIsVerifying(false);
-    }
-  }, [connectors, isVerifying]);
+    },
+    [connectors, isVerifying]
+  );
 
   const payForTrip = useCallback(() => {
     if (!isConnected) return;
@@ -111,9 +111,10 @@ const Checkout: React.FC = () => {
     isVerifying,
   });
 
-  function handleScan(data: string | null): void {
-    console.log(data);
-  }
+  const handleScan = (data: string) => {
+    console.log('Scanned code:', data);
+    checkTripCode(data);
+  };
 
   return (
     <div className={styles.checkoutContainer}>
@@ -131,7 +132,6 @@ const Checkout: React.FC = () => {
           showTaxiDetails={() => {}}
         />
       </div>
-      {/* <Divider /> */}
       {!isCodeEntered && isConnected ? (
         <div className={styles.accessCodeContainer}>
           <h2>Enter Trip Access Code or Scan QR</h2>
@@ -142,7 +142,10 @@ const Checkout: React.FC = () => {
               disabled={isVerifying}
               ref={inputRef}
             />
-            <button onClick={checkTripCode} disabled={isVerifying}>
+            <button
+              onClick={() => checkTripCode(inputRef.current?.value || '')}
+              disabled={isVerifying}
+            >
               Verify Code
             </button>
             <span className={styles.codeError}>{codeError}</span>
@@ -151,7 +154,7 @@ const Checkout: React.FC = () => {
           <span className="inline-span">
             Scan QR Code <FaQrcode />
           </span>
-          <QRCodeScanner onScan={handleScan} styles={styles} />
+          <QRScanner onScan={handleScan} />
         </div>
       ) : (
         <div className={styles.accessCodeContainer}>
