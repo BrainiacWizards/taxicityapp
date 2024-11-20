@@ -11,7 +11,7 @@ COPY . .
 RUN npm install --legacy-peer-deps
 
 # Move the .env.template to .env
-RUN mv packages/react-app/.env.template packages/react-app/.env
+# RUN mv packages/react-app/.env.template packages/react-app/.env
 
 # Change to the react-app directory and run the dev command
 CMD cd packages/react-app && npm run dev
