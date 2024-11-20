@@ -17,7 +17,7 @@ COPY . .
 WORKDIR /app/packages/react-app
 
 # Installing dependencies specific to react-app 
-RUN npm install --legacy-peer-deps
+# RUN npm install --legacy-peer-deps
 
 # Exposing the port the app runs on
 EXPOSE 3000
