@@ -33,25 +33,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {
-    "@sentry/nextjs": "^8.32.0",
-    "next": "^15.0.3",
-    "react-qr-reader": "^3.0.0-beta-1",
-    "taxicityapp": "file:"
-  },
-  "devDependencies": {
-    "@next/eslint-plugin-next": "^15.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.14.0",
-    "@typescript-eslint/parser": "^8.14.0",
-    "eslint": "^9.11.1",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-next": "^14.2.13",
-    "eslint-config-oclif": "^5.2.1",
-    "eslint-config-oclif-typescript": "^3.1.11",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }
