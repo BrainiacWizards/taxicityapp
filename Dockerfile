@@ -4,14 +4,11 @@ FROM node:20
 # Set the working directory to the root
 WORKDIR /app
 
-# Copy package.json and package-lock.json files
-COPY ./package*.json ./
+# Copy the rest of the application files into the container
+COPY . .
 
 # Install dependencies for the entire project
 RUN npm install --legacy-peer-deps
-
-# Copy the rest of the application files into the container
-COPY . .
 
 # Move the .env.template to .env
 RUN mv packages/react-app/.env.template packages/react-app/.env
