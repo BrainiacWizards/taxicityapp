@@ -1,20 +1,26 @@
-# Use the official Node.js image as the base image
-FROM node:19
+# Use Node.js 20 as the base image
+FROM node:20
 
-# Set the working directory in the container
+# Setting the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json files
+# Copying package.json and package-lock.json files
 COPY ./package*.json ./
 
-# Install dependencies
+# Installing dependencies at the root level
 RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application files
 COPY . .
 
-# Expose the port the app runs on
+# Setting the working directory to the react-app directory
+WORKDIR /app/packages/react-app
+
+# Installing dependencies specific to react-app 
+RUN npm install --legacy-peer-deps
+
+# Exposing the port the app runs on
 EXPOSE 3000
 
 # Command to run the application
-CMD ["npm", "run", "react-app:dev"]
+CMD ["npm", "run", "dev"]
