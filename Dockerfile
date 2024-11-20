@@ -8,7 +8,7 @@ WORKDIR /app
 COPY ./package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application files
 COPY . .
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 3000
 
 # Command to run the application
-CMD ["npm", "run", "build"]
+CMD ["npm", "run", "react-app:dev"]
