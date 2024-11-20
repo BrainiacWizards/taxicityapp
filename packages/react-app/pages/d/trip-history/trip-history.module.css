@@ -88,3 +88,10 @@
 .sortOptions label {
   font-weight: bold;
 }
+
+.statusSelect {
+  padding: 2px;
+  border-radius: 5px;
+  border: 1px solid var(--prim-color);
+  color: var(--prim-color);
+}
