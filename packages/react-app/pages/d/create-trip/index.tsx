@@ -6,7 +6,8 @@ import { taxis, ranks } from '@/lib/data';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails';
 import DriverLayout from '@/components/DriverLayout';
-import PopUpLoader from '@/components/PopupLoader/'; // Import the PopUpLoader component
+import PopUpLoader from '@/components/PopupLoader/';
+import { QRCodeGenerator } from '@/components/QRCodeGenerator'; // Import the QRCodeGenerator component
 
 const CreateTrip: React.FC = () => {
   const [driverName, setDriverName] = useState('');
@@ -17,6 +18,7 @@ const CreateTrip: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [tripCode, setTripCode] = useState<string | null>(null);
+  const [generateQRCode, setGenerateQRCode] = useState(false);
 
   const rankMap = useMemo(() => {
     return ranks.reduce((map: { [key: number]: iRank }, rank) => {
@@ -99,6 +101,7 @@ const CreateTrip: React.FC = () => {
       }
       setTripCode(tripCounter);
       setMessage('Trip created successfully!');
+      setGenerateQRCode(true); // Set generateQRCode to true to trigger QR code generation
     } catch (error) {
       console.error(error);
       setMessage('Failed to create trip.');
@@ -153,6 +156,9 @@ const CreateTrip: React.FC = () => {
           <div className={styles.tripDetails}>
             <h2>Trip Created Successfully!</h2>
             <p>Trip Code: {tripCode}</p>
+            {generateQRCode && (
+              <QRCodeGenerator value={tripCode} generate={generateQRCode} />
+            )}
           </div>
         )}
         {selectedTaxi && !tripCode && (

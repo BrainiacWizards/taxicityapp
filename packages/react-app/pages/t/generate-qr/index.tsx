@@ -1,34 +1,24 @@
-import { useState, useRef, RefObject } from 'react';
-import QRCode from 'qrcode';
+import { QRCodeGenerator } from '@/components/QRCodeGenerator';
+import { useState } from 'react';
 
-export default function Home() {
-  const [text, setText] = useState<string>('');
-  const canvasRef: RefObject<HTMLCanvasElement> = useRef(null);
-
-  const generateQRCode = () => {
-    if (canvasRef.current) {
-      QRCode.toCanvas(canvasRef.current, text, function (error) {
-        if (error) console.error(error);
-        console.log('QR code generated!');
-      });
-    }
-  };
-
+const Page = () => {
+  const [value, setValue] = useState('1');
+  const [generate, setGenerate] = useState(false);
   return (
-    <div>
+    <>
       <h1>QR Code Generator</h1>
-      <div>
-        <input
-          type="text"
-          value={text}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setText(e.target.value)
-          }
-          placeholder="Enter text to generate QR code"
-        />
-        <button onClick={generateQRCode}>Generate QR Code</button>
-      </div>
-      <canvas ref={canvasRef}></canvas>
-    </div>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => {
+          setGenerate(false);
+          setValue(e.target.value);
+        }}
+      />
+      <button onClick={() => setGenerate(true)}>Generate QR Code</button>
+      <QRCodeGenerator value={value} generate={generate} />;
+    </>
   );
-}
+};
+
+export default Page;
