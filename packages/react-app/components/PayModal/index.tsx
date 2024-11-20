@@ -36,9 +36,12 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, []);
 
   // initialize contract and signer
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  const contract = new ethers.Contract(contractAddress, abi, signer);
+  const { provider, signer, contract } = useMemo(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    return { provider, signer, contract };
+  }, [contractAddress, abi]);
 
   /*******Trip and payment functions***************/
   const joinTrip = useCallback(
