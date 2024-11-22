@@ -19,6 +19,7 @@ const CreateTrip: React.FC = () => {
   const [message, setMessage] = useState('');
   const [tripCode, setTripCode] = useState<string | null>(null);
   const [generateQRCode, setGenerateQRCode] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState<string | number>(0);
 
   const rankMap = useMemo(() => {
     return ranks.reduce((map: { [key: number]: iRank }, rank) => {
@@ -61,6 +62,7 @@ const CreateTrip: React.FC = () => {
 
   const handleSelectTaxi = (taxi: iTaxi) => {
     const taxiData = getFilteredTaxiData([taxi])[0];
+    setSelectedPrice(taxiData.price);
     setSelectedTaxi(taxiData);
   };
 
@@ -80,7 +82,7 @@ const CreateTrip: React.FC = () => {
       if (!route) throw new Error('Route not found');
 
       const tx = await contract.createTrip(
-        ethers.utils.parseEther(selectedTaxi.price.toString()),
+        ethers.utils.parseEther(selectedPrice.toString()),
         route,
         selectedTaxi.rankName,
         selectedTaxi.registration,
@@ -165,7 +167,13 @@ const CreateTrip: React.FC = () => {
           <form className={styles.formDetails} onSubmit={handleCreateTrip}>
             <div className={styles.formGroup}>
               <label htmlFor="fare">Fare (ETH):</label>
-              <input type="text" id="fare" value={selectedTaxi.price} />
+              <input
+                type="number"
+                id="fare"
+                step="0.1"
+                onChange={(e) => setSelectedPrice(parseFloat(e.target.value))}
+                value={selectedPrice}
+              />
             </div>
             <div className={styles.formGroup}>
               <label htmlFor="details">Details:</label>
