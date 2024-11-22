@@ -62,7 +62,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
           <span>Loading...</span>
         </div>
       ) : (
-        <canvas width={200} height={200} ref={canvasRef}></canvas>
+        <canvas width={250} height={250} ref={canvasRef}></canvas>
       )}
     </div>
   );
