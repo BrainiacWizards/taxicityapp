@@ -165,12 +165,7 @@ const CreateTrip: React.FC = () => {
           <form className={styles.formDetails} onSubmit={handleCreateTrip}>
             <div className={styles.formGroup}>
               <label htmlFor="fare">Fare (ETH):</label>
-              <input
-                type="text"
-                id="fare"
-                value={selectedTaxi.price}
-                readOnly
-              />
+              <input type="text" id="fare" value={selectedTaxi.price} />
             </div>
             <div className={styles.formGroup}>
               <label htmlFor="details">Details:</label>
