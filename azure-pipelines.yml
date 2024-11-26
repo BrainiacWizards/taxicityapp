@@ -16,9 +16,12 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
-    npm install --legacy-peer-deps
-    npm run build
-  displayName: 'npm install and build'
+    npm react-app:install
+  displayName: 'installing dependencies'
+
+- script: |
+    npm react-app:build
+  displayName: 'running build'
 
 - task: PublishBuildArtifacts@1
   inputs:
