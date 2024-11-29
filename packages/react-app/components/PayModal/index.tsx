@@ -14,6 +14,7 @@ import { FaCheckDouble, FaCopy } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import { contractAddress, abi } from '@/lib/contractConfig';
+import { toast } from 'react-toastify';
 
 interface iPayModal {
   TaxiData: iTaxiData;
@@ -56,6 +57,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
       return { gasEstimate, gasLimit };
     } catch (error) {
       logPayment('error', `Error estimating gas: ${(error as Error).message}`);
+      toast.error('Error estimating gas, please check console for more info');
       throw error;
     }
   }, [contract, TaxiData.tripCode, TaxiData.price, logPayment]);
@@ -71,6 +73,9 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         });
         await tx.wait();
         logPayment('success', `Joined trip with code: ${tripCode}`);
+        toast.success(
+          'Payment successful, you can now continue to trip, Thank you!'
+        );
         return tripCode;
       } catch (error) {
         const errorMessage = (error as Error).message.split('(')[0].trim();
@@ -100,6 +105,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         'error',
         `Error initiating payment: ${(error as Error).message}`
       );
+      toast.error('Error initiating payment, please try again');
     }
   }, [joinTrip, TaxiData.tripCode, paymentState, logPayment]);
 
@@ -107,6 +113,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
 
   useEffect(() => {
     if (!hasInitiatedPayment.current) {
+      toast.info('Initiating payment..., please check you wallet...');
       initiatePayment();
       hasInitiatedPayment.current = true;
     }

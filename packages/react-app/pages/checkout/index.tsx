@@ -10,6 +10,7 @@ import { abi, contractAddress } from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader/';
 import { FaQrcode } from 'react-icons/fa';
 import { QRScanner } from '@/components/QRScanner'; // Import the new QRScanner component
+import { toast } from 'react-toastify';
 
 let checkoutCalls = 0;
 
@@ -37,6 +38,7 @@ const Checkout: React.FC = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    toast.warn('We will need permission to access your camera for QR code.');
     setIsMounted(true);
     const tripData = sessionStorage.getItem('trip');
     if (tripData) setTaxiData(JSON.parse(tripData));
@@ -54,6 +56,7 @@ const Checkout: React.FC = () => {
           parseInt(accessCode) < 0
         ) {
           setCodeError('Enter a code');
+          toast.error('Please enter a valid code');
           return;
         }
 
@@ -85,10 +88,12 @@ const Checkout: React.FC = () => {
           }
         } else {
           setCodeError('Incorrect code');
+          toast.error('Incorrect code, please try again');
         }
       } catch (error) {
         console.error(error);
         setCodeError('Error checking code');
+        toast.error('Error checking code');
       } finally {
         setIsVerifying(false);
       }

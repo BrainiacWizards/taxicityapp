@@ -93,22 +93,20 @@ const TripPage: React.FC = () => {
       />
       <div className={styles.details}>
         <div className={styles.passengersSection}>
-          <h3>
+          <h2>
             <FaUser /> Passengers
-          </h3>
+          </h2>
           <p>Passenger Count: {passengers.length}</p>
         </div>
         <div className={styles.tripStatusSection}>
-          <h3>
+          <h2>
             <FaRoute /> Trip Status
-          </h3>
+          </h2>
           <p>{tripStatus}</p>
         </div>
       </div>
       <div className={styles.ratingSection}>
-        <h3>
-          <FaStar /> Rate Driver
-        </h3>
+        <h2>Rate Driver</h2>
         <div className={styles.stars}>
           {[...Array(5)].map((_, index) => {
             const ratingValue = index + 1;

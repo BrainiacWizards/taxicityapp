@@ -8,6 +8,7 @@ import { MdVerified } from 'react-icons/md';
 import TaxiDetails from '../TaxiDetails';
 import Divider from '../Divider';
 import { constructRouteString, findRank, findRoute } from '@/lib/helpers';
+import { toast } from 'react-toastify';
 
 const RankLocator: React.FC = () => {
   const [ranks, setRanks] = useState<iRank[]>([]);
@@ -35,6 +36,9 @@ const RankLocator: React.FC = () => {
         setRoutes(data.data.routes);
       } catch (error) {
         console.error('Error fetching data:', error);
+        toast.error(
+          'Unable to load data. Please refresh the page or try again later.'
+        );
       } finally {
         setIsFetching(false);
       }
@@ -54,6 +58,7 @@ const RankLocator: React.FC = () => {
 
     updateVisibleFields();
     window.addEventListener('resize', updateVisibleFields);
+    toast.info('We use your location to help you navigate the map easily.');
 
     return () => {
       window.removeEventListener('resize', updateVisibleFields);
@@ -64,7 +69,6 @@ const RankLocator: React.FC = () => {
     new Set(ranks.map((rank: iRank) => rank.province))
   );
 
-  console.log(provinces);
   const cities = Array.from(new Set(ranks.map((rank: iRank) => rank.city)));
   const towns = Array.from(new Set(ranks.map((rank: iRank) => rank.town)));
   const toTowns = Array.from(
@@ -80,10 +84,6 @@ const RankLocator: React.FC = () => {
     );
     setFilteredTaxis(filtered);
   }, [filteredRanks, taxis]);
-
-  useEffect(() =>
-    // filter taxis based on selected rank
-    {}, [taxis, filteredRanks, filteredTaxis]);
 
   const filterRanks = (event: FormEvent) => {
     event.preventDefault();
