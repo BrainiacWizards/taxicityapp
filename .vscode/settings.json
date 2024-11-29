@@ -23,21 +23,5 @@
 		"taxidetails",
 		"typechain",
 		"wagmi"
-	],
-	"sqltools.connections": [
-		{
-			"mysqlOptions": {
-				"authProtocol": "default",
-				"enableSsl": "Disabled"
-			},
-			"previewLimit": 50,
-			"server": "hackathondb.cdau24kiyihl.us-east-1.rds.amazonaws.com",
-			"port": 3306,
-			"driver": "MySQL",
-			"name": "TaxiCityDb",
-			"database": "hackathon",
-			"username": "admin",
-			"password": "brainiac_my$qldb"
-		}
 	]
 }
