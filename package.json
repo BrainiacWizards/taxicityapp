@@ -33,12 +33,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {
-    "mysql2": "^3.11.4",
-    "qrcode": "^1.5.4"
-  },
-  "devDependencies": {
-    "@types/qrcode": "^1.5.5",
-    "serverless-offline": "^14.3.4"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }
