@@ -11,22 +11,38 @@ import styles from './map.module.css';
 import { iRank } from '@/models/RankMapModels';
 
 const GoogleMap: React.FC<{ locations: iRank[] }> = ({ locations }) => {
+  const [currentLocation, setCurrentLocation] = React.useState({
+    lat: 0,
+    lng: 0,
+  });
+
+  // get users current location
+  navigator.geolocation.getCurrentPosition((position) => {
+    setCurrentLocation({
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+    });
+  });
+
   const PoiMarkers = (props: { pois: iRank[] }) => {
     return (
       <>
         {props.pois.map((poi: iRank, index: number) => (
           <AdvancedMarker
             key={index}
-            position={poi.location}
+            position={{
+              lat: poi.latitude,
+              lng: poi.longitude,
+            }}
             clickable
-            title={poi.name}
+            title={poi.rankName}
           >
             <Pin
               background={'#b90000'}
               glyphColor={'#ffffff'}
               borderColor={'#000'}
             />
-            <div className={styles.label}>{poi.name}</div>
+            <div className={styles.label}>{poi.rankName}</div>
           </AdvancedMarker>
         ))}
       </>
@@ -41,9 +57,7 @@ const GoogleMap: React.FC<{ locations: iRank[] }> = ({ locations }) => {
       <Map
         mapId={'609184b6d45dfcf6'}
         className={styles.map}
-        defaultCenter={
-          locations[0]?.location || { lat: -33.904139, lng: 18.630222 }
-        }
+        defaultCenter={currentLocation}
         colorScheme="dark"
         defaultZoom={10}
         gestureHandling={'greedy'}

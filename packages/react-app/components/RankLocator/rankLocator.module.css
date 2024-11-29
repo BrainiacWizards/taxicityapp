@@ -94,7 +94,7 @@
   overflow-y: auto;
   margin: 50px auto;
   scroll-margin: 20px;
-  border-radius: 20px;
+  border-radius: 10px;
 }
 
 .availableTaxis::-webkit-scrollbar {
