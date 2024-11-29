@@ -138,6 +138,7 @@
 .availableTaxis th {
   color: var(--font-color);
   padding: 10px;
+  text-wrap: nowrap;
 }
 
 .availableTaxis td {

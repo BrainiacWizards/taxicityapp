@@ -1,12 +1,13 @@
 'use client';
 import styles from './rankLocator.module.css';
 import GoogleMap from '../Map';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 import TaxiDetails from '../TaxiDetails';
 import Divider from '../Divider';
+import { constructRouteString, findRank, findRoute } from '@/lib/helpers';
 
 const RankLocator: React.FC = () => {
   const [ranks, setRanks] = useState<iRank[]>([]);
@@ -19,9 +20,11 @@ const RankLocator: React.FC = () => {
     undefined
   );
   const [visibleFields, setVisibleFields] = useState<number>(1);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsFetching(true);
       try {
         const response = await fetch(
           'https://api.brainiacwiz.com/api/taxicity/data'
@@ -32,6 +35,8 @@ const RankLocator: React.FC = () => {
         setRoutes(data.data.routes);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setIsFetching(false);
       }
     };
 
@@ -58,6 +63,8 @@ const RankLocator: React.FC = () => {
   const provinces = Array.from(
     new Set(ranks.map((rank: iRank) => rank.province))
   );
+
+  console.log(provinces);
   const cities = Array.from(new Set(ranks.map((rank: iRank) => rank.city)));
   const towns = Array.from(new Set(ranks.map((rank: iRank) => rank.town)));
   const toTowns = Array.from(
@@ -67,63 +74,6 @@ const RankLocator: React.FC = () => {
     new Set(routes.map((route: iRoute) => route.toCity))
   );
 
-  // get filteredTaxi data
-  const getFilteredTaxiData = React.useMemo(() => {
-    const rankMap = ranks.reduce((map: { [key: number]: iRank }, rank) => {
-      map[rank.rankId] = rank;
-      return map;
-    }, {} as { [key: number]: iRank });
-
-    return (filteredTaxis: iTaxi[]) =>
-      filteredTaxis.map((taxi: iTaxi) => {
-        const route: iRoute | undefined = routes.find(
-          (route) => route.routeId === taxi.routeId
-        );
-        const fromTown = route ? rankMap[taxi.rankId]?.town : 'N/A';
-
-        return {
-          rankName: rankMap[taxi.rankId]?.rankName,
-          registration: taxi.registrationNumber,
-          verified: taxi.isVerified ? true : false,
-          route: route ? `${fromTown} - ${route.toTown}` : 'N/A',
-          price: route ? route.price : 'N/A',
-          capacity: taxi.capacity,
-          driver: taxi.driverName,
-        };
-      });
-  }, [ranks, routes]);
-
-  const filterRanks = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
-    const province = form.province?.value.trim().toLowerCase();
-    const fromCity = form.fromCity?.value.trim().toLowerCase();
-    const fromTown = form.fromTown?.value.trim().toLowerCase();
-    const toCity = form.toCity?.value.trim().toLowerCase();
-    const toTown = form.toTown?.value.trim().toLowerCase();
-
-    const filtered = ranks.filter(
-      (rank) =>
-        (!province || rank.province.toLowerCase() === province) &&
-        (!fromCity || rank.city.toLowerCase() === fromCity) &&
-        (!fromTown || rank.town.toLowerCase() === fromTown) &&
-        (!toCity ||
-          routes.some(
-            (route) =>
-              route.toCity.toLowerCase() === toCity &&
-              route.fromRankId === rank.rankId
-          )) &&
-        (!toTown ||
-          routes.some(
-            (route) =>
-              route.toTown.toLowerCase() === toTown &&
-              route.fromRankId === rank.rankId
-          ))
-    );
-
-    setFilteredRanks(filtered);
-  };
-
   useEffect(() => {
     const filtered = taxis.filter((taxi: iTaxi) =>
       filteredRanks.some((rank) => taxi.rankId === rank.rankId)
@@ -131,7 +81,46 @@ const RankLocator: React.FC = () => {
     setFilteredTaxis(filtered);
   }, [filteredRanks, taxis]);
 
-  const filteredTaxiData = getFilteredTaxiData(filteredTaxis);
+  useEffect(() =>
+    // filter taxis based on selected rank
+    {}, [taxis, filteredRanks, filteredTaxis]);
+
+  const filterRanks = (event: FormEvent) => {
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+    const selectedProvince = formData.get('province') as string;
+    const selectedFromCity = formData.get('fromCity') as string;
+    const selectedFromTown = formData.get('fromTown') as string;
+    const selectedToCity = formData.get('toCity') as string;
+    const selectedToTown = formData.get('toTown') as string;
+
+    console.log(selectedProvince, selectedFromCity, selectedFromTown);
+
+    console.log(ranks);
+
+    const filtered = ranks.filter((rank: iRank) => {
+      return (
+        (!selectedProvince ||
+          rank.province.toLowerCase() === selectedProvince) &&
+        (!selectedFromCity || rank.city.toLowerCase() === selectedFromCity) &&
+        (!selectedFromTown || rank.town.toLowerCase() === selectedFromTown) &&
+        (!selectedToCity ||
+          routes.some(
+            (route) =>
+              route.toCity.toLowerCase() === selectedToCity &&
+              route.destinationRankId === rank.rankId
+          )) &&
+        (!selectedToTown ||
+          routes.some(
+            (route) =>
+              route.toTown.toLowerCase() === selectedToTown &&
+              route.destinationRankId === rank.rankId
+          ))
+      );
+    });
+
+    setFilteredRanks(filtered);
+  };
 
   return (
     <>
@@ -153,6 +142,7 @@ const RankLocator: React.FC = () => {
                     'select' + field.charAt(0).toUpperCase() + field.slice(1)
                   }
                   aria-label={`Select ${field}`}
+                  disabled={isFetching}
                 />
                 <datalist id={`list_${field}`}>
                   {(field === 'province'
@@ -176,16 +166,22 @@ const RankLocator: React.FC = () => {
             <button
               type="button"
               onClick={() => setVisibleFields((prev) => Math.min(prev + 1, 5))}
+              disabled={isFetching}
             >
               +
             </button>
             <button
               type="button"
               onClick={() => setVisibleFields((prev) => Math.max(prev - 1, 1))}
+              disabled={isFetching}
             >
               -
             </button>
-            <button className={styles.searchBtn} type="submit">
+            <button
+              className={styles.searchBtn}
+              type="submit"
+              disabled={isFetching}
+            >
               Search
             </button>
           </div>
@@ -208,30 +204,45 @@ const RankLocator: React.FC = () => {
           <thead>
             <tr>
               <th>Rank</th>
-              <th>Taxi Registration</th>
+              <th>Taxi Reg</th>
               <th>Verified</th>
               <th>Route</th>
               <th>Price</th>
             </tr>
           </thead>
           <tbody>
-            {filteredTaxiData.map((taxiData: iTaxiData) => (
+            {filteredTaxis.map((taxi: iTaxi) => (
               <tr
-                key={taxiData.registration}
+                key={taxi.registrationNumber}
                 onClick={() => {
+                  const taxiData: iTaxiData = {
+                    driver: taxi.driverName,
+                    rankName: findRank(taxi, ranks)?.rankName,
+                    route: constructRouteString(findRoute(taxi, routes), ranks),
+                    registration: taxi.registrationNumber,
+                    verified: taxi.isVerified,
+                    price: (
+                      routes.find(
+                        (route) => route.routeId === taxi.routeId
+                      ) as iRoute
+                    ).price,
+                    capacity: taxi.capacity,
+                  };
                   setCurrentTaxiData(taxiData);
                   setShowTaxiDetails(true);
                 }}
                 role="button"
-                aria-label={`Taxi ${taxiData.registration}`}
+                aria-label={`Taxi ${taxi.registrationNumber}`}
               >
-                <td>{taxiData.rankName}</td>
-                <td>{taxiData.registration}</td>
                 <td>
-                  {taxiData.verified ? <MdVerified /> : <FaQuestionCircle />}
+                  {ranks.find((rank) => rank.rankId === taxi.rankId)?.rankName}
                 </td>
-                <td>{taxiData.route}</td>
-                <td>R{taxiData.price}</td>
+                <td>{taxi.registrationNumber}</td>
+                <td>
+                  {taxi.isVerified ? <MdVerified /> : <FaQuestionCircle />}
+                </td>
+                <td>{constructRouteString(findRoute(taxi, routes), ranks)}</td>
+                <td>R{findRoute(taxi, routes).price}</td>
               </tr>
             ))}
           </tbody>

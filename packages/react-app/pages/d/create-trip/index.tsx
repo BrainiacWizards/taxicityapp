@@ -9,6 +9,7 @@ import TaxiDetails from '@/components/TaxiDetails';
 import DriverLayout from '@/components/DriverLayout';
 import PopUpLoader from '@/components/PopupLoader/';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator'; // Import the QRCodeGenerator component
+import { constructRouteString, findRank, findRoute } from '@/lib/helpers';
 
 const CreateTrip: React.FC = () => {
   const [driverName, setDriverName] = useState('');
@@ -56,13 +57,8 @@ const CreateTrip: React.FC = () => {
   const getFilteredTaxiData = (taxis: iTaxi[]): iTaxiData[] => {
     return taxis.map((taxi) => ({
       driver: taxi.driverName,
-      route: `${
-        routes.find((route) => route.routeId === taxi.routeId)?.fromRankId
-      } - ${
-        routes.find((route) => route.routeId === taxi.routeId)
-          ?.destinationRankId
-      }`,
-      rankName: ranks.find((rank) => rank.rankId === taxi.rankId)?.rankName,
+      route: constructRouteString(findRoute(taxi, routes), ranks),
+      rankName: findRank(taxi, ranks).rankName,
       registration: taxi.registrationNumber,
       verified: taxi.isVerified,
       price:
