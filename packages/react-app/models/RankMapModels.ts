@@ -1,32 +1,31 @@
 export interface iRank {
-  id: number;
-  name: string;
+  rankId: number;
+  rankName: string;
   town: string;
   city: string;
   province: string;
-  location: {
-    lat: number;
-    lng: number;
-  };
-  routes: iRoute[];
+  latitude: number;
+  longitude: number;
+  routeIds: string;
 }
 
 export interface iRoute {
   routeId: number;
+  fromRankId: number;
   toTown: string;
   toCity: string;
-  price: number;
-  destinationId: number;
+  price: string;
+  destinationRankId: number;
 }
 
 export interface iTaxi {
-  id: number;
-  driver: string;
+  taxiId: number;
+  driverName: string;
   rankId: number;
   routeId: number;
-  registration: string;
+  registrationNumber: string;
   capacity: number;
-  verified: boolean;
+  isVerified: boolean;
 }
 
 export interface iTaxiData {

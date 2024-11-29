@@ -1,5 +1,4 @@
 'use client';
-import { ranks, taxis } from '@/lib/data';
 import styles from './rankLocator.module.css';
 import GoogleMap from '../Map';
 import React, { useState, useEffect } from 'react';
@@ -10,6 +9,9 @@ import TaxiDetails from '../TaxiDetails';
 import Divider from '../Divider';
 
 const RankLocator: React.FC = () => {
+  const [ranks, setRanks] = useState<iRank[]>([]);
+  const [taxis, setTaxis] = useState<iTaxi[]>([]);
+  const [routes, setRoutes] = useState<iRoute[]>([]);
   const [filteredRanks, setFilteredRanks] = useState<iRank[]>([]);
   const [filteredTaxis, setFilteredTaxis] = useState<iTaxi[]>([]);
   const [showTaxiDetails, setShowTaxiDetails] = useState<boolean>(false);
@@ -17,6 +19,24 @@ const RankLocator: React.FC = () => {
     undefined
   );
   const [visibleFields, setVisibleFields] = useState<number>(1);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          'https://api.brainiacwiz.com/api/taxicity/data'
+        );
+        const data = await response.json();
+        setRanks(data.data.ranks);
+        setTaxis(data.data.taxis);
+        setRoutes(data.data.routes);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const updateVisibleFields = () => {
@@ -41,45 +61,37 @@ const RankLocator: React.FC = () => {
   const cities = Array.from(new Set(ranks.map((rank: iRank) => rank.city)));
   const towns = Array.from(new Set(ranks.map((rank: iRank) => rank.town)));
   const toTowns = Array.from(
-    new Set(
-      ranks
-        .map((rank: iRank) => rank.routes.map((route) => route.toTown))
-        .flat()
-    )
+    new Set(routes.map((route: iRoute) => route.toTown))
   );
   const toCities = Array.from(
-    new Set(
-      ranks
-        .map((rank: iRank) => rank.routes.map((route) => route.toCity))
-        .flat()
-    )
+    new Set(routes.map((route: iRoute) => route.toCity))
   );
 
   // get filteredTaxi data
   const getFilteredTaxiData = React.useMemo(() => {
     const rankMap = ranks.reduce((map: { [key: number]: iRank }, rank) => {
-      map[rank.id] = rank;
+      map[rank.rankId] = rank;
       return map;
     }, {} as { [key: number]: iRank });
 
     return (filteredTaxis: iTaxi[]) =>
       filteredTaxis.map((taxi: iTaxi) => {
-        const route: iRoute | undefined = rankMap[taxi.rankId]?.routes.find(
+        const route: iRoute | undefined = routes.find(
           (route) => route.routeId === taxi.routeId
         );
         const fromTown = route ? rankMap[taxi.rankId]?.town : 'N/A';
 
         return {
-          rankName: rankMap[taxi.rankId]?.name,
-          registration: taxi.registration,
-          verified: taxi.verified,
+          rankName: rankMap[taxi.rankId]?.rankName,
+          registration: taxi.registrationNumber,
+          verified: taxi.isVerified ? true : false,
           route: route ? `${fromTown} - ${route.toTown}` : 'N/A',
           price: route ? route.price : 'N/A',
           capacity: taxi.capacity,
-          driver: taxi.driver,
+          driver: taxi.driverName,
         };
       });
-  }, [ranks]);
+  }, [ranks, routes]);
 
   const filterRanks = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -96,9 +108,17 @@ const RankLocator: React.FC = () => {
         (!fromCity || rank.city.toLowerCase() === fromCity) &&
         (!fromTown || rank.town.toLowerCase() === fromTown) &&
         (!toCity ||
-          rank.routes.some((route) => route.toCity.toLowerCase() === toCity)) &&
+          routes.some(
+            (route) =>
+              route.toCity.toLowerCase() === toCity &&
+              route.fromRankId === rank.rankId
+          )) &&
         (!toTown ||
-          rank.routes.some((route) => route.toTown.toLowerCase() === toTown))
+          routes.some(
+            (route) =>
+              route.toTown.toLowerCase() === toTown &&
+              route.fromRankId === rank.rankId
+          ))
     );
 
     setFilteredRanks(filtered);
@@ -106,10 +126,10 @@ const RankLocator: React.FC = () => {
 
   useEffect(() => {
     const filtered = taxis.filter((taxi: iTaxi) =>
-      filteredRanks.some((rank) => taxi.rankId === rank.id)
+      filteredRanks.some((rank) => taxi.rankId === rank.rankId)
     );
     setFilteredTaxis(filtered);
-  }, [filteredRanks]);
+  }, [filteredRanks, taxis]);
 
   const filteredTaxiData = getFilteredTaxiData(filteredTaxis);
 

@@ -2,7 +2,7 @@
   display: flex;
   position: fixed;
   flex-direction: column;
-  z-index: 2;
+  z-index: 200;
   background-color: var(--bg-color);
   top: 50%;
   left: 50%;

@@ -36,7 +36,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, []);
 
   // initialize contract and signer
-  const { provider, signer, contract } = useMemo(() => {
+  const { contract } = useMemo(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, abi, signer);
@@ -44,12 +44,30 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, [contractAddress, abi]);
 
   /*******Trip and payment functions***************/
+  const estimateGas = useCallback(async () => {
+    try {
+      const gasEstimate = await contract.estimateGas.joinTrip(
+        TaxiData.tripCode,
+        {
+          value: ethers.utils.parseEther(TaxiData.price.toString()),
+        }
+      );
+      const gasLimit = gasEstimate.mul(ethers.BigNumber.from(2)); // Adding a buffer to the gas limit
+      return { gasEstimate, gasLimit };
+    } catch (error) {
+      logPayment('error', `Error estimating gas: ${(error as Error).message}`);
+      throw error;
+    }
+  }, [contract, TaxiData.tripCode, TaxiData.price, logPayment]);
+
   const joinTrip = useCallback(
     async (tripCode: number) => {
       setPaymentLog('Joining trip...');
       try {
+        const { gasLimit } = await estimateGas();
         const tx = await contract.joinTrip(tripCode, {
           value: ethers.utils.parseEther(TaxiData.price.toString()),
+          gasLimit: gasLimit,
         });
         await tx.wait();
         logPayment('success', `Joined trip with code: ${tripCode}`);
@@ -60,7 +78,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         throw error;
       }
     },
-    [contract, logPayment, TaxiData.price]
+    [contract, estimateGas, logPayment, TaxiData.price]
   );
 
   const initiatePayment = useCallback(async () => {
