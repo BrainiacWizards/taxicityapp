@@ -76,7 +76,7 @@
 .rankLocatorMap {
   min-width: 250px;
   width: 100%;
-  border-radius: 10px;
+  border-radius: 5px;
   overflow: hidden;
 }
 
@@ -85,7 +85,8 @@
   flex-direction: column;
   grid-column: 1 / -1;
   gap: 10px;
-  padding: 0px 10px;
+  padding: 20px;
+  background-color: var(--sec-color);
   min-width: calc(90% - 0px);
   max-width: calc(90% - 0px);
   width: fit-content;
@@ -93,6 +94,7 @@
   overflow-y: auto;
   margin: 50px auto;
   scroll-margin: 20px;
+  border-radius: 10px;
 }
 
 .availableTaxis::-webkit-scrollbar {
@@ -119,12 +121,14 @@
 
 .availableTaxis h2 {
   font-size: 24px;
+  color: var(--font-color);
+  font-weight: bold;
 }
 
 .availableTaxis table {
   width: 100%;
   border-collapse: collapse;
-  box-shadow: 2px 2px 4px var(--prim-color);
+  box-shadow: 2px 2px 4px 0 var(--prim-color);
 }
 
 .availableTaxis thead tr {
@@ -134,6 +138,7 @@
 .availableTaxis th {
   color: var(--font-color);
   padding: 10px;
+  text-wrap: nowrap;
 }
 
 .availableTaxis td {

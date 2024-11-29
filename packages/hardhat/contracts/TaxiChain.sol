@@ -19,7 +19,7 @@ contract TaxiService {
     bool completed;
   }
 
-  mapping(uint256 => Trip) public trips;
+  mapping(uint256 => Trip) private trips;
   uint256 public tripCounter;
 
   event TripCreated(
@@ -122,7 +122,38 @@ contract TaxiService {
     emit TripCompleted(_tripCode);
   }
 
-  function getTripDetails(uint256 _tripCode) public view returns (Trip memory) {
-    return trips[_tripCode];
+  function getTripDetails(
+    uint256 _tripCode
+  )
+    public
+    view
+    returns (
+      uint256 tripCode,
+      string memory rankName,
+      string memory registration,
+      bool verified,
+      string memory route,
+      uint256 price,
+      uint256 capacity,
+      address driver,
+      address[] memory passengers,
+      bytes32 transactionHash,
+      bool completed
+    )
+  {
+    Trip storage trip = trips[_tripCode];
+    return (
+      trip.tripCode,
+      trip.rankName,
+      trip.registration,
+      trip.verified,
+      trip.route,
+      trip.price,
+      trip.capacity,
+      trip.driver,
+      trip.passengers,
+      trip.transactionHash,
+      trip.completed
+    );
   }
 }

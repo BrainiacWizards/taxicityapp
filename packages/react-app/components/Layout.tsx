@@ -2,6 +2,8 @@ import { FC, ReactNode } from 'react';
 import type { Metadata } from 'next';
 import Footer from './Footer';
 import Header from './Header';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata: Metadata = {
   title: 'TaxiCity',
@@ -28,6 +30,7 @@ interface Props {
 const Layout: FC<Props> = ({ children }) => {
   return (
     <>
+      <ToastContainer />
       <Header />
       <main style={{ backgroundColor: 'rgba(255, 255, 255, 0.71)' }}>
         {children}

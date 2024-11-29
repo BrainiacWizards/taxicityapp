@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AdvancedMarker,
   APIProvider,
@@ -11,22 +11,53 @@ import styles from './map.module.css';
 import { iRank } from '@/models/RankMapModels';
 
 const GoogleMap: React.FC<{ locations: iRank[] }> = ({ locations }) => {
+  const [currentLocation, setCurrentLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
+  useEffect(() => {
+    // get users current location
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCurrentLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      () => {
+        // If user denies permission, use the first location in the locations array
+        if (locations.length > 0) {
+          setCurrentLocation({
+            lat: locations[0].latitude,
+            lng: locations[0].longitude,
+          });
+        }
+      }
+    );
+  }, [locations]);
+
+  console.log('current loc', currentLocation);
+
   const PoiMarkers = (props: { pois: iRank[] }) => {
     return (
       <>
         {props.pois.map((poi: iRank, index: number) => (
           <AdvancedMarker
             key={index}
-            position={poi.location}
+            position={{
+              lat: poi.latitude,
+              lng: poi.longitude,
+            }}
             clickable
-            title={poi.name}
+            title={poi.rankName}
           >
             <Pin
               background={'#b90000'}
               glyphColor={'#ffffff'}
               borderColor={'#000'}
             />
-            <div className={styles.label}>{poi.name}</div>
+            <div className={styles.label}>{poi.rankName}</div>
           </AdvancedMarker>
         ))}
       </>
@@ -38,19 +69,19 @@ const GoogleMap: React.FC<{ locations: iRank[] }> = ({ locations }) => {
       apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
       onLoad={() => console.log('Maps API has loaded.')}
     >
-      <Map
-        mapId={'609184b6d45dfcf6'}
-        className={styles.map}
-        defaultCenter={
-          locations[0]?.location || { lat: -33.904139, lng: 18.630222 }
-        }
-        colorScheme="dark"
-        defaultZoom={10}
-        gestureHandling={'greedy'}
-        disableDefaultUI={true}
-      >
-        <PoiMarkers pois={locations} />
-      </Map>
+      {currentLocation && (
+        <Map
+          mapId={'609184b6d45dfcf6'}
+          className={styles.map}
+          defaultCenter={currentLocation}
+          colorScheme="dark"
+          defaultZoom={10}
+          gestureHandling={'greedy'}
+          disableDefaultUI={true}
+        >
+          <PoiMarkers pois={locations} />
+        </Map>
+      )}
     </APIProvider>
   );
 };

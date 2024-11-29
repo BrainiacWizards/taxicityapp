@@ -1,19 +1,24 @@
-import React, { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+
+import axios from 'axios';
 import { ethers } from 'ethers';
 import styles from './create-trip.module.css';
 import { abi, contractAddress } from '@/lib/contractConfig';
-import { taxis, ranks } from '@/lib/data';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails';
 import DriverLayout from '@/components/DriverLayout';
 import PopUpLoader from '@/components/PopupLoader/';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator'; // Import the QRCodeGenerator component
+import { constructRouteString, findRank, findRoute } from '@/lib/helpers';
 
 const CreateTrip: React.FC = () => {
   const [driverName, setDriverName] = useState('');
   const [routeID, setRouteID] = useState('');
   const [registration, setRegistration] = useState('');
   const [filteredTaxis, setFilteredTaxis] = useState<iTaxi[]>([]);
+  const [ranks, setRanks] = useState<iRank[]>([]);
+  const [taxis, setTaxis] = useState<iTaxi[]>([]);
+  const [routes, setRoutes] = useState<iRoute[]>([]);
   const [selectedTaxi, setSelectedTaxi] = useState<iTaxiData | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -21,41 +26,55 @@ const CreateTrip: React.FC = () => {
   const [generateQRCode, setGenerateQRCode] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState<string | number>(0);
 
-  const rankMap = useMemo(() => {
-    return ranks.reduce((map: { [key: number]: iRank }, rank) => {
-      map[rank.id] = rank;
-      return map;
-    }, {} as { [key: number]: iRank });
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          'https://api.brainiacwiz.com/api/taxicity/data'
+        );
+        const { ranks, taxis, routes } = response.data.data;
+
+        // Process ranks
+        const processedRanks = ranks.map((rank: any) => ({
+          ...rank,
+          routeIds: rank.routeIds
+            .split(',')
+            .map((id: string) => parseInt(id, 10)),
+        }));
+
+        // Update state with fetched data
+        setRanks(processedRanks);
+        setTaxis(taxis);
+        setRoutes(routes);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const getFilteredTaxiData = useMemo(() => {
-    return (filteredTaxis: iTaxi[]) =>
-      filteredTaxis.map((taxi: iTaxi) => {
-        const route: iRoute | undefined = rankMap[taxi.rankId]?.routes.find(
-          (route) => route.routeId === taxi.routeId
-        );
-        const fromTown = route ? rankMap[taxi.rankId]?.town : 'N/A';
-
-        return {
-          rankName: rankMap[taxi.rankId]?.name,
-          registration: taxi.registration,
-          verified: taxi.verified,
-          route: route ? `${fromTown} - ${route.toTown}` : 'N/A',
-          price: route ? route.price : 'N/A',
-          capacity: taxi.capacity,
-          driver: taxi.driver,
-        };
-      });
-  }, [rankMap]);
+  const getFilteredTaxiData = (taxis: iTaxi[]): iTaxiData[] => {
+    return taxis.map((taxi) => ({
+      driver: taxi.driverName,
+      route: constructRouteString(findRoute(taxi, routes), ranks),
+      rankName: findRank(taxi, ranks).rankName,
+      registration: taxi.registrationNumber,
+      verified: taxi.isVerified,
+      price:
+        routes.find((route) => route.routeId === taxi.routeId)?.price || '0.00',
+      capacity: taxi.capacity,
+    }));
+  };
 
   const handleSearchTaxi = () => {
     const regexDriver = new RegExp(driverName, 'i');
     const regexRegistration = new RegExp(registration, 'i');
     const foundTaxis = taxis.filter(
       (taxi) =>
-        (driverName && regexDriver.test(taxi.driver)) ||
+        (driverName && regexDriver.test(taxi.driverName)) ||
         (routeID && taxi.routeId.toString() === routeID) ||
-        (registration && regexRegistration.test(taxi.registration))
+        (registration && regexRegistration.test(taxi.registrationNumber))
     );
     setFilteredTaxis(foundTaxis);
   };
@@ -141,7 +160,7 @@ const CreateTrip: React.FC = () => {
             </div>
             <div className={styles.taxiList}>
               {filteredTaxis.map((taxi) => (
-                <div key={taxi.registration} className={styles.taxiItem}>
+                <div key={taxi.registrationNumber} className={styles.taxiItem}>
                   <TaxiDetails
                     type="fitted"
                     TaxiData={getFilteredTaxiData([taxi])[0]}
