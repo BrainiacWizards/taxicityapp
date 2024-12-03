@@ -4,7 +4,7 @@ const process = require("process");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "output",
+  output: "export",
   reactStrictMode: true,
   swcMinify: true,
   webpack: (config) => {
