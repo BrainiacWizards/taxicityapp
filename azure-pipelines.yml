@@ -1,30 +1,44 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
-variables:
-- group: NextJsEnvironmentVariables
+trigger: none
 
-pool:
-  vmImage: ubuntu-latest
+name: Taxicity-$(Build.BuildId)
 
-steps:
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-  displayName: 'Install Node.js'
+stages:
+  - stage: Build
+    displayName: Build and Push stage
+    jobs:
+    - job:
+      displayName: Build job
+      pool:
+        name: ProdPool
+      steps:
+      # - task: Docker@2
+      #   displayName: Build and Push an image to the container registry
+      #   inputs:
+      #     containerRegistry: $(docker_registry)
+      #     repository: $(registry_repo)
+      #     command: buildAndPush
+      #     dockerfile: '**/Dockerfile'
+      #     tags: |
+      #       $(Build.BuildNumber)
+            
+      - script: |
+          npm install --legacy-peer-deps
+          mv packages/react-app/.env.template packages/react-app/.env
+          cd packages/react-app
+          npm run react-app:build
+    
+        displayName: Installing dependencies
+      
+      # - script: |
+      #    ls packages/react-app
 
-- script: |
-    npm install --legacy-peer-deps
-  displayName: 'installing dependencies'
-
-- script: |
-    npm run react-app:build
-  displayName: 'running build'
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'packages/react-app/out'
-    ArtifactName: 'dev'
-    publishLocation: 'Container'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: packages/react-app/out
+          ArtifactName: 'tax-web-site'
+          publishLocation: Container
