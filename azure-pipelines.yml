@@ -29,8 +29,8 @@ stages:
       - script: |
           npm install --legacy-peer-deps
           mv packages/react-app/.env.template packages/react-app/.env
-          cd packages/react-app
-          npm run react-app:build
+          cd packages/react-app && npm run react-app:build
+          
     
         displayName: Installing dependencies
       
