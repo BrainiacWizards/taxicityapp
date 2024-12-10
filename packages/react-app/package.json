@@ -30,7 +30,7 @@
     "react-loading-skeleton": "^3.5.0",
     "react-toastify": "^10.0.6",
     "taxicityapp": "file:",
-    "viem": "2.21.25",
+    "viem": "2.21.54",
     "wagmi": "^2.9.0"
   },
   "devDependencies": {
