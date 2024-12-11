@@ -31,6 +31,7 @@ const Checkout: React.FC = () => {
   const [taxiData, setTaxiData] = useState<iTaxiData>(dummyTaxiData);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'metamask' | 'minipay'>('metamask');
   const { isConnected } = useAccount();
   const { openConnectModal } = useConnectModal();
   const { connectors } = useConnect();
@@ -96,20 +97,30 @@ const Checkout: React.FC = () => {
     [connectors, isVerifying]
   );
 
-  const payForTrip = useCallback(() => {
+  const payWithMetaMask = useCallback(async () => {
     if (!isConnected) return;
-    if (!showPaymentModal) setShowPaymentModal(true);
-  }, [isConnected, showPaymentModal]);
 
-  console.log('checkout component rendered', checkoutCalls, {
-    codeError,
-    isCodeEntered,
-    isMounted,
-    taxiData,
-    showPaymentModal,
-    isConnected,
-    isVerifying,
-  });
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      
+      const tx = await contract.joinTrip(taxiData.tripCode, {
+        value: ethers.utils.parseEther(taxiData.price.toString()), 
+      });
+
+      await tx.wait(); // 
+      setShowPaymentModal(true);
+    } catch (error) {
+      console.error(error);
+      alert('Payment failed. Please try again.');
+    }
+  }, [isConnected, taxiData]);
+
+  const payWithMiniPay = () => {
+    window.location.href = 'https://minipay.opera.com/add_cash'; 
+  };
 
   const handleScan = (data: string) => {
     console.log('Scanned code:', data);
@@ -169,7 +180,20 @@ const Checkout: React.FC = () => {
           ) : (
             <>
               <h3>Trip Code correct: Proceed to pay.</h3>
-              <button onClick={payForTrip}>Pay with Wallet</button>
+              <div className={styles.paymentButtons}>
+                <button onClick={() => setPaymentMethod('metamask')}>
+                  Pay with MetaMask
+                </button>
+                <button onClick={() => setPaymentMethod('minipay')}>
+                  Pay with MiniPay
+                </button>
+              </div>
+              {paymentMethod === 'metamask' && (
+                <button onClick={payWithMetaMask}>Confirm Payment with MetaMask</button>
+              )}
+              {paymentMethod === 'minipay' && (
+                <button onClick={payWithMiniPay}>Pay with MiniPay</button>
+              )}
             </>
           )}
         </div>
