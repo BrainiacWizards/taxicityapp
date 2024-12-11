@@ -22,7 +22,7 @@
     "react-app:start": "yarn workspace @taxicityapp/react-app start",
     "react-app:lint": "yarn workspace @taxicityapp/react-app lint",
     "hardhat:compile": "yarn workspace @taxicityapp/hardhat compile",
-"hardhat:tsc": "yarn workspace @taxicityapp/hardhat tsc",
+    "hardhat:tsc": "yarn workspace @taxicityapp/hardhat tsc",
     "hardhat:build": "yarn workspace @taxicityapp/hardhat build",
     "hardhat:clean": "yarn workspace @taxicityapp/hardhat clean",
     "hardhat:run:node": "yarn workspace @taxicityapp/hardhat run:node",
@@ -33,6 +33,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "wagmi": "^2.13.5"
+  }
 }
