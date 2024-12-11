@@ -91,7 +91,7 @@ const Checkout: React.FC = () => {
           toast.error('Incorrect code, please try again');
         }
       } catch (error) {
-        console.error(error);
+        console.error('Error checking trip code:', error);
         setCodeError('Error checking code');
         toast.error('Error checking code');
       } finally {

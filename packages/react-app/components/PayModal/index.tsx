@@ -53,10 +53,19 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
           value: ethers.utils.parseEther(TaxiData.price.toString()),
         }
       );
-      const gasLimit = gasEstimate.mul(ethers.BigNumber.from(2)); // Adding a buffer to the gas limit
+      const gasLimit = gasEstimate
+        .mul(ethers.BigNumber.from(2))
+        .add(ethers.BigNumber.from(10000)); // Adding an extra buffer
       return { gasEstimate, gasLimit };
     } catch (error) {
-      logPayment('error', `Error estimating gas: ${(error as Error).message}`);
+      console.error('Error estimating gas:', error);
+      logPayment(
+        'error',
+        `Error estimating gas: ${
+          (error as Error).message
+        }, data: ${JSON.stringify(error)}`
+      );
+
       toast.error('Error estimating gas, please check console for more info');
       throw error;
     }
@@ -78,6 +87,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         );
         return tripCode;
       } catch (error) {
+        console.error('Error joining trip:', error);
         const errorMessage = (error as Error).message.split('(')[0].trim();
         logPayment('error', `Error joining trip: ${errorMessage}`);
         throw error;
@@ -95,6 +105,15 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     setPaymentState('processing');
     setPaymentLog('Payment initiated...');
     try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const balance = await signer.getBalance();
+      const tripCost = ethers.utils.parseEther(TaxiData.price.toString());
+
+      if (balance.lt(tripCost)) {
+        throw new Error('Insufficient funds to cover the trip cost');
+      }
+
       if (TaxiData.tripCode) {
         await joinTrip(TaxiData.tripCode);
       } else {

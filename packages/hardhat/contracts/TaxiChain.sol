@@ -94,6 +94,8 @@ contract TaxiService {
     uint256 taxAmount = (trip.price * taxRate) / 100;
     uint256 paymentAmount = trip.price - taxAmount;
 
+    require(msg.value >= trip.price, 'Insufficient funds to join the trip');
+
     payable(trip.driver).transfer(paymentAmount);
 
     trip.passengers.push(msg.sender);
