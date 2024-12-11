@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Config, useChains } from 'wagmi';
+import { useChains } from 'wagmi';
+import { Config } from '@wagmi/core';
 import { clearStorage } from '@/lib/storage';
 import { Chain } from 'viem';
 import {
