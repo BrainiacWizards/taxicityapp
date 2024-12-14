@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers, run } from 'hardhat';
 
 async function main() {
   // Get the contract factory
@@ -9,6 +9,12 @@ async function main() {
 
   // Wait for the deployment to be mined and confirmed
   await taxiService.deployTransaction.wait(5); // Wait for 5 confirmations
+
+  // Verify the contract after deployment
+  await run('verify:verify', {
+    address: taxiService.address,
+    constructorArguments: [],
+  });
 
   // Log the contract address
   console.log('TaxiService deployed to:', taxiService.address);
