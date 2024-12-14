@@ -42,78 +42,9 @@ type AbiItem = AbiFunction | AbiEvent | AbiConstructor;
 
 export const abi: AbiItem[] = [
   {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_tripCode',
-        type: 'uint256',
-      },
-    ],
-    name: 'completeTrip',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_fare',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: '_details',
-        type: 'string',
-      },
-    ],
-    name: 'createTrip',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_tripCode',
-        type: 'uint256',
-      },
-    ],
-    name: 'joinTrip',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     inputs: [],
     stateMutability: 'nonpayable',
     type: 'constructor',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'tripCode',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'passenger',
-        type: 'address',
-      },
-    ],
-    name: 'PassengerJoinedTrip',
-    type: 'event',
   },
   {
     anonymous: false,
@@ -149,7 +80,7 @@ export const abi: AbiItem[] = [
         type: 'bytes32',
       },
     ],
-    name: 'PaymentMade',
+    name: 'PassengerJoinedTrip',
     type: 'event',
   },
   {
@@ -159,6 +90,19 @@ export const abi: AbiItem[] = [
         indexed: false,
         internalType: 'uint256',
         name: 'tripCode',
+        type: 'uint256',
+      },
+    ],
+    name: 'TripCompleted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'tripCounter',
         type: 'uint256',
       },
       {
@@ -191,40 +135,169 @@ export const abi: AbiItem[] = [
         type: 'uint256',
       },
     ],
-    name: 'getTripDetails',
-    outputs: [
+    name: 'completeTrip',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
       {
-        internalType: 'address',
-        name: '',
-        type: 'address',
+        internalType: 'uint256',
+        name: '_fare',
+        type: 'uint256',
       },
+      {
+        internalType: 'string',
+        name: '_details',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: '_rankName',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: '_registration',
+        type: 'string',
+      },
+      {
+        internalType: 'bool',
+        name: '_verified',
+        type: 'bool',
+      },
+    ],
+    name: 'createTrip',
+    outputs: [
       {
         internalType: 'uint256',
         name: '',
         type: 'uint256',
       },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: '_transactionHash',
+        type: 'bytes32',
+      },
+    ],
+    name: 'getTransactionDetails',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'tripCode',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'passenger',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tax',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_tripCode',
+        type: 'uint256',
+      },
+    ],
+    name: 'getTripDetails',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'tripCode',
+        type: 'uint256',
+      },
       {
         internalType: 'string',
-        name: '',
+        name: 'rankName',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'registration',
         type: 'string',
       },
       {
         internalType: 'bool',
-        name: '',
+        name: 'verified',
         type: 'bool',
       },
       {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
+        internalType: 'string',
+        name: 'route',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'price',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'capacity',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'driver',
+        type: 'address',
       },
       {
         internalType: 'address[]',
-        name: '',
+        name: 'passengers',
         type: 'address[]',
+      },
+      {
+        internalType: 'bytes32',
+        name: 'transactionHash',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'bool',
+        name: 'completed',
+        type: 'bool',
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_tripCode',
+        type: 'uint256',
+      },
+    ],
+    name: 'joinTrip',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -248,45 +321,6 @@ export const abi: AbiItem[] = [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    name: 'trips',
-    outputs: [
-      {
-        internalType: 'address',
-        name: 'driver',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'fare',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'details',
-        type: 'string',
-      },
-      {
-        internalType: 'bool',
-        name: 'completed',
-        type: 'bool',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'transactionHash',
-        type: 'bytes32',
       },
     ],
     stateMutability: 'view',

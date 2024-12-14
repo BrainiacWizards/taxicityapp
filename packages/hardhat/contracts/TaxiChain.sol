@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity >=0.7.0 <0.9.0;
 
 contract TaxiService {
@@ -19,7 +18,17 @@ contract TaxiService {
     bool completed;
   }
 
+  struct Transaction {
+    uint256 tripCode;
+    address passenger;
+    uint256 amount;
+    uint256 tax;
+    bytes32 transactionHash;
+    uint256 timestamp;
+  }
+
   mapping(uint256 => Trip) private trips;
+  mapping(bytes32 => Transaction) private transactions;
   uint256 public tripCounter;
 
   event TripCreated(
@@ -101,6 +110,15 @@ contract TaxiService {
     trip.passengers.push(msg.sender);
     trip.transactionHash = blockhash(block.number - 1);
 
+    transactions[trip.transactionHash] = Transaction({
+      tripCode: _tripCode,
+      passenger: msg.sender,
+      amount: paymentAmount,
+      tax: taxAmount,
+      transactionHash: trip.transactionHash,
+      timestamp: block.timestamp
+    });
+
     emit PassengerJoinedTrip(
       _tripCode,
       msg.sender,
@@ -157,5 +175,22 @@ contract TaxiService {
       trip.transactionHash,
       trip.completed
     );
+  }
+
+  function getTransactionDetails(
+    bytes32 _transactionHash
+  )
+    public
+    view
+    returns (
+      uint256 tripCode,
+      address passenger,
+      uint256 amount,
+      uint256 tax,
+      uint256 timestamp
+    )
+  {
+    Transaction storage txn = transactions[_transactionHash];
+    return (txn.tripCode, txn.passenger, txn.amount, txn.tax, txn.timestamp);
   }
 }
