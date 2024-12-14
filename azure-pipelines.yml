@@ -15,28 +15,13 @@ stages:
       displayName: Build job
       pool:
         name: ProdPool
-      steps:
-      # - task: Docker@2
-      #   displayName: Build and Push an image to the container registry
-      #   inputs:
-      #     containerRegistry: $(docker_registry)
-      #     repository: $(registry_repo)
-      #     command: buildAndPush
-      #     dockerfile: '**/Dockerfile'
-      #     tags: |
-      #       $(Build.BuildNumber)
-            
+      steps:           
       - script: |
           npm install --legacy-peer-deps
           mv packages/react-app/.env.template packages/react-app/.env
-          cd packages/react-app && npm run build
-          
-    
+          cd packages/react-app && npm run build    
         displayName: Installing dependencies
-      
-      # - script: |
-      #    ls packages/react-app
-
+        
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: packages/react-app/out
