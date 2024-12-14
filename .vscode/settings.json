@@ -24,6 +24,7 @@
 		"taxidetails",
 		"Toastify",
 		"typechain",
+		"valora",
 		"wagmi"
 	]
 }

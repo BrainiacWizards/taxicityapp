@@ -1,5 +1,4 @@
 import { http } from 'viem';
-
 import { Config, createConfig } from 'wagmi';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
