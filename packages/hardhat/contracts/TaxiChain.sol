@@ -95,36 +95,29 @@ contract TaxiService {
   }
 
   function joinTrip(
-    uint256 _tripCode
-  ) public payable tripExists(_tripCode) tripNotCompleted(_tripCode) {
+    uint256 _tripCode,
+    bytes32 _transactionHash
+  ) public tripExists(_tripCode) tripNotCompleted(_tripCode) {
     Trip storage trip = trips[_tripCode];
-    // require(msg.value == trip.price, 'Exact fare required');
-
-    uint256 taxAmount = (trip.price * taxRate) / 100;
-    uint256 paymentAmount = trip.price - taxAmount;
-
-    require(msg.value >= trip.price, 'Insufficient funds to join the trip');
-
-    payable(trip.driver).transfer(paymentAmount);
-
+    require(trip.passengers.length < trip.capacity, 'Trip is full');
     trip.passengers.push(msg.sender);
-    trip.transactionHash = blockhash(block.number - 1);
+    trip.transactionHash = _transactionHash;
 
-    transactions[trip.transactionHash] = Transaction({
+    transactions[_transactionHash] = Transaction({
       tripCode: _tripCode,
       passenger: msg.sender,
-      amount: paymentAmount,
-      tax: taxAmount,
-      transactionHash: trip.transactionHash,
+      amount: trip.price,
+      tax: (trip.price * taxRate) / 100,
+      transactionHash: _transactionHash,
       timestamp: block.timestamp
     });
 
     emit PassengerJoinedTrip(
       _tripCode,
       msg.sender,
-      paymentAmount,
-      taxAmount,
-      trip.transactionHash
+      trip.price,
+      (trip.price * taxRate) / 100,
+      _transactionHash
     );
   }
 
