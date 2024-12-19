@@ -1,70 +1,5 @@
 export const abi = [
   {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_tripCode',
-        type: 'uint256',
-      },
-    ],
-    name: 'completeTrip',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_fare',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: '_details',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_rankName',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_registration',
-        type: 'string',
-      },
-      {
-        internalType: 'bool',
-        name: '_verified',
-        type: 'bool',
-      },
-    ],
-    name: 'createTrip',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_tripCode',
-        type: 'uint256',
-      },
-    ],
-    name: 'joinTrip',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
     inputs: [],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -149,6 +84,63 @@ export const abi = [
     ],
     name: 'TripCreated',
     type: 'event',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_tripCode',
+        type: 'uint256',
+      },
+    ],
+    name: 'completeTrip',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_fare',
+        type: 'uint256',
+      },
+      {
+        internalType: 'string',
+        name: '_details',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: '_rankName',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: '_registration',
+        type: 'string',
+      },
+      {
+        internalType: 'bool',
+        name: '_verified',
+        type: 'bool',
+      },
+      {
+        internalType: 'uint256',
+        name: '_capacity',
+        type: 'uint256',
+      },
+    ],
+    name: 'createTrip',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
@@ -259,6 +251,19 @@ export const abi = [
     type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_tripCode',
+        type: 'uint256',
+      },
+    ],
+    name: 'joinTrip',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
     inputs: [],
     name: 'taxRate',
     outputs: [
@@ -286,4 +291,4 @@ export const abi = [
   },
 ];
 
-export const contractAddress = '0x0f31cd37db094909a2896df3921c5f514d876334';
+export const contractAddress = '0x3b9bfa7e66f2773d86dc6b528b36e233569dc472';

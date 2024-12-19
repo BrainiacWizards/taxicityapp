@@ -15,6 +15,7 @@ import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import { contractAddress, abi } from '@/lib/contractConfig';
 import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
 
 interface iMiniPayModal {
   TaxiData: iTaxiData;
@@ -33,6 +34,7 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
   const router = useRouter();
+  const account = useAccount();
 
   const logPayment = useCallback((status: PaymentState, message: string) => {
     setPaymentState(status);
@@ -67,10 +69,14 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
   }, [contract, TaxiData.tripCode, logPayment]);
 
   const joinTrip = useCallback(
-    async (tripCode: number) => {
+    async (tripCode: number, paymentAmount: string) => {
       setPaymentLog('Joining trip...');
       try {
-        const tx = await contract.joinTrip(tripCode);
+        const gasLimit = 3000000; // specify your gas limit here
+        const tx = await contract.joinTrip(tripCode, {
+          value: ethers.utils.parseEther(paymentAmount), // convert paymentAmount to wei
+          gasLimit: gasLimit,
+        });
         await tx.wait();
         logPayment('success', `Joined trip with code: ${tripCode}`);
         toast.success(
@@ -78,13 +84,13 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
         );
         return tripCode;
       } catch (error) {
-        console.error('Error joining trip:', error);
         const errorMessage = (error as Error).message.split('(')[0].trim();
         logPayment('error', `Error joining trip: ${errorMessage}`);
-        throw error;
+        toast.error(`Error joining trip: ${errorMessage}`);
+        throw new Error(`Error joining trip: ${String(error)}`);
       }
     },
-    [contract, estimateGas, logPayment, TaxiData.price]
+    [contract, logPayment]
   );
 
   const initiatePayment = useCallback(async () => {
@@ -115,18 +121,30 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
           .formatUnits(tripCost, 'ether')
           .slice(0, 6)}...`
       );
-      const { gasLimit } = await estimateGas();
-      const tx = await signer.sendTransaction({
-        to: '0x0717329c677ab484eaa73f4c8eed92a2fa948746',
-        value: tripCost,
-        gasLimit: gasLimit,
-      });
-      const receipt = await tx.wait();
+      // const { gasLimit } = await estimateGas();
+      // const tx = await signer.sendTransaction({
+      //   to: '0x0717329c677ab484eaa73f4c8eed92a2fa948746',
+      //   value: tripCost,
+      //   gasLimit: gasLimit,
+      // });
+      // const receipt = await tx.wait();
+      // setPaymentLog((prevLog) => `${prevLog}\nPayment Successful!`);
+      // setPaymentLog(
+      //   (prevLog) => `${prevLog}\nTransaction Hash: ${receipt.transactionHash}`
+      // );
 
       if (TaxiData.tripCode) {
-        // await joinTrip(TaxiData.tripCode);
-        toast.success(`transactions successful: ${receipt.transactionHash}`);
+        setPaymentLog(
+          (prevLog) =>
+            `${prevLog}\nJoining Trip with Code: ${TaxiData.tripCode}`
+        );
+        await joinTrip(TaxiData.tripCode, '0.2');
       } else {
+        setPaymentLog((prevLog) => `${prevLog}\ncouldn't find trip code!`);
+        logPayment(
+          'error',
+          'Trip Code Not Found! if payment is successful, please report transaction (use your transaction hash) as reference'
+        );
         throw new Error('Trip code is undefined');
       }
     } catch (error) {

@@ -73,52 +73,45 @@ contract TaxiService {
     string memory _details,
     string memory _rankName,
     string memory _registration,
-    bool _verified
+    bool _verified,
+    uint256 _capacity
   ) public returns (uint256) {
     tripCounter++;
-    trips[tripCounter] = Trip({
-      tripCode: tripCounter,
+    _initializeTrip(
+      tripCounter,
+      _fare,
+      _details,
+      _rankName,
+      _registration,
+      _verified,
+      _capacity
+    );
+    emit TripCreated(tripCounter, msg.sender, _fare, _details);
+    return tripCounter;
+  }
+
+  function _initializeTrip(
+    uint256 _tripCode,
+    uint256 _fare,
+    string memory _details,
+    string memory _rankName,
+    string memory _registration,
+    bool _verified,
+    uint256 _capacity
+  ) internal {
+    trips[_tripCode] = Trip({
+      tripCode: _tripCode,
       rankName: _rankName,
       registration: _registration,
       verified: _verified,
       route: _details,
       price: _fare,
-      capacity: 0,
+      capacity: _capacity,
       driver: msg.sender,
       passengers: new address[](0),
       transactionHash: bytes32(0),
       completed: false
     });
-
-    emit TripCreated(tripCounter, msg.sender, _fare, _details);
-    return tripCounter;
-  }
-
-  function joinTrip(
-    uint256 _tripCode,
-    bytes32 _transactionHash
-  ) public tripExists(_tripCode) tripNotCompleted(_tripCode) {
-    Trip storage trip = trips[_tripCode];
-    require(trip.passengers.length < trip.capacity, 'Trip is full');
-    trip.passengers.push(msg.sender);
-    trip.transactionHash = _transactionHash;
-
-    transactions[_transactionHash] = Transaction({
-      tripCode: _tripCode,
-      passenger: msg.sender,
-      amount: trip.price,
-      tax: (trip.price * taxRate) / 100,
-      transactionHash: _transactionHash,
-      timestamp: block.timestamp
-    });
-
-    emit PassengerJoinedTrip(
-      _tripCode,
-      msg.sender,
-      trip.price,
-      (trip.price * taxRate) / 100,
-      _transactionHash
-    );
   }
 
   function completeTrip(
@@ -185,5 +178,38 @@ contract TaxiService {
   {
     Transaction storage txn = transactions[_transactionHash];
     return (txn.tripCode, txn.passenger, txn.amount, txn.tax, txn.timestamp);
+  }
+
+  function joinTrip(
+    uint256 _tripCode
+  ) public payable tripExists(_tripCode) tripNotCompleted(_tripCode) {
+    Trip storage trip = trips[_tripCode];
+    require(trip.passengers.length < trip.capacity, 'Trip is full');
+    require(msg.value == trip.price, 'Incorrect payment amount');
+
+    uint256 taxAmount = (msg.value * taxRate) / 100;
+    uint256 netAmount = msg.value - taxAmount;
+
+    trip.passengers.push(msg.sender);
+
+    bytes32 transactionHash = keccak256(
+      abi.encodePacked(_tripCode, msg.sender, block.timestamp)
+    );
+    transactions[transactionHash] = Transaction({
+      tripCode: _tripCode,
+      passenger: msg.sender,
+      amount: netAmount,
+      tax: taxAmount,
+      transactionHash: transactionHash,
+      timestamp: block.timestamp
+    });
+
+    emit PassengerJoinedTrip(
+      _tripCode,
+      msg.sender,
+      netAmount,
+      taxAmount,
+      transactionHash
+    );
   }
 }
