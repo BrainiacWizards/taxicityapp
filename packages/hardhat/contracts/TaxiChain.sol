@@ -2,7 +2,10 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 contract TaxiService {
-  uint256 public constant taxRate = 8;
+  uint256 public constant taxRate = 10;
+
+  address public owner;
+  uint256 public totalTaxCollected;
 
   struct Trip {
     uint256 tripCode;
@@ -47,7 +50,13 @@ contract TaxiService {
   event TripCompleted(uint256 tripCode);
 
   constructor() {
+    owner = msg.sender;
     tripCounter = 0;
+  }
+
+  modifier onlyOwner() {
+    require(msg.sender == owner, 'Only the owner can perform this action');
+    _;
   }
 
   modifier onlyDriver(uint256 _tripCode) {
@@ -180,18 +189,26 @@ contract TaxiService {
     return (txn.tripCode, txn.passenger, txn.amount, txn.tax, txn.timestamp);
   }
 
-  function joinTrip(
-    uint256 _tripCode
-  ) public payable tripExists(_tripCode) tripNotCompleted(_tripCode) {
+  function joinTrip(uint256 _tripCode) public payable {
     Trip storage trip = trips[_tripCode];
     require(trip.passengers.length < trip.capacity, 'Trip is full');
     require(msg.value == trip.price, 'Incorrect payment amount');
 
+    // calculate tax
     uint256 taxAmount = (msg.value * taxRate) / 100;
     uint256 netAmount = msg.value - taxAmount;
 
+    // transfer net amount to trip driver
+    (bool success, ) = trip.driver.call{ value: netAmount, gas: 2300 }('');
+    require(success, 'Transfer to driver failed');
+
+    // store tax in contract
+    totalTaxCollected += taxAmount;
+
+    // Checks-Effects-Interactions pattern
     trip.passengers.push(msg.sender);
 
+    // save transaction details
     bytes32 transactionHash = keccak256(
       abi.encodePacked(_tripCode, msg.sender, block.timestamp)
     );
@@ -204,6 +221,7 @@ contract TaxiService {
       timestamp: block.timestamp
     });
 
+    // trigger PassengerJoinedTrip event
     emit PassengerJoinedTrip(
       _tripCode,
       msg.sender,
@@ -212,4 +230,9 @@ contract TaxiService {
       transactionHash
     );
   }
+
+  // fallback function to handle unexpected Ether transfers
+  fallback() external payable {}
+
+  receive() external payable {}
 }

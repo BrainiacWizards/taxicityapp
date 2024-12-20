@@ -42,7 +42,7 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
   }, []);
 
   // initialize contract and signer
-  const { provider, signer, contract } = useMemo(() => {
+  const { signer, contract } = useMemo(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, abi, signer);
@@ -52,7 +52,7 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
   /*******Trip and payment functions***************/
   const estimateGas = useCallback(async () => {
     try {
-      const gasLimit = ethers.BigNumber.from(3000000); // Set a manual gas limit
+      const gasLimit = ethers.BigNumber.from(9000000); // Set a manual gas limit
       return { gasLimit };
     } catch (error) {
       console.error('Error estimating gas:', error);
@@ -69,13 +69,12 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
   }, [contract, TaxiData.tripCode, logPayment]);
 
   const joinTrip = useCallback(
-    async (tripCode: number, paymentAmount: string) => {
+    async (tripCode: number) => {
       setPaymentLog('Joining trip...');
       try {
-        const gasLimit = 3000000; // specify your gas limit here
         const tx = await contract.joinTrip(tripCode, {
-          value: ethers.utils.parseEther(paymentAmount), // convert paymentAmount to wei
-          gasLimit: gasLimit,
+          value: ethers.utils.parseEther('0.2'),
+          gasLimit: 9000000,
         });
         await tx.wait();
         logPayment('success', `Joined trip with code: ${tripCode}`);
@@ -103,16 +102,9 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
     setPaymentLog('Payment initiated...');
     try {
       const balance = await signer.getBalance();
-      // const tripCost = ethers.utils.parseEther(TaxiData.price.toString());
-      const tripCost = ethers.utils.parseEther('0.2'); //we going to use the test value for now
+      const tripCost = ethers.utils.parseEther(TaxiData.price.toString());
 
       if (balance.lt(tripCost)) {
-        console.log(
-          balance.lt(tripCost),
-          ethers.utils.formatUnits(tripCost, 'ether').slice(0, 6),
-          ethers.utils.formatUnits(balance, 'ether').slice(0, 6),
-          TaxiData.price.toString()
-        );
         throw new Error('Insufficient funds to cover the trip cost');
       }
 
@@ -121,24 +113,13 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
           .formatUnits(tripCost, 'ether')
           .slice(0, 6)}...`
       );
-      // const { gasLimit } = await estimateGas();
-      // const tx = await signer.sendTransaction({
-      //   to: '0x0717329c677ab484eaa73f4c8eed92a2fa948746',
-      //   value: tripCost,
-      //   gasLimit: gasLimit,
-      // });
-      // const receipt = await tx.wait();
-      // setPaymentLog((prevLog) => `${prevLog}\nPayment Successful!`);
-      // setPaymentLog(
-      //   (prevLog) => `${prevLog}\nTransaction Hash: ${receipt.transactionHash}`
-      // );
 
       if (TaxiData.tripCode) {
         setPaymentLog(
           (prevLog) =>
             `${prevLog}\nJoining Trip with Code: ${TaxiData.tripCode}`
         );
-        await joinTrip(TaxiData.tripCode, '0.2');
+        await joinTrip(TaxiData.tripCode);
       } else {
         setPaymentLog((prevLog) => `${prevLog}\ncouldn't find trip code!`);
         logPayment(
