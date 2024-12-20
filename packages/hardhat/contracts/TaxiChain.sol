@@ -189,10 +189,11 @@ contract TaxiService {
     return (txn.tripCode, txn.passenger, txn.amount, txn.tax, txn.timestamp);
   }
 
-  function joinTrip(uint256 _tripCode) public payable {
+  function joinTrip(
+    uint256 _tripCode
+  ) public payable tripExists(_tripCode) tripNotCompleted(_tripCode) {
     Trip storage trip = trips[_tripCode];
     require(trip.passengers.length < trip.capacity, 'Trip is full');
-    require(msg.value == trip.price, 'Incorrect payment amount');
 
     // calculate tax
     uint256 taxAmount = (msg.value * taxRate) / 100;
