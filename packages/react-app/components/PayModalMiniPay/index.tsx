@@ -73,7 +73,7 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
       setPaymentLog('Joining trip...');
       try {
         const tx = await contract.joinTrip(tripCode, {
-          value: ethers.utils.parseEther('0.2'),
+          value: ethers.utils.parseEther(TaxiData.price.toString()),
           gasLimit: 9000000,
         });
         await tx.wait();
