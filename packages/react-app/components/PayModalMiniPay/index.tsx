@@ -72,13 +72,14 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
     async (tripCode: number) => {
       setPaymentLog('Joining trip...');
       try {
+        const tripCost = ethers.utils.parseEther(TaxiData.price.toString());
+        const gasLimit = await contract.estimateGas.joinTrip(tripCode, {
+          value: tripCost,
+        });
+
         const tx = await contract.joinTrip(tripCode, {
-          // value: ethers.utils.parseEther(TaxiData.price.toString()),
-          value: ethers.utils.defaultAbiCoder.encode(
-            ['uint256'],
-            [ethers.utils.parseEther(TaxiData.price.toString())]
-          ),
-          gasLimit: (await estimateGas()).gasLimit,
+          value: tripCost,
+          gasLimit: gasLimit,
         });
         await tx.wait();
         logPayment('success', `Joined trip with code: ${tripCode}`);
@@ -93,7 +94,7 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
         throw new Error(`Error joining trip: ${String(error)}`);
       }
     },
-    [contract, logPayment]
+    [contract, logPayment, TaxiData.price]
   );
 
   const initiatePayment = useCallback(async () => {
@@ -140,7 +141,7 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
       );
       toast.error('Error initiating payment, please try again');
     }
-  }, [joinTrip, TaxiData.tripCode, paymentState, logPayment]);
+  }, [joinTrip, TaxiData.tripCode, paymentState, logPayment, TaxiData.price]);
 
   const hasInitiatedPayment = useRef(false);
 
