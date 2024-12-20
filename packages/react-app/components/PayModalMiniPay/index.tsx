@@ -15,21 +15,26 @@ import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
 import { contractAddress, abi } from '@/lib/contractConfig';
 import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
 
-interface iPayModal {
+interface iMiniPayModal {
   TaxiData: iTaxiData;
   setShowPaymentModal: Dispatch<SetStateAction<boolean>>;
 }
 
 type PaymentState = 'idle' | 'processing' | 'success' | 'error';
 
-const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
+const MiniPayModal: React.FC<iMiniPayModal> = ({
+  TaxiData,
+  setShowPaymentModal,
+}) => {
   /*********States******************/
   const [paymentState, setPaymentState] = useState<PaymentState>('idle');
   const [paymentLog, setPaymentLog] = useState<string>('No log info yet..');
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
   const router = useRouter();
+  const account = useAccount();
 
   const logPayment = useCallback((status: PaymentState, message: string) => {
     setPaymentState(status);
@@ -37,8 +42,8 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   }, []);
 
   // initialize contract and signer
-  const { contract } = useMemo(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const { signer, contract } = useMemo(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
     const signer = provider.getSigner();
     const contract = new ethers.Contract(contractAddress, abi, signer);
     return { provider, signer, contract };
@@ -47,16 +52,8 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   /*******Trip and payment functions***************/
   const estimateGas = useCallback(async () => {
     try {
-      const gasEstimate = await contract.estimateGas.joinTrip(
-        TaxiData.tripCode,
-        {
-          value: ethers.utils.parseEther(TaxiData.price.toString()),
-        }
-      );
-      const gasLimit = gasEstimate
-        .mul(ethers.BigNumber.from(2))
-        .add(ethers.BigNumber.from(10000)); // Adding an extra buffer
-      return { gasEstimate, gasLimit };
+      const gasLimit = ethers.BigNumber.from(9000000); // Set a manual gas limit
+      return { gasLimit };
     } catch (error) {
       console.error('Error estimating gas:', error);
       logPayment(
@@ -69,16 +66,15 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
       toast.error('Error estimating gas, please check console for more info');
       throw error;
     }
-  }, [contract, TaxiData.tripCode, TaxiData.price, logPayment]);
+  }, [contract, TaxiData.tripCode, logPayment]);
 
   const joinTrip = useCallback(
     async (tripCode: number) => {
       setPaymentLog('Joining trip...');
       try {
-        const { gasLimit } = await estimateGas();
         const tx = await contract.joinTrip(tripCode, {
           value: ethers.utils.parseEther(TaxiData.price.toString()),
-          gasLimit: gasLimit,
+          gasLimit: 9000000,
         });
         await tx.wait();
         logPayment('success', `Joined trip with code: ${tripCode}`);
@@ -87,13 +83,13 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         );
         return tripCode;
       } catch (error) {
-        console.error('Error joining trip:', error);
         const errorMessage = (error as Error).message.split('(')[0].trim();
         logPayment('error', `Error joining trip: ${errorMessage}`);
-        throw error;
+        toast.error(`Error joining trip: ${errorMessage}`);
+        throw new Error(`Error joining trip: ${String(error)}`);
       }
     },
-    [contract, estimateGas, logPayment, TaxiData.price]
+    [contract, logPayment]
   );
 
   const initiatePayment = useCallback(async () => {
@@ -105,8 +101,6 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
     setPaymentState('processing');
     setPaymentLog('Payment initiated...');
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
       const balance = await signer.getBalance();
       const tripCost = ethers.utils.parseEther(TaxiData.price.toString());
 
@@ -114,12 +108,28 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
         throw new Error('Insufficient funds to cover the trip cost');
       }
 
+      setPaymentLog(
+        `Initiating transaction: ${ethers.utils
+          .formatUnits(tripCost, 'ether')
+          .slice(0, 6)}...`
+      );
+
       if (TaxiData.tripCode) {
+        setPaymentLog(
+          (prevLog) =>
+            `${prevLog}\nJoining Trip with Code: ${TaxiData.tripCode}`
+        );
         await joinTrip(TaxiData.tripCode);
       } else {
+        setPaymentLog((prevLog) => `${prevLog}\ncouldn't find trip code!`);
+        logPayment(
+          'error',
+          'Trip Code Not Found! if payment is successful, please report transaction (use your transaction hash) as reference'
+        );
         throw new Error('Trip code is undefined');
       }
     } catch (error) {
+      console.error('Error initiating payment:', error);
       logPayment(
         'error',
         `Error initiating payment: ${(error as Error).message}`
@@ -269,4 +279,4 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   );
 };
 
-export default PayModal;
+export default MiniPayModal;

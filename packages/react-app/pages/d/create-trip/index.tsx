@@ -105,7 +105,8 @@ const CreateTrip: React.FC = () => {
         route,
         selectedTaxi.rankName,
         selectedTaxi.registration,
-        selectedTaxi.verified
+        selectedTaxi.verified,
+        selectedTaxi.capacity
       );
       setMessage('decoding transaction');
       const receipt = await tx.wait();

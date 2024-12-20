@@ -5,6 +5,7 @@
 		"brainiacwizards",
 		"CELOSCAN",
 		"cput",
+		"keccak",
 		"kwazulu",
 		"minmax",
 		"nelspruit",
@@ -24,6 +25,7 @@
 		"taxidetails",
 		"Toastify",
 		"typechain",
+		"valora",
 		"wagmi"
 	]
 }

@@ -8,7 +8,7 @@ import {
   useChainModal,
   useConnectModal,
 } from '@rainbow-me/rainbowkit';
-import { getAccount } from '@wagmi/core';
+import { getAccount, Config } from '@wagmi/core';
 import styles from './settings.module.css';
 import { config } from '@/lib/config';
 import Image from 'next/image';
@@ -19,7 +19,7 @@ const SettingsPage = () => {
   const [storageSize, setStorageSize] = useState(0);
   const [storageClear, setStorageClear] = useState(false);
   const chains = useChains();
-  const account = getAccount(config);
+  const account = getAccount(config as Config);
   const { openChainModal } = useChainModal();
   const { openAccountModal } = useAccountModal();
   const { openConnectModal } = useConnectModal();

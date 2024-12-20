@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@celo/abis": "^11.0.0",
+    "@celo/contractkit": "^8.3.1",
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^2.1.6",
     "@sentry/nextjs": "^8.32.0",
@@ -19,7 +20,7 @@
     "@wagmi/connectors": "5.1.15",
     "@wagmi/core": "^2.13.7",
     "axios": "^1.7.8",
-    "ethers": "^5.0.0",
+    "ethers": "^5.7.2",
     "html5-qrcode": "^2.3.8",
     "mysql2": "^3.11.4",
     "next": "^14.2.13",
@@ -31,7 +32,7 @@
     "react-toastify": "^10.0.6",
     "taxicityapp": "file:",
     "viem": "2.21.25",
-    "wagmi": "^2.9.0"
+    "wagmi": "^2.13.5"
   },
   "devDependencies": {
     "@types/node": "^22.7.4",

@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity >=0.7.0 <0.9.0;
 
 contract TaxiService {
-  uint256 public constant taxRate = 8;
+  uint256 public constant taxRate = 10;
+
+  address public owner;
+  uint256 public totalTaxCollected;
 
   struct Trip {
     uint256 tripCode;
@@ -19,7 +21,17 @@ contract TaxiService {
     bool completed;
   }
 
+  struct Transaction {
+    uint256 tripCode;
+    address passenger;
+    uint256 amount;
+    uint256 tax;
+    bytes32 transactionHash;
+    uint256 timestamp;
+  }
+
   mapping(uint256 => Trip) private trips;
+  mapping(bytes32 => Transaction) private transactions;
   uint256 public tripCounter;
 
   event TripCreated(
@@ -38,7 +50,13 @@ contract TaxiService {
   event TripCompleted(uint256 tripCode);
 
   constructor() {
+    owner = msg.sender;
     tripCounter = 0;
+  }
+
+  modifier onlyOwner() {
+    require(msg.sender == owner, 'Only the owner can perform this action');
+    _;
   }
 
   modifier onlyDriver(uint256 _tripCode) {
@@ -64,48 +82,45 @@ contract TaxiService {
     string memory _details,
     string memory _rankName,
     string memory _registration,
-    bool _verified
+    bool _verified,
+    uint256 _capacity
   ) public returns (uint256) {
     tripCounter++;
-    trips[tripCounter] = Trip({
-      tripCode: tripCounter,
+    _initializeTrip(
+      tripCounter,
+      _fare,
+      _details,
+      _rankName,
+      _registration,
+      _verified,
+      _capacity
+    );
+    emit TripCreated(tripCounter, msg.sender, _fare, _details);
+    return tripCounter;
+  }
+
+  function _initializeTrip(
+    uint256 _tripCode,
+    uint256 _fare,
+    string memory _details,
+    string memory _rankName,
+    string memory _registration,
+    bool _verified,
+    uint256 _capacity
+  ) internal {
+    trips[_tripCode] = Trip({
+      tripCode: _tripCode,
       rankName: _rankName,
       registration: _registration,
       verified: _verified,
       route: _details,
       price: _fare,
-      capacity: 0,
+      capacity: _capacity,
       driver: msg.sender,
       passengers: new address[](0),
       transactionHash: bytes32(0),
       completed: false
     });
-
-    emit TripCreated(tripCounter, msg.sender, _fare, _details);
-    return tripCounter;
-  }
-
-  function joinTrip(
-    uint256 _tripCode
-  ) public payable tripExists(_tripCode) tripNotCompleted(_tripCode) {
-    Trip storage trip = trips[_tripCode];
-    // require(msg.value == trip.price, 'Exact fare required');
-
-    uint256 taxAmount = (trip.price * taxRate) / 100;
-    uint256 paymentAmount = trip.price - taxAmount;
-
-    payable(trip.driver).transfer(paymentAmount);
-
-    trip.passengers.push(msg.sender);
-    trip.transactionHash = blockhash(block.number - 1);
-
-    emit PassengerJoinedTrip(
-      _tripCode,
-      msg.sender,
-      paymentAmount,
-      taxAmount,
-      trip.transactionHash
-    );
   }
 
   function completeTrip(
@@ -156,4 +171,68 @@ contract TaxiService {
       trip.completed
     );
   }
+
+  function getTransactionDetails(
+    bytes32 _transactionHash
+  )
+    public
+    view
+    returns (
+      uint256 tripCode,
+      address passenger,
+      uint256 amount,
+      uint256 tax,
+      uint256 timestamp
+    )
+  {
+    Transaction storage txn = transactions[_transactionHash];
+    return (txn.tripCode, txn.passenger, txn.amount, txn.tax, txn.timestamp);
+  }
+
+  function joinTrip(uint256 _tripCode) public payable {
+    Trip storage trip = trips[_tripCode];
+    require(trip.passengers.length < trip.capacity, 'Trip is full');
+    require(msg.value == trip.price, 'Incorrect payment amount');
+
+    // calculate tax
+    uint256 taxAmount = (msg.value * taxRate) / 100;
+    uint256 netAmount = msg.value - taxAmount;
+
+    // transfer net amount to trip driver
+    (bool success, ) = trip.driver.call{ value: netAmount, gas: 2300 }('');
+    require(success, 'Transfer to driver failed');
+
+    // store tax in contract
+    totalTaxCollected += taxAmount;
+
+    // Checks-Effects-Interactions pattern
+    trip.passengers.push(msg.sender);
+
+    // save transaction details
+    bytes32 transactionHash = keccak256(
+      abi.encodePacked(_tripCode, msg.sender, block.timestamp)
+    );
+    transactions[transactionHash] = Transaction({
+      tripCode: _tripCode,
+      passenger: msg.sender,
+      amount: netAmount,
+      tax: taxAmount,
+      transactionHash: transactionHash,
+      timestamp: block.timestamp
+    });
+
+    // trigger PassengerJoinedTrip event
+    emit PassengerJoinedTrip(
+      _tripCode,
+      msg.sender,
+      netAmount,
+      taxAmount,
+      transactionHash
+    );
+  }
+
+  // fallback function to handle unexpected Ether transfers
+  fallback() external payable {}
+
+  receive() external payable {}
 }

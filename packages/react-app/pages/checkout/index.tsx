@@ -11,6 +11,7 @@ import PopUpLoader from '@/components/PopupLoader/';
 import { FaQrcode } from 'react-icons/fa';
 import { QRScanner } from '@/components/QRScanner'; // Import the new QRScanner component
 import { toast } from 'react-toastify';
+import MiniPayModal from '@/components/PayModalMiniPay';
 
 let checkoutCalls = 0;
 
@@ -91,7 +92,7 @@ const Checkout: React.FC = () => {
           toast.error('Incorrect code, please try again');
         }
       } catch (error) {
-        console.error(error);
+        console.error('Error checking trip code:', error);
         setCodeError('Error checking code');
         toast.error('Error checking code');
       } finally {
@@ -125,7 +126,11 @@ const Checkout: React.FC = () => {
     <div className={styles.checkoutContainer}>
       {isVerifying && <PopUpLoader />}
       {showPaymentModal && (
-        <PayModal
+        // <PayModal
+        //   TaxiData={taxiData}
+        //   setShowPaymentModal={setShowPaymentModal}
+        // />
+        <MiniPayModal
           TaxiData={taxiData}
           setShowPaymentModal={setShowPaymentModal}
         />
