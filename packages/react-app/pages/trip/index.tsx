@@ -4,7 +4,13 @@ import React, { useEffect, useState } from 'react';
 import { FaStar, FaUser, FaRoute } from 'react-icons/fa';
 import { ethers } from 'ethers';
 import styles from './trip.module.css';
-import { abi, contractAddress } from '@/lib/contractConfig';
+import {
+  abi,
+  contractAddress,
+  mainnetAbi,
+  mainnetContractAddress,
+} from '@/lib/contractConfig';
+import { useAccount } from 'wagmi';
 
 const dummyTaxiData: iTaxiData = {
   tripCode: 0,
@@ -23,13 +29,18 @@ const TripPage: React.FC = () => {
   const [rating, setRating] = useState<number>(0);
   const [hover, setHover] = useState<number>(0);
   const [tripStatus, setTripStatus] = useState<string>('not started');
+  const account = useAccount();
 
   useEffect(() => {
     const fetchTripData = async () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
 
-      const contract = new ethers.Contract(contractAddress, abi, signer);
+      const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+      const CONTRACT_ADDRESS = account?.chain?.testnet
+        ? contractAddress
+        : mainnetContractAddress;
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
       const tripCode = taxiData.tripCode;
       const tripDetails = await contract.getTripDetails(tripCode);

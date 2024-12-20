@@ -13,7 +13,12 @@ import Image from 'next/image';
 import { FaCheckDouble, FaCopy } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
-import { contractAddress, abi } from '@/lib/contractConfig';
+import {
+  contractAddress,
+  abi,
+  mainnetAbi,
+  mainnetContractAddress,
+} from '@/lib/contractConfig';
 import { toast } from 'react-toastify';
 import { useAccount } from 'wagmi';
 
@@ -45,7 +50,11 @@ const MiniPayModal: React.FC<iMiniPayModal> = ({
   const { signer, contract } = useMemo(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, abi, signer);
+    const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+    const CONTRACT_ADDRESS = account?.chain?.testnet
+      ? contractAddress
+      : mainnetContractAddress;
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
     return { provider, signer, contract };
   }, [contractAddress, abi]);
 

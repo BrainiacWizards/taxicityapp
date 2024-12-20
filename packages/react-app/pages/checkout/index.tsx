@@ -6,7 +6,12 @@ import { useConnect, useAccount } from 'wagmi';
 import PayModal from '@/components/PayModal';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
-import { abi, contractAddress } from '@/lib/contractConfig';
+import {
+  abi,
+  contractAddress,
+  mainnetAbi,
+  mainnetContractAddress,
+} from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader/';
 import { FaQrcode } from 'react-icons/fa';
 import { QRScanner } from '@/components/QRScanner'; // Import the new QRScanner component
@@ -37,6 +42,7 @@ const Checkout: React.FC = () => {
   const { openConnectModal } = useConnectModal();
   const { connectors } = useConnect();
   const inputRef = useRef<HTMLInputElement>(null);
+  const account = useAccount();
 
   useEffect(() => {
     toast.warn('We will need permission to access your camera for QR code.');
@@ -65,7 +71,11 @@ const Checkout: React.FC = () => {
           (await connectors[0].getProvider()) as ethers.providers.ExternalProvider
         );
         const signer = provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, abi, signer);
+        const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+        const CONTRACT_ADDRESS = account?.chain?.testnet
+          ? contractAddress
+          : mainnetContractAddress;
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
         const tripCode = parseInt(accessCode);
         const tripDetails = await contract.getTripDetails(tripCode);

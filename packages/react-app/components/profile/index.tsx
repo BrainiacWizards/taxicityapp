@@ -41,8 +41,12 @@ const ProfilePage: React.FC = () => {
   const account = useAccount();
   const { data: balanceData, isLoading: balanceLoading } = useBalance({
     address: account.address,
-    token: STABLE_TOKEN_ADDRESS,
+    token: account?.chain?.testnet
+      ? STABLE_TOKEN_ADDRESS
+      : '0x471EcE3750Da237f93B8E339c536989b8978a438',
   });
+
+  console.log(account);
 
   useEffect(() => {
     if (account.address) {

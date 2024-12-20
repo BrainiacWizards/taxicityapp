@@ -3,13 +3,19 @@ import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import { ethers } from 'ethers';
 import styles from './create-trip.module.css';
-import { abi, contractAddress } from '@/lib/contractConfig';
+import {
+  abi,
+  contractAddress,
+  mainnetAbi,
+  mainnetContractAddress,
+} from '@/lib/contractConfig';
 import { iRank, iRoute, iTaxi, iTaxiData } from '@/models/RankMapModels';
 import TaxiDetails from '@/components/TaxiDetails';
 import DriverLayout from '@/components/DriverLayout';
 import PopUpLoader from '@/components/PopupLoader/';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator'; // Import the QRCodeGenerator component
 import { constructRouteString, findRank, findRoute } from '@/lib/helpers';
+import { useAccount } from 'wagmi';
 
 const CreateTrip: React.FC = () => {
   const [driverName, setDriverName] = useState('');
@@ -25,6 +31,7 @@ const CreateTrip: React.FC = () => {
   const [tripCode, setTripCode] = useState<string | null>(null);
   const [generateQRCode, setGenerateQRCode] = useState(false);
   const [selectedPrice, setSelectedPrice] = useState<string | number>(0);
+  const account = useAccount();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,7 +102,12 @@ const CreateTrip: React.FC = () => {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(contractAddress, abi, signer);
+
+      const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+      const CONTRACT_ADDRESS = account?.chain?.testnet
+        ? contractAddress
+        : mainnetContractAddress;
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
       const route = selectedTaxi.route;
       if (!route) throw new Error('Route not found');
