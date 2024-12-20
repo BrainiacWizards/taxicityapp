@@ -8,8 +8,15 @@ import {
   FaMapMarkerAlt,
 } from 'react-icons/fa';
 import DriverLayout from '@/components/DriverLayout';
-import { abi, contractAddress } from '@/lib/contractConfig';
+import {
+  abi,
+  contractAddress,
+  mainnetAbi,
+  mainnetContractAddress,
+} from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader';
+import { useAccount } from 'wagmi';
+import { Account } from 'viem';
 
 interface iTrip {
   rankName: string;
@@ -26,13 +33,18 @@ const updateTripStatus = async (
   tripId: string,
   newStatus: 'completed' | 'ongoing' | 'not started',
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  setTrips: React.Dispatch<React.SetStateAction<iTrip[]>>
+  setTrips: React.Dispatch<React.SetStateAction<iTrip[]>>,
+  account: any
 ) => {
   try {
     setLoading(true);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, abi, signer);
+    const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+    const CONTRACT_ADDRESS = account?.chain?.testnet
+      ? contractAddress
+      : mainnetContractAddress;
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
 
     await contract.updateTripStatus(tripId, newStatus === 'completed');
 
@@ -144,13 +156,18 @@ const UserTripHistoryPage: React.FC = () => {
   const [sortCriteria, setSortCriteria] = useState<keyof iTrip>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [loading, setLoading] = useState(true);
+  const account = useAccount();
 
   useEffect(() => {
     const fetchTrips = async () => {
       setLoading(true);
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(contractAddress, abi, provider);
+        const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+        const CONTRACT_ADDRESS = account?.chain?.testnet
+          ? contractAddress
+          : mainnetContractAddress;
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
         const tripCount = await contract.tripCounter();
 
         const tripPromises = Array.from(
@@ -217,7 +234,7 @@ const UserTripHistoryPage: React.FC = () => {
     tripId: string,
     newStatus: 'completed' | 'ongoing' | 'not started'
   ) => {
-    updateTripStatus(tripId, newStatus, setLoading, setTrips);
+    updateTripStatus(tripId, newStatus, setLoading, setTrips, account);
   };
 
   return (

@@ -13,8 +13,14 @@ import Image from 'next/image';
 import { FaCheckDouble, FaCopy } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { ethers } from 'ethers';
-import { contractAddress, abi } from '@/lib/contractConfig';
+import {
+  contractAddress,
+  abi,
+  mainnetContractAddress,
+  mainnetAbi,
+} from '@/lib/contractConfig';
 import { toast } from 'react-toastify';
+import { useAccount } from 'wagmi';
 
 interface iPayModal {
   TaxiData: iTaxiData;
@@ -30,6 +36,7 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const paymentInfoRef = useRef<HTMLDivElement>(null);
   const [copyIcon, setCopyIcon] = useState(<FaCopy size={20} />);
   const router = useRouter();
+  const account = useAccount();
 
   const logPayment = useCallback((status: PaymentState, message: string) => {
     setPaymentState(status);
@@ -40,7 +47,11 @@ const PayModal: React.FC<iPayModal> = ({ TaxiData, setShowPaymentModal }) => {
   const { contract } = useMemo(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, abi, signer);
+    const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+    const CONTRACT_ADDRESS = account?.chain?.testnet
+      ? contractAddress
+      : mainnetContractAddress;
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
     return { provider, signer, contract };
   }, [contractAddress, abi]);
 

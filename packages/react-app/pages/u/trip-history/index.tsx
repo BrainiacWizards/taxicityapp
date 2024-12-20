@@ -8,8 +8,14 @@ import {
   FaMapMarkerAlt,
 } from 'react-icons/fa';
 import UserLayout from '@/components/UserLayout';
-import { abi, contractAddress } from '@/lib/contractConfig';
+import {
+  abi,
+  contractAddress,
+  mainnetAbi,
+  mainnetContractAddress,
+} from '@/lib/contractConfig';
 import PopUpLoader from '@/components/PopupLoader'; // Import the PopUpLoader component
+import { useAccount } from 'wagmi';
 
 interface iTrip {
   rankName: string;
@@ -98,12 +104,17 @@ const UserTripHistoryPage: React.FC = () => {
   const [loading, setLoading] = useState(true); // Add loading state
   const [sortCriteria, setSortCriteria] = useState<keyof iTrip>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const account = useAccount();
 
   useEffect(() => {
     const fetchTrips = async () => {
       setLoading(true); // Set loading to true when fetching starts
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const contract = new ethers.Contract(contractAddress, abi, provider);
+      const ABI = account?.chain?.testnet ? abi : mainnetAbi;
+      const CONTRACT_ADDRESS = account?.chain?.testnet
+        ? contractAddress
+        : mainnetContractAddress;
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, provider);
 
       const tripCounter = await contract.tripCounter();
       const tripPromises: Promise<any>[] = [];
