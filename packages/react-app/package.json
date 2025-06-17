@@ -13,7 +13,7 @@
     "@celo/contractkit": "^8.3.1",
     "@heroicons/react": "^2.0.18",
     "@rainbow-me/rainbowkit": "^2.1.6",
-    "@sentry/nextjs": "^8.32.0",
+    "@sentry/nextjs": "^9.29.0",
     "@tanstack/react-query": "^5.28.6",
     "@taxicityapp/react-app": "file:",
     "@vis.gl/react-google-maps": "^1.2.0",
